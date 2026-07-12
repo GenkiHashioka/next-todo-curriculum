@@ -71,7 +71,7 @@ export function LoginForm() {
       // フィールドごとのエラー状態を設定する。 STEP3 MOD START
       if (!validationInput.success) {
         // エラーメッセージを一覧で取得
-        const errors = validationInput.error.errors;
+        const errors = validationInput.error.issues;
 
         // err.path[0]でエラー対象のフィールド名を特定して、対応するエラーstateを更新
         errors.forEach((err) => {

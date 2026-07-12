@@ -149,7 +149,8 @@ describe('Validation Module', () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data).toEqual(validData);
+        // Zod 4 では completed の default(false) がパース結果に適用される
+        expect(result.data).toEqual({ ...validData, completed: false });
       }
     });
 

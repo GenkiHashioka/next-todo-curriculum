@@ -105,7 +105,7 @@ export async function PUT(request: NextRequest): Promise<Response> {
 
     if (err instanceof z.ZodError) {
       // バリデーションエラーの詳細レスポンス
-      const errorMessages = err.errors.map((error) => error.message).join(', ');
+      const errorMessages = err.issues.map((error) => error.message).join(', ');
       return error(`入力データが正しくありません: ${errorMessages}`, 400);
     }
 

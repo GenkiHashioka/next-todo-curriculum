@@ -77,7 +77,7 @@ export function PasswordChangeForm() {
       // バリデーション失敗時の処理
       if (!result.success) {
         // エラーメッセージを一覧で取得
-        const errors = result.error.errors;
+        const errors = result.error.issues;
         // 各フィールドのエラーメッセージを設定
         errors.forEach((err) => {
           if (err.path[0] === 'currentPassword') {

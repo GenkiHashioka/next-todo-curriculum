@@ -138,7 +138,7 @@ export function UserCreateForm({ currentUserRole, onSuccess }: UserCreateFormPro
     // フィールドごとにエラー状態を設定する
     if (!validationInput.success) {
       // エラーメッセージを一覧で取得
-      const errors = validationInput.error.errors;
+      const errors = validationInput.error.issues;
 
       // err.path[0]でフィールド名を特定し、対応するエラーステートにメッセージを設定
       errors.forEach((err) => {

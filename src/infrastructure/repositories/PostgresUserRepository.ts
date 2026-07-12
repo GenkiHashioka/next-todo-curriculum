@@ -16,7 +16,7 @@
  */
 
 import bcrypt from 'bcryptjs';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'node:crypto';
 import {
   type CreateUserInput,
   type UpdateUserInput,
@@ -39,7 +39,7 @@ import { dbNowJST, dbValueToJST } from '@/lib/date-utils';
  * 認証情報の管理、データの整合性確保などの機能を含みます。
  *
  * セキュリティ機能:
- * - bcryptによるパスワードハッシュ化（ソルトラウンド: 10）
+ * - bcryptによるパスワードハッシュ化（ソルトラウンド: 12）
  * - SQLインジェクション対策のパラメータ化クエリ
  * - 論理削除による安全なデータ管理
  *
@@ -184,7 +184,7 @@ export class PostgresUserRepository implements UserRepository {
    * ```
    */
   async create(input: CreateUserInput): Promise<User> {
-    const id = uuidv4();
+    const id = randomUUID();
     const hashedPassword = await bcrypt.hash(input.password, 12);
     const now = dbNowJST();
 
@@ -533,7 +533,7 @@ export class PostgresUserRepository implements UserRepository {
    *
    * @security
    * - 現在のパスワードを bcrypt で検証
-   * - 新しいパスワードを bcrypt でハッシュ化（ソルトラウンド: 10）
+   * - 新しいパスワードを bcrypt でハッシュ化（ソルトラウンド: 12）
    * - SQLインジェクション対策のパラメータ化クエリ
    * - 論理削除されたユーザーは更新対象外
    */

@@ -72,7 +72,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
 
       // バリデーションエラー時の処理
       if (!validationInput.success) {
-        const errors = validationInput.error.errors;
+        const errors = validationInput.error.issues;
         errors.forEach((err) => {
           if (err.path[0] === 'username') setUsernameError(err.message);
           if (err.path[0] === 'password') setPasswordError(err.message);

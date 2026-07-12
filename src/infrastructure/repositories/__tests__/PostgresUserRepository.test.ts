@@ -2,8 +2,8 @@
  * @jest-environment node
  */
 
+import { randomUUID } from 'node:crypto';
 import type { QueryResult } from 'pg';
-import { v4 as uuidv4 } from 'uuid';
 import { UserRole } from '../../../domain/entities/User';
 import { database } from '../../database/connection';
 import { PostgresUserRepository } from '../PostgresUserRepository';
@@ -13,12 +13,15 @@ jest.mock('../../database/connection');
 jest.mock('bcryptjs', () => ({
   hash: jest.fn(),
 }));
-jest.mock('uuid');
+jest.mock('node:crypto', () => ({
+  ...jest.requireActual('node:crypto'),
+  randomUUID: jest.fn(),
+}));
 
 const mockDatabase = database as jest.Mocked<typeof database>;
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const bcrypt = require('bcryptjs');
-const mockUuidv4 = uuidv4 as jest.MockedFunction<typeof uuidv4>;
+const mockRandomUUID = randomUUID as jest.MockedFunction<typeof randomUUID>;
 
 describe('PostgresUserRepository', () => {
   let repository: PostgresUserRepository;
@@ -215,7 +218,7 @@ describe('PostgresUserRepository', () => {
         createdBy: 'admin',
       };
 
-      mockUuidv4.mockReturnValue(newUserId);
+      mockRandomUUID.mockReturnValue(newUserId);
       bcrypt.hash.mockResolvedValue(hashedPassword);
 
       const mockRow = {
@@ -264,8 +267,8 @@ describe('PostgresUserRepository', () => {
         deleted: false,
       });
 
-      expect(bcrypt.hash).toHaveBeenCalledWith(createUserInput.password, 10);
-      expect(mockUuidv4).toHaveBeenCalled();
+      expect(bcrypt.hash).toHaveBeenCalledWith(createUserInput.password, 12);
+      expect(mockRandomUUID).toHaveBeenCalled();
     });
 
     it('should create user with minimal data', async () => {
@@ -279,7 +282,7 @@ describe('PostgresUserRepository', () => {
         createdBy: 'system',
       };
 
-      mockUuidv4.mockReturnValue(newUserId);
+      mockRandomUUID.mockReturnValue(newUserId);
       bcrypt.hash.mockResolvedValue(hashedPassword);
 
       const mockRow = {

@@ -15,7 +15,7 @@
  * @since 1.0.0
  */
 
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'node:crypto';
 import type { CreateTodoInput, Todo, UpdateTodoInput } from '@/domain/entities/Todo';
 import type { TodoRepository } from '@/domain/repositories/TodoRepository';
 import { database } from '@/infrastructure/database/connection';
@@ -294,7 +294,7 @@ export class PostgresTodoRepository implements TodoRepository {
    * ```
    */
   async create(input: CreateTodoInput): Promise<Todo> {
-    const id = uuidv4();
+    const id = randomUUID();
     const now = dbNowJST();
 
     const query = `

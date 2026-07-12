@@ -177,6 +177,7 @@ describe('/api/todos API エンドポイント', () => {
       expect(mockContainer.todoUseCase.createTodo).toHaveBeenCalledWith({
         title: 'New Todo',
         descriptions: 'New Description',
+        completed: false,
         userId: 'user-123',
       });
       expect(mockResponseLib.success).toHaveBeenCalledWith(

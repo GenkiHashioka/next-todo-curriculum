@@ -17,7 +17,7 @@
  * @since 1.0.0
  */
 
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'node:crypto';
 import type { CreateTodoInput, Todo, UpdateTodoInput } from '@/domain/entities/Todo';
 import { database } from '@/infrastructure/database/connection';
 import { PostgresTodoRepository } from '../PostgresTodoRepository';
@@ -29,13 +29,14 @@ jest.mock('@/infrastructure/database/connection', () => ({
   },
 }));
 
-// UUIDモジュールをモック化（予測可能なIDを生成）
-jest.mock('uuid', () => ({
-  v4: jest.fn(),
+// crypto.randomUUID をモック化（予測可能なIDを生成）
+jest.mock('node:crypto', () => ({
+  ...jest.requireActual('node:crypto'),
+  randomUUID: jest.fn(),
 }));
 
 const mockDatabase = database as jest.Mocked<typeof database>;
-const mockUuidv4 = uuidv4 as jest.MockedFunction<typeof uuidv4>;
+const mockRandomUUID = randomUUID as jest.MockedFunction<typeof randomUUID>;
 
 describe('PostgresTodoRepository', () => {
   let repository: PostgresTodoRepository;
@@ -209,7 +210,7 @@ describe('PostgresTodoRepository', () => {
       const mockId = 'new-todo-id';
       const mockDate = new Date('2024-01-01T12:00:00Z');
 
-      mockUuidv4.mockReturnValue(mockId);
+      mockRandomUUID.mockReturnValue(mockId);
       const originalDate = global.Date;
       global.Date = jest.fn(() => mockDate) as unknown as DateConstructor;
 
@@ -269,7 +270,7 @@ describe('PostgresTodoRepository', () => {
       const mockId = 'new-todo-id';
       const mockDate = new Date('2024-01-01T12:00:00Z');
 
-      mockUuidv4.mockReturnValue(mockId);
+      mockRandomUUID.mockReturnValue(mockId);
       const originalDate = global.Date;
       global.Date = jest.fn(() => mockDate) as unknown as DateConstructor;
 
