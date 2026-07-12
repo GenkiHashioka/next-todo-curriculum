@@ -1,5 +1,5 @@
 'use client';
-import { Card, CardBody, Skeleton } from '@heroui/react';
+import { Card, Skeleton } from '@heroui/react';
 
 // スケルトン表示用のIDリスト。indexをキーとして使用した場合lintエラーになるため、固定のIDを使用。
 const SKELETON_IDS = [
@@ -19,7 +19,7 @@ export default function Loading() {
   return (
     <div className="container mx-auto p-4 max-w-2xl">
       <Card>
-        <CardBody className="gap-4">
+        <Card.Content className="gap-4">
           <Skeleton className="w-48 h-8 rounded-lg mb-4" />
           {/* フォームフィールドのスケルトン（5件） */}
           {SKELETON_IDS.map((id) => (
@@ -33,7 +33,7 @@ export default function Loading() {
             <Skeleton className="flex-1 h-10 rounded-lg" />
             <Skeleton className="flex-1 h-10 rounded-lg" />
           </div>
-        </CardBody>
+        </Card.Content>
       </Card>
     </div>
   );

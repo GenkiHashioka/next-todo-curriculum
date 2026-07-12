@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, CardBody, CardFooter, CardHeader } from '@heroui/react';
+import { Button, Card } from '@heroui/react';
 
 /**
  * プロフィールページのエラー表示コンポーネント
@@ -19,15 +19,15 @@ export default function ErrorPage({
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="max-w-md w-full">
-        <CardHeader className="flex flex-col items-start gap-1">
+        <Card.Header className="flex flex-col items-start gap-1">
           <h2 className="text-2xl font-bold text-danger">
             プロフィールの読み込みエラー
           </h2>
           {error.digest && (
             <p className="text-small text-default-500">エラーID: {error.digest}</p>
           )}
-        </CardHeader>
-        <CardBody>
+        </Card.Header>
+        <Card.Content>
           <p className="text-default-700 mb-2">
             プロフィール情報を取得できませんでした。
           </p>
@@ -37,14 +37,13 @@ export default function ErrorPage({
           <p className="text-small text-default-500 mt-3">
             認証エラーの可能性があります。再ログインをお試しください。
           </p>
-        </CardBody>
-        <CardFooter className="flex flex-col gap-2">
-          <Button color="primary" onPress={reset} className="w-full">
+        </Card.Content>
+        <Card.Footer className="flex flex-col gap-2">
+          <Button variant="primary" onPress={reset} className="w-full">
             再試行
           </Button>
           <Button
-            color="default"
-            variant="flat"
+            variant="secondary"
             onPress={() => {
               window.location.href = '/login';
             }}
@@ -52,7 +51,7 @@ export default function ErrorPage({
           >
             ログインページへ
           </Button>
-        </CardFooter>
+        </Card.Footer>
       </Card>
     </div>
   );

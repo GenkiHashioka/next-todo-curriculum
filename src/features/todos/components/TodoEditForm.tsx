@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, CardBody, CardHeader, Input, Textarea } from '@heroui/react';
+import { Button, Card, Input, TextArea } from '@heroui/react';
 import { type FormEvent, useCallback, useState } from 'react';
 import { z } from 'zod';
 import type { Todo } from './types';
@@ -119,10 +119,10 @@ export function TodoEditForm({
 
   return (
     <Card className="mb-8">
-      <CardHeader>
+      <Card.Header>
         <h2 className="text-2xl font-semibold text-gray-900">Todo編集</h2>
-      </CardHeader>
-      <CardBody>
+      </Card.Header>
+      <Card.Content>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* タイトル入力欄 */}
           <Input
@@ -143,7 +143,7 @@ export function TodoEditForm({
           />
 
           {/* 説明入力欄 */}
-          <Textarea
+          <TextArea
             id="descriptions"
             label="説明"
             placeholder="Todoの説明（128文字以内）"
@@ -169,15 +169,15 @@ export function TodoEditForm({
             </Button>
             <Button
               type="submit"
-              color="primary"
-              isLoading={isUpdating}
+              variant="primary"
+              isPending={isUpdating}
               className="font-medium"
             >
               {isUpdating ? '保存中' : '保存'}
             </Button>
           </div>
         </form>
-      </CardBody>
+      </Card.Content>
     </Card>
   );
 }

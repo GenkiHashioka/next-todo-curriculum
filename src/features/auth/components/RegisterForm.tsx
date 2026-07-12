@@ -187,8 +187,8 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
         {/* 登録ボタン */}
         <Button
           type="submit"
-          color="primary"
-          isLoading={isLoading}
+          variant="primary"
+          isPending={isLoading}
           className="w-full px-4 py-2"
         >
           {isLoading ? '登録中' : '登録'}
@@ -202,8 +202,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
           <Button
             as={Link}
             href="/login"
-            variant="light"
-            color="primary"
+            variant="primary"
             size="md"
             className="h-auto p-0 min-w-0 data-[hover=true]:bg-transparent font-medium"
           >

@@ -278,7 +278,7 @@ export default function UserListPage({ currentUserId, currentUserRole }: Props) 
           <Button
             as={Link}
             href="/users/create"
-            color="primary"
+            variant="primary"
             className="font-medium shadow-md hover:shadow-lg"
           >
             新規ユーザー作成
@@ -287,10 +287,10 @@ export default function UserListPage({ currentUserId, currentUserRole }: Props) 
 
         {/* 検索・フィルターCard */}
         <Card className="mb-8">
-          <CardHeader>
+          <Card.Header>
             <h3 className="text-xl font-semibold text-gray-900">検索・フィルター</h3>
-          </CardHeader>
-          <CardBody className="space-y-4">
+          </Card.Header>
+          <Card.Content className="space-y-4">
             {/* ロールフィルター、ソートのコントロール */}
             <UserSearchFilter
               searchQuery={searchQuery}
@@ -302,7 +302,7 @@ export default function UserListPage({ currentUserId, currentUserRole }: Props) 
               onSortByChange={handleSortByChange}
               onSortOrderChange={handleSortOrderChange}
             />
-          </CardBody>
+          </Card.Content>
         </Card>
 
         {/* ユーザー一覧Card */}
@@ -312,7 +312,7 @@ export default function UserListPage({ currentUserId, currentUserRole }: Props) 
             paginationInfo={paginationInfo}
             currentUserRole={currentUserRole}
             currentUserId={currentUserId}
-            isLoading={isLoading}
+            isPending={isLoading}
             onDelete={handleOpenDeleteModal}
           />
 
@@ -335,7 +335,7 @@ export default function UserListPage({ currentUserId, currentUserRole }: Props) 
             </ModalBody>
             <ModalFooter>
               <Button onPress={onClose}>キャンセル</Button>
-              <Button color="danger" onPress={handleDeleteUser} isLoading={isLoading}>
+              <Button variant="danger" onPress={handleDeleteUser} isPending={isLoading}>
                 削除
               </Button>
             </ModalFooter>

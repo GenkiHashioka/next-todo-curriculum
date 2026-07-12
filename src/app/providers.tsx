@@ -1,13 +1,13 @@
 'use client';
 
-import { HeroUIProvider } from '@heroui/react';
-import { ToastProvider } from '@heroui/toast';
+import { Toast } from '@heroui/react';
 
+// HeroUI v3 は Provider ラッパー不要。トースト表示のため Toast.Provider のみ設置する。
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <HeroUIProvider>
-      <ToastProvider />
+    <>
       {children}
-    </HeroUIProvider>
+      <Toast.Provider />
+    </>
   );
 }

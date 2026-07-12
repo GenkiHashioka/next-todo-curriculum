@@ -212,7 +212,7 @@ export default function UserDetailPage({
             </ModalBody>
             <ModalFooter>
               <Button onPress={onClose}>キャンセル</Button>
-              <Button color="danger" onPress={handleDeleteUser}>
+              <Button variant="danger" onPress={handleDeleteUser}>
                 削除する
               </Button>
             </ModalFooter>

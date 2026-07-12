@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, CardBody, CardHeader, Input, Textarea } from '@heroui/react';
+import { Button, Card, Input, TextArea } from '@heroui/react';
 import { type FormEvent, useCallback, useState } from 'react';
 import { z } from 'zod';
 
@@ -88,10 +88,10 @@ export function TodoCreateForm({ onSubmit, isCreating }: TodoCreateFormProps) {
 
   return (
     <Card className="mb-10 p-4">
-      <CardHeader>
+      <Card.Header>
         <h2 className="text-2xl font-semibold text-gray-900">新しいTodoを作成</h2>
-      </CardHeader>
-      <CardBody>
+      </Card.Header>
+      <Card.Content>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* タイトル入力欄 */}
           <Input
@@ -112,7 +112,7 @@ export function TodoCreateForm({ onSubmit, isCreating }: TodoCreateFormProps) {
           />
 
           {/* 説明入力欄 */}
-          <Textarea
+          <TextArea
             id="description"
             label="説明"
             placeholder="Todoの説明（128文字以内）"
@@ -130,15 +130,15 @@ export function TodoCreateForm({ onSubmit, isCreating }: TodoCreateFormProps) {
           <div className="flex justify-end">
             <Button
               type="submit"
-              color="primary"
-              isLoading={isCreating}
+              variant="primary"
+              isPending={isCreating}
               className="px-8 py-2.5 font-medium"
             >
               {isCreating ? '作成中' : '作成'}
             </Button>
           </div>
         </form>
-      </CardBody>
+      </Card.Content>
     </Card>
   );
 }

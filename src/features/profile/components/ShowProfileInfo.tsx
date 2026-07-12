@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, CardBody, CardHeader } from '@heroui/react';
+import { Button, Card } from '@heroui/react';
 import type { User } from './types';
 
 /**
@@ -21,14 +21,14 @@ interface ShowProfileInfoProps {
 export function ShowProfileInfo({ user, onEdit }: ShowProfileInfoProps) {
   return (
     <Card className="p-6 mb-8">
-      <CardHeader className="justify-between mb-4">
+      <Card.Header className="justify-between mb-4">
         <h2 className="text-2xl font-semibold text-gray-900">プロフィール情報</h2>
-        <Button type="button" onPress={onEdit} color="primary" className="font-medium">
+        <Button type="button" onPress={onEdit} variant="primary" className="font-medium">
           編集
         </Button>
-      </CardHeader>
+      </Card.Header>
 
-      <CardBody className="space-y-4">
+      <Card.Content className="space-y-4">
         <div>
           <p className="text-sm font-medium text-gray-600 mb-1">ユーザー名</p>
           <p className="text-gray-900">{user.username}</p>
@@ -41,7 +41,7 @@ export function ShowProfileInfo({ user, onEdit }: ShowProfileInfoProps) {
           <p className="text-sm font-medium text-gray-600 mb-1">名</p>
           <p className="text-gray-900">{user.firstName || '未設定'}</p>
         </div>
-      </CardBody>
+      </Card.Content>
     </Card>
   );
 }

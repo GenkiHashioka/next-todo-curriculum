@@ -1,5 +1,5 @@
 'use client';
-import { CardBody } from '@heroui/react';
+import { } from '@heroui/react';
 import type { PaginationInfo, User } from './types';
 import { UserListItem } from './UserListItem';
 
@@ -33,7 +33,7 @@ export function UserList({
   onDelete,
 }: UserListProps) {
   return (
-    <CardBody>
+    <Card.Content>
       {/* ヘッダー部分 */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-semibold text-gray-900">ユーザー一覧</h2>
@@ -78,6 +78,6 @@ export function UserList({
           />
         ))}
       </div>
-    </CardBody>
+    </Card.Content>
   );
 }

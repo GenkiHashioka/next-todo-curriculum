@@ -76,14 +76,14 @@ export function UserInfoEditForm({
 
   return (
     <Card className="p-8 mb-8">
-      <CardHeader className="flex items-center justify-between mb-6">
+      <Card.Header className="flex items-center justify-between mb-6">
         <h3 className="text-2xl font-semibold text-gray-900">ユーザー情報編集</h3>
         <div className="flex items-center gap-3">
           <Button
             type="button"
             onPress={handleSave}
-            color="primary"
-            isLoading={isSaving}
+            variant="primary"
+            isPending={isSaving}
             className="font-medium"
           >
             {isSaving ? '保存中' : '保存'}
@@ -99,8 +99,8 @@ export function UserInfoEditForm({
             キャンセル
           </Button>
         </div>
-      </CardHeader>
-      <CardBody className="space-y-6">
+      </Card.Header>
+      <Card.Content className="space-y-6">
         {/* 名前編集 */}
 
         {/* ユーザー名 */}
@@ -167,7 +167,7 @@ export function UserInfoEditForm({
             ))}
           </Select>
         </div>
-      </CardBody>
+      </Card.Content>
     </Card>
   );
 }

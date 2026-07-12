@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, CardBody, CardFooter, CardHeader, Input } from '@heroui/react';
+import { Button, Card, Input } from '@heroui/react';
 import { type FormEvent, useCallback, useState } from 'react';
 import { z } from 'zod';
 
@@ -163,19 +163,19 @@ export function PasswordChangeForm() {
 
   return (
     <Card className="p-6">
-      <CardHeader className="justify-between mb-4">
+      <Card.Header className="justify-between mb-4">
         <h2 className="text-2xl font-semibold text-gray-900">パスワード変更</h2>
         {!isChanging && (
           <Button
             type="button"
             onPress={() => setIsChanging(true)}
-            color="primary"
+            variant="primary"
             className="font-medium"
           >
             変更
           </Button>
         )}
-      </CardHeader>
+      </Card.Header>
 
       {/* 成功メッセージ */}
       {successMessage && (
@@ -194,7 +194,7 @@ export function PasswordChangeForm() {
       {isChanging ? (
         // 変更フォーム
         <form onSubmit={handleChange}>
-          <CardBody className="space-y-6">
+          <Card.Content className="space-y-6">
             <Input
               id="currentPassword"
               type="password"
@@ -243,9 +243,9 @@ export function PasswordChangeForm() {
               isInvalid={!!confirmPasswordError}
               errorMessage={confirmPasswordError}
             />
-          </CardBody>
+          </Card.Content>
 
-          <CardFooter className="justify-end gap-3">
+          <Card.Footer className="justify-end gap-3">
             <Button
               type="button"
               onPress={handleCancel}
@@ -256,13 +256,13 @@ export function PasswordChangeForm() {
             </Button>
             <Button
               type="submit"
-              isLoading={isSaving}
-              color="primary"
+              isPending={isSaving}
+              variant="primary"
               className="font-medium"
             >
               {isSaving ? '変更中' : '変更'}
             </Button>
-          </CardFooter>
+          </Card.Footer>
         </form>
       ) : (
         // 通常表示

@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, CardBody, CardHeader } from '@heroui/react';
+import { Card } from '@heroui/react';
 import { useState } from 'react';
 import type { Todo } from './types';
 
@@ -50,30 +50,30 @@ export function UserTodoList({
 
   return (
     <Card className='p-8'>
-      <CardHeader className='justify-between'>
+      <Card.Header className='justify-between'>
         <h3 className='text-2xl font-semibold text-gray-900 mb-6'>
           最近のTodo
         </h3>
         {todos.length > 0 && <span>全{todos.length}件</span>}
-      </CardHeader>
+      </Card.Header>
 
       {/* Todoが一件もない場合の表示 */}
       {!cannotViewTodos && todos.length === 0 && (
-        <CardBody className='text-center py-12'>
+        <Card.Content className='text-center py-12'>
           <p className='text-gray-500'>Todoがありません</p>
-        </CardBody>
+        </Card.Content>
       )}
 
       {/* MANAGER権限でほかのユーザーの詳細ページを参照している場合 */}
       {cannotViewTodos && (
-        <CardBody className='text-center py-12'>
+        <Card.Content className='text-center py-12'>
           <p className='text-gray-500 text-sm'>
             他のユーザーのTodoは閲覧できません
           </p>
           <p className='text-gray-400 text-xs mt-2'>
             MANAGER権限では自分のTodoのみ閲覧可能です
           </p>
-        </CardBody>
+        </Card.Content>
       )}
 
       {/* Todoリスト表示部分 */}

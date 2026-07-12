@@ -1,5 +1,5 @@
 'use client';
-import { Button, Card, CardBody } from '@heroui/react';
+import { Button, Card } from '@heroui/react';
 import Link from 'next/link';
 import { getFullName, getRoleStyle, roleLabels, type User } from './types';
 
@@ -31,7 +31,7 @@ export function UserListItem({
 }: UserListItemProps) {
   return (
     <Card className="bg-gray-50 hover:bg-gray-100 hover:border-primary transition-all">
-      <CardBody className="flex flex-row items-center justify-between">
+      <Card.Content className="flex flex-row items-center justify-between">
         <div className="flex items-center gap-4 flex-1">
           {/* ユーザー情報 */}
           <div className="flex-1">
@@ -63,7 +63,7 @@ export function UserListItem({
           <Button
             as={Link}
             href={`/users/${user.id}`}
-            color="primary"
+            variant="primary"
             size="sm"
             className="font-medium"
           >
@@ -75,7 +75,7 @@ export function UserListItem({
             <Button
               type="button"
               onPress={() => onDelete(user.id)}
-              color="danger"
+              variant="danger"
               size="sm"
               className="font-medium"
             >
@@ -83,7 +83,7 @@ export function UserListItem({
             </Button>
           )}
         </div>
-      </CardBody>
+      </Card.Content>
     </Card>
   );
 }

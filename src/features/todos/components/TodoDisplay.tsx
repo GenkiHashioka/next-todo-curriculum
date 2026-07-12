@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, CardBody, CardHeader, Chip } from '@heroui/react';
+import { Button, Card, Chip } from '@heroui/react';
 import type { Todo } from './types';
 
 /**
@@ -28,16 +28,16 @@ export function TodoDisplay({ todo, onEdit, onDelete }: TodoDisplayProps) {
 
   return (
     <Card className="mb-8">
-      <CardHeader className="flex items-center justify-between">
+      <Card.Header className="flex items-center justify-between">
         <h2 className="text-2xl font-semibold text-gray-900">Todo 詳細</h2>
 
         {/* 完了ステータス */}
-        <Chip color={todo.completed ? 'success' : 'warning'} variant="flat" size="lg">
+        <Chip color={todo.completed ? 'success' : 'warning'} variant="soft" size="lg">
           {todo.completed ? '完了' : '未完了'}
         </Chip>
-      </CardHeader>
+      </Card.Header>
 
-      <CardBody className="space-y-6">
+      <Card.Content className="space-y-6">
         {/* タイトル */}
         <div>
           <h3 className="text-sm font-medium text-gray-500 mb-2">タイトル</h3>
@@ -78,7 +78,7 @@ export function TodoDisplay({ todo, onEdit, onDelete }: TodoDisplayProps) {
         <div className="flex justify-end gap-3 pt-4">
           <Button
             type="button"
-            color="danger"
+            variant="danger"
             onPress={onDelete}
             className="font-medium"
           >
@@ -86,14 +86,14 @@ export function TodoDisplay({ todo, onEdit, onDelete }: TodoDisplayProps) {
           </Button>
           <Button
             type="button"
-            color="primary"
+            variant="primary"
             onPress={onEdit}
             className="font-medium"
           >
             編集
           </Button>
         </div>
-      </CardBody>
+      </Card.Content>
     </Card>
   );
 }

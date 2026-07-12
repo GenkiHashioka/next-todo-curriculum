@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, CardBody, CardFooter, CardHeader } from '@heroui/react';
+import { Card } from '@heroui/react';
 import Link from 'next/link';
 import { TodoItem } from './TodoItem';
 import type { Todo } from './types';
@@ -29,34 +29,34 @@ export function UserTodoList({ todos, maxDisplay = 20 }: UserTodoListProps) {
 
   return (
     <Card className="p-8 mb-8">
-      <CardHeader>
+      <Card.Header>
         <h2 className="text-2xl font-semibold text-gray-900 mb-6">最近のTodo</h2>
-      </CardHeader>
+      </Card.Header>
 
       {/* Todoがない場合の表示 */}
       {todos.length === 0 && (
-        <CardBody>
+        <Card.Content>
           <p className="text-center text-gray-500 py-8">Todoがありません</p>
-        </CardBody>
+        </Card.Content>
       )}
 
       {/* Todo一覧の表示 */}
-      <CardBody className="space-y-4">
+      <Card.Content className="space-y-4">
         {displayTodos.map((todo) => (
           <TodoItem key={todo.id} todo={todo} />
         ))}
-      </CardBody>
+      </Card.Content>
 
       {/* すべてのTodoを見るリンク */}
       {hasMoreTodos && (
-        <CardFooter className="text-right">
+        <Card.Footer className="text-right">
           <Link
             href="/todos"
             className="text-blue-500 hover:text-blue-600 font-medium transition-colors"
           >
             すべてのTodoを見る ({todos.length}件) →
           </Link>
-        </CardFooter>
+        </Card.Footer>
       )}
     </Card>
   );

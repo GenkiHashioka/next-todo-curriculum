@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, CardFooter } from '@heroui/react';
+import { Button } from '@heroui/react';
 import type { PaginationInfo } from './types';
 
 /**
@@ -30,7 +30,7 @@ export function UserPagination({
   }
 
   return (
-    <CardFooter className="justify-between mt-8 pt-6 border-t border-gray-200">
+    <Card.Footer className="justify-between mt-8 pt-6 border-t border-gray-200">
       <Button
         type="button"
         onPress={() => onPageChange(currentPage - 1)}
@@ -54,6 +54,6 @@ export function UserPagination({
       >
         次のページ
       </Button>
-    </CardFooter>
+    </Card.Footer>
   );
 }

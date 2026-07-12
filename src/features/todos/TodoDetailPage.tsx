@@ -245,7 +245,7 @@ export default function TodoDetailPage({
             </ModalBody>
             <ModalFooter>
               <Button onPress={onClose}>キャンセル</Button>
-              <Button color="danger" onPress={handleDeleteTodo} isLoading={isLoading}>
+              <Button variant="danger" onPress={handleDeleteTodo} isPending={isLoading}>
                 {isLoading ? '削除中' : '削除する'}
               </Button>
             </ModalFooter>

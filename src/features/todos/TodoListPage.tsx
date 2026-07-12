@@ -317,7 +317,7 @@ Props) {
 
         {/* フィルター・ソートコントロール */}
         <Card className="mb-8 p-4">
-          <CardBody>
+          <Card.Content>
             <TodoFilter
               completedFilter={completedFilter}
               sortBy={sortBy}
@@ -326,12 +326,12 @@ Props) {
               onSortByChange={handleSortByChange}
               onSortOrderChange={handleSortOrderChange}
             />
-          </CardBody>
+          </Card.Content>
         </Card>
 
         {/* Todo一覧表示 */}
         <Card>
-          <CardBody>
+          <Card.Content>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-semibold text-gray-900">Todo一覧</h2>
 
@@ -350,7 +350,7 @@ Props) {
             </div>
             <TodoList
               todos={todos}
-              isLoading={isLoading}
+              isPending={isLoading}
               onToggleComplete={toggleCompleteTodo}
               onDelete={openDeleteModal}
             />
@@ -363,7 +363,7 @@ Props) {
                 onPageChange={setPage}
               />
             )}
-          </CardBody>
+          </Card.Content>
         </Card>
 
         <Modal isOpen={isOpen} onClose={onClose} isDismissable={false}>
@@ -377,7 +377,7 @@ Props) {
             </ModalBody>
             <ModalFooter>
               <Button onPress={onClose}>キャンセル</Button>
-              <Button color="danger" onPress={handleDeleteTodo} isLoading={isLoading}>
+              <Button variant="danger" onPress={handleDeleteTodo} isPending={isLoading}>
                 {isLoading ? '削除中' : '削除する'}
               </Button>
             </ModalFooter>

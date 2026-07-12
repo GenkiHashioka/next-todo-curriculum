@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, CardBody, CardFooter } from '@heroui/react';
+import { Button } from '@heroui/react';
 import type { Todo } from './types';
 import { UserTodoItem } from './UserTodoItem';
 
@@ -37,15 +37,15 @@ export function UserTodoListContents({
   return (
     <div>
       {/* Todoリストコンテンツ */}
-      <CardBody className='space-y-4'>
+      <Card.Content className='space-y-4'>
         {displayTodos.map((todo) => (
           <UserTodoItem key={todo.id} todo={todo} />
         ))}
-      </CardBody>
+      </Card.Content>
 
       {/* もっと見るボタン */}
       {hasMoreTodos && (
-        <CardFooter className='justify-center mt-4'>
+        <Card.Footer className='justify-center mt-4'>
           <Button
             type='button'
             onPress={onLoadMoreTodos}
@@ -54,16 +54,16 @@ export function UserTodoListContents({
           >
             もっと見る
           </Button>
-        </CardFooter>
+        </Card.Footer>
       )}
 
       {/* 全件表示完了メッセージ */}
       {isAllDisplayed && (
-        <CardFooter className='justify-center mt-4'>
+        <Card.Footer className='justify-center mt-4'>
           <p className='text-sm text-gray-500'>
             すべてのTodoが表示されています
           </p>
-        </CardFooter>
+        </Card.Footer>
       )}
     </div>
   );

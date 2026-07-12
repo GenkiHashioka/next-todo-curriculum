@@ -113,40 +113,61 @@ export function LoginForm() {
       {/* ログインフォーム */}
       <form onSubmit={handleSubmit} className="space-y-6">
         {/*ユーザー名の入力 */}
-        <Input
-          id="username"
-          type="text"
-          value={username}
-          onChange={(e) => {
-            setUsername(e.target.value);
-            setUsernameError(''); // エラーメッセージをクリア
-          }}
-          disabled={isLoading}
-          placeholder="ユーザー名を入力"
-          label="ユーザー名"
-          isRequired
-          validationBehavior="aria"
-          isInvalid={!!usernameError}
-          errorMessage={usernameError}
-        />
+        <div className="flex flex-col gap-1.5">
+          <label
+            htmlFor="username"
+            className="text-sm font-medium text-foreground"
+          >
+            ユーザー名
+          </label>
+          <Input
+            id="username"
+            type="text"
+            value={username}
+            onChange={(e) => {
+              setUsername(e.target.value);
+              setUsernameError(''); // エラーメッセージをクリア
+            }}
+            disabled={isLoading}
+            placeholder="ユーザー名を入力"
+            aria-label="ユーザー名"
+            aria-invalid={!!usernameError}
+            className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
+          />
+          {usernameError && (
+            <span className="text-danger text-sm" role="alert">
+              {usernameError}
+            </span>
+          )}
+        </div>
         {/*パスワードの入力 */}
-        <Input
-          id="password"
-          type="password"
-          value={password}
-          onChange={(e) => {
-            setPassword(e.target.value);
-            setPasswordError(''); // エラーメッセージをクリア
-          }}
-          disabled={isLoading}
-          placeholder="パスワードを入力"
-          label="パスワード"
-          isRequired
-          // ブラウザ標準のバリデーション表示を無効化
-          validationBehavior="aria"
-          isInvalid={!!passwordError}
-          errorMessage={passwordError}
-        />
+        <div className="flex flex-col gap-1.5">
+          <label
+            htmlFor="password"
+            className="text-sm font-medium text-foreground"
+          >
+            パスワード
+          </label>
+          <Input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setPasswordError(''); // エラーメッセージをクリア
+            }}
+            disabled={isLoading}
+            placeholder="パスワードを入力"
+            aria-label="パスワード"
+            aria-invalid={!!passwordError}
+            className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
+          />
+          {passwordError && (
+            <span className="text-danger text-sm" role="alert">
+              {passwordError}
+            </span>
+          )}
+        </div>
 
         {/*ログイン時エラーメッセージの表示 */}
         {error && (
@@ -157,8 +178,8 @@ export function LoginForm() {
         {/* ログインボタン */}
         <Button
           type="submit"
-          color="primary"
-          isLoading={isLoading}
+          variant="primary"
+          isPending={isLoading}
           className="w-full px-4 py-2"
         >
           ログイン
@@ -171,8 +192,7 @@ export function LoginForm() {
           <Button
             as={Link}
             href="/register"
-            variant="light"
-            color="primary"
+            variant="primary"
             size="md"
             className="h-auto p-0 min-w-0 data-[hover=true]:bg-transparent font-medium"
           >

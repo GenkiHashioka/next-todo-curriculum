@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, CardBody, Checkbox } from '@heroui/react';
+import { Button, Card, Checkbox } from '@heroui/react';
 import Link from 'next/link';
 import type { Todo } from './types';
 
@@ -29,7 +29,7 @@ export function TodoItem({ todo, onToggleComplete, onDelete }: TodoItemProps) {
       key={todo.id}
       className="bg-gray-50 hover:bg-gray-100 hover:border-primary transition-all"
     >
-      <CardBody className="flex flex-row items-center justify-between">
+      <Card.Content className="flex flex-row items-center justify-between">
         <div className="flex items-start gap-4 flex-1">
           {/* 完了チェックボックス */}
           <Checkbox
@@ -70,7 +70,7 @@ export function TodoItem({ todo, onToggleComplete, onDelete }: TodoItemProps) {
           {/* 詳細ボタン */}
           <Button
             type="button"
-            color="primary"
+            variant="primary"
             as={Link}
             href={`/todos/${todo.id}`}
             className="font-medium"
@@ -81,7 +81,7 @@ export function TodoItem({ todo, onToggleComplete, onDelete }: TodoItemProps) {
           {/* 削除ボタン */}
           <Button
             type="button"
-            color="danger"
+            variant="danger"
             onPress={() => onDelete(todo.id)}
             className="font-medium"
           >
@@ -89,7 +89,7 @@ export function TodoItem({ todo, onToggleComplete, onDelete }: TodoItemProps) {
           </Button>
           {/* STEP3 MOD END */}
         </div>
-      </CardBody>
+      </Card.Content>
     </Card>
   );
 }

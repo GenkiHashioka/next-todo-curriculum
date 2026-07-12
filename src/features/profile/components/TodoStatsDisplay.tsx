@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, CardBody, CardHeader } from '@heroui/react';
+import { Card } from '@heroui/react';
 import type { TodoStats } from './types';
 
 /**
@@ -29,11 +29,11 @@ export function TodoStatsDisplay({ stats }: TodoStatsDisplayProps) {
 
   return (
     <Card className="shadow-md rounded-lg p-8 mb-8">
-      <CardHeader>
+      <Card.Header>
         <h2 className="text-2xl font-semibold text-gray-900 mb-6">Todo統計</h2>
-      </CardHeader>
+      </Card.Header>
 
-      <CardBody className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <Card.Content className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {/* 総Todo数 */}
         <div className="bg-blue-50 rounded-lg p-4 text-center">
           <p className="text-sm font-medium text-blue-600 mb-1">総Todo数</p>
@@ -59,7 +59,7 @@ export function TodoStatsDisplay({ stats }: TodoStatsDisplayProps) {
             {stats.completionRate.toFixed(1)}%
           </p>
         </div>
-      </CardBody>
+      </Card.Content>
     </Card>
   );
 }

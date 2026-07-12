@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, CardBody, CardFooter, CardHeader, Input } from '@heroui/react';
+import { Button, Card, Input } from '@heroui/react';
 import { type FormEvent, useCallback, useState } from 'react';
 import { z } from 'zod';
 import { updateCurrentUserProfile } from '@/lib/api';
@@ -141,9 +141,9 @@ export function EditProfileInfo({ user, onSuccess, onCancel }: EditProfileInfoPr
 
   return (
     <Card className="p-6 mb-8">
-      <CardHeader className="justify-between mb-4">
+      <Card.Header className="justify-between mb-4">
         <h2 className="text-2xl font-semibold text-gray-900">プロフィール情報</h2>
-      </CardHeader>
+      </Card.Header>
       {/* エラーメッセージ */}
       {error && (
         <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -152,7 +152,7 @@ export function EditProfileInfo({ user, onSuccess, onCancel }: EditProfileInfoPr
       )}
 
       <form onSubmit={handleUpdate}>
-        <CardBody className="space-y-6">
+        <Card.Content className="space-y-6">
           <Input
             id="username"
             type="text"
@@ -188,9 +188,9 @@ export function EditProfileInfo({ user, onSuccess, onCancel }: EditProfileInfoPr
             isInvalid={!!firstNameError}
             errorMessage={firstNameError}
           />
-        </CardBody>
+        </Card.Content>
 
-        <CardFooter className="justify-end gap-3">
+        <Card.Footer className="justify-end gap-3">
           <Button
             type="button"
             onPress={handleCancel}
@@ -201,13 +201,13 @@ export function EditProfileInfo({ user, onSuccess, onCancel }: EditProfileInfoPr
           </Button>
           <Button
             type="submit"
-            isLoading={isSaving}
-            color="primary"
+            isPending={isSaving}
+            variant="primary"
             className="font-medium"
           >
             {isSaving ? '保存中' : '保存'}
           </Button>
-        </CardFooter>
+        </Card.Footer>
       </form>
     </Card>
   );

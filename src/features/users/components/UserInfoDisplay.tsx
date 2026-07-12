@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, CardBody, CardFooter, CardHeader } from '@heroui/react';
+import { Button, Card } from '@heroui/react';
 import type { User } from './types';
 import { getFullName, getRoleStyle, roleLabels } from './types';
 /**
@@ -37,26 +37,26 @@ export function UserInfoDisplay({
 }: UserInfoDisplayProps) {
   return (
     <Card className="p-8 mb-8">
-      <CardHeader className="flex items-center justify-between mb-6">
+      <Card.Header className="flex items-center justify-between mb-6">
         <h3 className="text-2xl font-semibold text-gray-900">ユーザー情報</h3>
         {/* 編集ボタン(ADMINのみ) */}
         {currentUserRole === 1 && (
           <Button
             type="button"
             onPress={onEdit}
-            color="primary"
+            variant="primary"
             className="font-medium"
           >
             編集
           </Button>
           // STEP3 MOD END
         )}
-      </CardHeader>
+      </Card.Header>
 
       {/* ユーザー情報表示 */}
 
       {/* 編集モードでない場合 */}
-      <CardBody className="space-y-4">
+      <Card.Content className="space-y-4">
         {/* ユーザー名 */}
         <div>
           <label
@@ -124,21 +124,21 @@ export function UserInfoDisplay({
             </p>
           </div>
         </div>
-      </CardBody>
+      </Card.Content>
 
       {/* 削除ボタン（ADMINのみ、自分以外） */}
       {currentUserRole === 1 && currentUserId !== user.id && (
-        <CardFooter className="mt-6">
+        <Card.Footer className="mt-6">
           {/* button → Button STEP3 MOD START */}
           <Button
             type="button"
             onPress={onDelete}
-            color="danger"
+            variant="danger"
             className="font-medium"
           >
             このユーザーを削除
           </Button>
-        </CardFooter>
+        </Card.Footer>
       )}
     </Card>
   );

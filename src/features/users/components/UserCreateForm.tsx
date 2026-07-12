@@ -195,16 +195,16 @@ export function UserCreateForm({ currentUserRole, onSuccess }: UserCreateFormPro
       {/* ユーザー作成フォーム */}
       {/* ユーザー作成フォーム */}
       <Card className="p-8">
-        <CardHeader>
+        <Card.Header>
           <h3 className="text-2xl font-semibold text-gray-900 mb-2">
             ユーザー情報入力
           </h3>
-        </CardHeader>
+        </Card.Header>
 
         {/* 入力フォーム */}
         <form onSubmit={handleSubmit} className="space-y-2">
           {/* ユーザー入力 */}
-          <CardBody>
+          <Card.Content>
             {/* input → Input に変更 STEP3 MOD START */}
             <Input
               id="username"
@@ -223,10 +223,10 @@ export function UserCreateForm({ currentUserRole, onSuccess }: UserCreateFormPro
             />
             {/* STEP3 MOD END */}
             <p className="text-xs text-gray-500 mt-1">1～50文字で入力してください</p>
-          </CardBody>
+          </Card.Content>
 
           {/* パスワード入力 */}
-          <CardBody className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card.Content className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               {/* input → Input に変更 STEP3 MOD START */}
               <Input
@@ -267,10 +267,10 @@ export function UserCreateForm({ currentUserRole, onSuccess }: UserCreateFormPro
                 errorMessage={confirmPasswordError}
               />
             </div>
-          </CardBody>
+          </Card.Content>
 
           {/* 名前入力 */}
-          <CardBody className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card.Content className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* 姓 */}
             <div>
               <Input
@@ -294,10 +294,10 @@ export function UserCreateForm({ currentUserRole, onSuccess }: UserCreateFormPro
                 placeholder="名"
               />
             </div>
-          </CardBody>
+          </Card.Content>
 
           {/* 権限選択 */}
-          <CardBody>
+          <Card.Content>
             <Select
               id="role"
               label="ロール"
@@ -314,22 +314,22 @@ export function UserCreateForm({ currentUserRole, onSuccess }: UserCreateFormPro
                 <SelectItem key={String(role.value)}>{role.label}</SelectItem>
               ))}
             </Select>
-          </CardBody>
+          </Card.Content>
 
           {/* 送信ボタン */}
-          <CardFooter className="justify-end gap-4 pt-6">
+          <Card.Footer className="justify-end gap-4 pt-6">
             <Button as={Link} href="/users" className="font-medium">
               キャンセル
             </Button>
             <Button
               type="submit"
-              color="primary"
-              isLoading={isCreating}
+              variant="primary"
+              isPending={isCreating}
               className="font-medium"
             >
               {isCreating ? '作成中' : 'ユーザーを作成'}
             </Button>
-          </CardFooter>
+          </Card.Footer>
         </form>
       </Card>
     </div>
