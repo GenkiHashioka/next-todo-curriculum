@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@heroui/react';
+import { Button, Card } from '@heroui/react';
 import type { Todo } from './types';
 import { UserTodoItem } from './UserTodoItem';
 
@@ -49,7 +49,7 @@ export function UserTodoListContents({
           <Button
             type='button'
             onPress={onLoadMoreTodos}
-            color='primary'
+            variant='primary'
             className='font-medium'
           >
             もっと見る

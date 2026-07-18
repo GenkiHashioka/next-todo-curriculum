@@ -2,15 +2,10 @@
 
 import {
   Button,
+  buttonVariants,
   Card,
-  CardBody,
-  CardHeader,
   Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  useDisclosure,
+  useOverlayState,
 } from '@heroui/react';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
@@ -72,7 +67,7 @@ export default function UserListPage({ currentUserId, currentUserRole }: Props) 
   const [userToDeleteId, setUserToDeleteId] = useState<string | null>(null);
 
   // ユーザー削除モーダル関連のステートと関数を追加
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, open, close } = useOverlayState();
 
   /**
    * ユーザー一覧データを取得する非同期関数。
@@ -193,7 +188,7 @@ export default function UserListPage({ currentUserId, currentUserRole }: Props) 
    */
   const handleOpenDeleteModal = (userId: string) => {
     setUserToDeleteId(userId);
-    onOpen();
+    open();
   };
 
   /**
@@ -207,7 +202,7 @@ export default function UserListPage({ currentUserId, currentUserRole }: Props) 
     if (!userToDeleteId) return;
 
     // モーダルを閉じる
-    onClose();
+    close();
 
     // エラーメッセージと成功メッセージをクリア
     setError('');
@@ -275,14 +270,15 @@ export default function UserListPage({ currentUserId, currentUserRole }: Props) 
             <h2 className="text-3xl font-bold text-gray-900">ユーザー管理</h2>
           </div>
           {/* 新規ユーザー作成ボタン */}
-          <Button
-            as={Link}
+          <Link
             href="/users/create"
-            variant="primary"
-            className="font-medium shadow-md hover:shadow-lg"
+            className={buttonVariants({
+              variant: 'primary',
+              className: 'font-medium shadow-md hover:shadow-lg',
+            })}
           >
             新規ユーザー作成
-          </Button>
+          </Link>
         </div>
 
         {/* 検索・フィルターCard */}
@@ -312,7 +308,7 @@ export default function UserListPage({ currentUserId, currentUserRole }: Props) 
             paginationInfo={paginationInfo}
             currentUserRole={currentUserRole}
             currentUserId={currentUserId}
-            isPending={isLoading}
+            isLoading={isLoading}
             onDelete={handleOpenDeleteModal}
           />
 
@@ -324,22 +320,37 @@ export default function UserListPage({ currentUserId, currentUserRole }: Props) 
           />
         </Card>
 
-        <Modal isOpen={isOpen} onClose={onClose} isDismissable={false}>
-          <ModalContent>
-            <ModalHeader className="flex flex-col gap-1">削除確認</ModalHeader>
-            <ModalBody>
-              <p className="text-gray-700">このユーザーを削除してもよろしいですか？</p>
-              <p className="text-sm text-gray-500 mt-2">
-                この操作は取り消すことができません。
-              </p>
-            </ModalBody>
-            <ModalFooter>
-              <Button onPress={onClose}>キャンセル</Button>
-              <Button variant="danger" onPress={handleDeleteUser} isPending={isLoading}>
-                削除
-              </Button>
-            </ModalFooter>
-          </ModalContent>
+        <Modal isOpen={isOpen} onOpenChange={(o) => !o && close()}>
+          <Modal.Backdrop>
+            <Modal.Container>
+              <Modal.Dialog>
+                <Modal.Header>
+                  <Modal.Heading>削除確認</Modal.Heading>
+                  <Modal.CloseTrigger />
+                </Modal.Header>
+                <Modal.Body>
+                  <p className="text-gray-700">
+                    このユーザーを削除してもよろしいですか？
+                  </p>
+                  <p className="text-sm text-gray-500 mt-2">
+                    この操作は取り消すことができません。
+                  </p>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button variant="secondary" onPress={close}>
+                    キャンセル
+                  </Button>
+                  <Button
+                    variant="danger"
+                    onPress={handleDeleteUser}
+                    isPending={isLoading}
+                  >
+                    削除
+                  </Button>
+                </Modal.Footer>
+              </Modal.Dialog>
+            </Modal.Container>
+          </Modal.Backdrop>
         </Modal>
       </main>
     </div>

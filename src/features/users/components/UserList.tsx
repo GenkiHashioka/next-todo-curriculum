@@ -1,5 +1,5 @@
 'use client';
-import { } from '@heroui/react';
+import { Card } from '@heroui/react';
 import type { PaginationInfo, User } from './types';
 import { UserListItem } from './UserListItem';
 

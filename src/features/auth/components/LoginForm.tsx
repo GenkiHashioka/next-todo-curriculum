@@ -189,15 +189,12 @@ export function LoginForm() {
       <div className="mt-6 text-center">
         <p className="text-sm text-gray-600 flex items-center justify-center gap-1">
           アカウントをお持ちでない場合は
-          <Button
-            as={Link}
+          <Link
             href="/register"
-            variant="primary"
-            size="md"
-            className="h-auto p-0 min-w-0 data-[hover=true]:bg-transparent font-medium"
+            className="text-primary font-medium hover:underline"
           >
             新規登録
-          </Button>
+          </Link>
         </p>
       </div>
     </Card>

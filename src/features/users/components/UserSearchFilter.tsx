@@ -1,7 +1,11 @@
 'use client';
 
-import { Input, Select, SelectItem } from '@heroui/react';
+import { Input, ListBox, Select } from '@heroui/react';
 import type { RoleFilter, SortBy, SortOrder } from './types';
+
+/** 入力・Select トリガーの共通クラス（HeroUI v2 bordered 相当） */
+const fieldClass =
+  'flex w-full items-center justify-between rounded-medium border border-default-200 bg-default-50 px-3 py-2 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30';
 
 /**
  * UserSearchFilterのPropsタイプ定義
@@ -48,69 +52,129 @@ export function UserSearchFilter({
   return (
     <div className="space-y-4">
       {/* 検索ボックス */}
-      <Input
-        id="search"
-        label="ユーザー名"
-        type="text"
-        value={searchQuery}
-        onChange={(e) => {
-          onSearchChange(e.target.value);
-        }}
-        placeholder="ユーザー名で検索"
-      />
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="search" className="text-sm font-medium text-foreground">
+          ユーザー名
+        </label>
+        <Input
+          id="search"
+          type="text"
+          value={searchQuery}
+          onChange={(e) => {
+            onSearchChange(e.target.value);
+          }}
+          placeholder="ユーザー名で検索"
+          aria-label="ユーザー名"
+          className={fieldClass}
+        />
+      </div>
 
       {/* ロールフィルター */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div>
-          <Select
-            id="roleFilter"
-            label="ロールフィルター"
-            selectedKeys={[String(roleFilter)]}
-            onSelectionChange={(keys) => {
-              // Set から最初の要素を取得
-              const selected = Array.from(keys)[0] as string;
-              // 'all' の場合はそのまま、数値の場合は Number に変換
-              onRoleFilterChange(selected === 'all' ? 'all' : Number(selected));
-            }}
+        <div className="flex flex-col gap-1.5">
+          <label
+            htmlFor="roleFilter"
+            className="text-sm font-medium text-foreground"
           >
-            <SelectItem key="all">すべて</SelectItem>
-            <SelectItem key="1">ADMIN</SelectItem>
-            <SelectItem key="2">MANAGER</SelectItem>
-            <SelectItem key="3">USER</SelectItem>
-            <SelectItem key="4">GUEST</SelectItem>
+            ロールフィルター
+          </label>
+          <Select
+            aria-label="ロールフィルター"
+            selectedKey={String(roleFilter)}
+            onSelectionChange={(key) =>
+              onRoleFilterChange(key === 'all' ? 'all' : Number(key))
+            }
+          >
+            <Select.Trigger className={fieldClass}>
+              <Select.Value />
+              <Select.Indicator />
+            </Select.Trigger>
+            <Select.Popover>
+              <ListBox>
+                <ListBox.Item id="all" textValue="すべて">
+                  すべて
+                </ListBox.Item>
+                <ListBox.Item id="1" textValue="ADMIN">
+                  ADMIN
+                </ListBox.Item>
+                <ListBox.Item id="2" textValue="MANAGER">
+                  MANAGER
+                </ListBox.Item>
+                <ListBox.Item id="3" textValue="USER">
+                  USER
+                </ListBox.Item>
+                <ListBox.Item id="4" textValue="GUEST">
+                  GUEST
+                </ListBox.Item>
+              </ListBox>
+            </Select.Popover>
           </Select>
         </div>
         {/* ソート項目 */}
-        <div>
-          <Select
-            id="sortBy"
-            label="並び順"
-            selectedKeys={[sortBy]}
-            onSelectionChange={(keys) => {
-              const selected = Array.from(keys)[0] as SortBy;
-              onSortByChange(selected);
-            }}
+        <div className="flex flex-col gap-1.5">
+          <label
+            htmlFor="sortBy"
+            className="text-sm font-medium text-foreground"
           >
-            <SelectItem key="createdAt">作成日時</SelectItem>
-            <SelectItem key="username">ユーザー名</SelectItem>
-            <SelectItem key="firstName">名前</SelectItem>
-            <SelectItem key="lastName">姓</SelectItem>
-            <SelectItem key="role">ロール</SelectItem>
+            並び順
+          </label>
+          <Select
+            aria-label="並び順"
+            selectedKey={sortBy}
+            onSelectionChange={(key) => onSortByChange(key as SortBy)}
+          >
+            <Select.Trigger className={fieldClass}>
+              <Select.Value />
+              <Select.Indicator />
+            </Select.Trigger>
+            <Select.Popover>
+              <ListBox>
+                <ListBox.Item id="createdAt" textValue="作成日時">
+                  作成日時
+                </ListBox.Item>
+                <ListBox.Item id="username" textValue="ユーザー名">
+                  ユーザー名
+                </ListBox.Item>
+                <ListBox.Item id="firstName" textValue="名前">
+                  名前
+                </ListBox.Item>
+                <ListBox.Item id="lastName" textValue="姓">
+                  姓
+                </ListBox.Item>
+                <ListBox.Item id="role" textValue="ロール">
+                  ロール
+                </ListBox.Item>
+              </ListBox>
+            </Select.Popover>
           </Select>
         </div>
 
-        <div>
-          <Select
-            id="sortOrder"
-            label="順序"
-            selectedKeys={[sortOrder]}
-            onSelectionChange={(keys) => {
-              const selected = Array.from(keys)[0] as SortOrder;
-              onSortOrderChange(selected);
-            }}
+        <div className="flex flex-col gap-1.5">
+          <label
+            htmlFor="sortOrder"
+            className="text-sm font-medium text-foreground"
           >
-            <SelectItem key="desc">降順</SelectItem>
-            <SelectItem key="asc">昇順</SelectItem>
+            順序
+          </label>
+          <Select
+            aria-label="順序"
+            selectedKey={sortOrder}
+            onSelectionChange={(key) => onSortOrderChange(key as SortOrder)}
+          >
+            <Select.Trigger className={fieldClass}>
+              <Select.Value />
+              <Select.Indicator />
+            </Select.Trigger>
+            <Select.Popover>
+              <ListBox>
+                <ListBox.Item id="desc" textValue="降順">
+                  降順
+                </ListBox.Item>
+                <ListBox.Item id="asc" textValue="昇順">
+                  昇順
+                </ListBox.Item>
+              </ListBox>
+            </Select.Popover>
           </Select>
         </div>
       </div>

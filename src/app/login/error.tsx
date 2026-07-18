@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card } from '@heroui/react';
+import { Button, buttonVariants, Card } from '@heroui/react';
 import Link from 'next/link';
 
 /**
@@ -37,14 +37,12 @@ export default function ErrorPage({
           <Button variant="primary" onPress={reset} className="flex-1">
             再試行
           </Button>
-          <Button
-            as={Link}
+          <Link
             href="/register"
-            variant="secondary"
-            className="flex-1"
+            className={buttonVariants({ variant: 'secondary', className: 'flex-1' })}
           >
             登録ページへ
-          </Button>
+          </Link>
         </Card.Footer>
       </Card>
     </div>

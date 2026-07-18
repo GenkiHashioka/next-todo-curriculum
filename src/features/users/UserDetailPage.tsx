@@ -2,13 +2,10 @@
 
 import {
   Button,
+  buttonVariants,
   Link,
   Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  useDisclosure,
+  useOverlayState,
 } from '@heroui/react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -63,7 +60,7 @@ export default function UserDetailPage({
   // 成功メッセージ
   const [successMessage, setSuccessMessage] = useState<string>('');
   // 削除確認モーダルの状態管理
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, open, close } = useOverlayState();
 
   /**
    * 編集モードに切り替えるハンドラー。
@@ -132,7 +129,7 @@ export default function UserDetailPage({
    * ユーザー削除処理
    */
   const handleDeleteUser = async () => {
-    onClose();
+    close();
 
     try {
       const result = await deleteUserAction(user.id);
@@ -171,9 +168,12 @@ export default function UserDetailPage({
           </div>
           <div className="flex items-center gap-3">
             {/* 戻るボタン */}
-            <Button type="button" as={Link} href="/users" className="font-medium">
+            <Link
+              href="/users"
+              className={buttonVariants({ className: 'font-medium' })}
+            >
               ユーザー一覧に戻る
-            </Button>
+            </Link>
           </div>
         </div>
 
@@ -183,7 +183,7 @@ export default function UserDetailPage({
             currentUserRole={currentUserRole}
             currentUserId={currentUserId}
             onEdit={handleEdit}
-            onDelete={onOpen}
+            onDelete={open}
           />
         ) : (
           <UserInfoEditForm
@@ -203,20 +203,29 @@ export default function UserDetailPage({
           targetUserId={user.id}
         />
 
-        <Modal isOpen={isOpen} onClose={onClose} isDismissable={false}>
-          <ModalContent>
-            <ModalHeader>削除確認</ModalHeader>
-            <ModalBody>
-              <p>このユーザーを削除してもよろしいですか？</p>
-              <p>この操作は取り消すことができません。</p>
-            </ModalBody>
-            <ModalFooter>
-              <Button onPress={onClose}>キャンセル</Button>
-              <Button variant="danger" onPress={handleDeleteUser}>
-                削除する
-              </Button>
-            </ModalFooter>
-          </ModalContent>
+        <Modal isOpen={isOpen} onOpenChange={(o) => !o && close()}>
+          <Modal.Backdrop>
+            <Modal.Container>
+              <Modal.Dialog>
+                <Modal.Header>
+                  <Modal.Heading>削除確認</Modal.Heading>
+                  <Modal.CloseTrigger />
+                </Modal.Header>
+                <Modal.Body>
+                  <p>このユーザーを削除してもよろしいですか？</p>
+                  <p>この操作は取り消すことができません。</p>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button variant="secondary" onPress={close}>
+                    キャンセル
+                  </Button>
+                  <Button variant="danger" onPress={handleDeleteUser}>
+                    削除する
+                  </Button>
+                </Modal.Footer>
+              </Modal.Dialog>
+            </Modal.Container>
+          </Modal.Backdrop>
         </Modal>
       </main>
     </div>

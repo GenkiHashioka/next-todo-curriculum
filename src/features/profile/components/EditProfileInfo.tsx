@@ -153,48 +153,82 @@ export function EditProfileInfo({ user, onSuccess, onCancel }: EditProfileInfoPr
 
       <form onSubmit={handleUpdate}>
         <Card.Content className="space-y-6">
-          <Input
-            id="username"
-            type="text"
-            value={user.username}
-            label="ユーザー名"
-            isReadOnly
-            isDisabled
-            className="bg-gray-50"
-          />
-          <Input
-            id="lastName"
-            type="text"
-            value={lastName}
-            onChange={(e) => {
-              setLastName(e.target.value);
-              setLastNameError('');
-            }}
-            placeholder="姓を入力"
-            label="姓"
-            isInvalid={!!lastNameError}
-            errorMessage={lastNameError}
-          />
-          <Input
-            id="firstName"
-            type="text"
-            value={firstName}
-            onChange={(e) => {
-              setFirstName(e.target.value);
-              setFirstNameError('');
-            }}
-            placeholder="名を入力"
-            label="名"
-            isInvalid={!!firstNameError}
-            errorMessage={firstNameError}
-          />
+          <div className="flex flex-col gap-1.5">
+            <label
+              htmlFor="username"
+              className="text-sm font-medium text-foreground"
+            >
+              ユーザー名
+            </label>
+            <Input
+              id="username"
+              type="text"
+              value={user.username}
+              readOnly
+              disabled
+              aria-label="ユーザー名"
+              className="w-full rounded-medium border border-default-200 bg-default-100 px-3 py-2 text-foreground outline-none"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label
+              htmlFor="lastName"
+              className="text-sm font-medium text-foreground"
+            >
+              姓
+            </label>
+            <Input
+              id="lastName"
+              type="text"
+              value={lastName}
+              onChange={(e) => {
+                setLastName(e.target.value);
+                setLastNameError('');
+              }}
+              placeholder="姓を入力"
+              aria-label="姓"
+              aria-invalid={!!lastNameError}
+              className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
+            />
+            {lastNameError && (
+              <span className="text-danger text-sm" role="alert">
+                {lastNameError}
+              </span>
+            )}
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label
+              htmlFor="firstName"
+              className="text-sm font-medium text-foreground"
+            >
+              名
+            </label>
+            <Input
+              id="firstName"
+              type="text"
+              value={firstName}
+              onChange={(e) => {
+                setFirstName(e.target.value);
+                setFirstNameError('');
+              }}
+              placeholder="名を入力"
+              aria-label="名"
+              aria-invalid={!!firstNameError}
+              className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
+            />
+            {firstNameError && (
+              <span className="text-danger text-sm" role="alert">
+                {firstNameError}
+              </span>
+            )}
+          </div>
         </Card.Content>
 
         <Card.Footer className="justify-end gap-3">
           <Button
             type="button"
             onPress={handleCancel}
-            disabled={isSaving}
+            isDisabled={isSaving}
             className="font-medium"
           >
             キャンセル

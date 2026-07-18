@@ -1,5 +1,5 @@
 'use client';
-import { Button, Card } from '@heroui/react';
+import { Button, buttonVariants, Card } from '@heroui/react';
 import Link from 'next/link';
 import { getFullName, getRoleStyle, roleLabels, type User } from './types';
 
@@ -60,15 +60,16 @@ export function UserListItem({
         {/* アクションボタン */}
         <div className="flex items-center gap-3 ml-4">
           {/* 詳細ボタン */}
-          <Button
-            as={Link}
+          <Link
             href={`/users/${user.id}`}
-            variant="primary"
-            size="sm"
-            className="font-medium"
+            className={buttonVariants({
+              variant: 'primary',
+              size: 'sm',
+              className: 'font-medium',
+            })}
           >
             詳細
-          </Button>
+          </Link>
 
           {/* ADMIN権限のユーザーのみ削除ボタンを表示 */}
           {currentUserRole === 1 && user.id !== currentUserId && (

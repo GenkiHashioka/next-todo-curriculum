@@ -94,37 +94,62 @@ export function TodoCreateForm({ onSubmit, isCreating }: TodoCreateFormProps) {
       <Card.Content>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* タイトル入力欄 */}
-          <Input
-            id="title"
-            type="text"
-            value={title}
-            onChange={(e) => {
-              setTitle(e.target.value);
-              setTitleError(''); // エラーメッセージをクリア
-            }}
-            maxLength={32}
-            placeholder="Todoのタイトル（32文字以内）"
-            label="タイトル"
-            isRequired
-            validationBehavior="aria"
-            isInvalid={!!titleError}
-            errorMessage={titleError}
-          />
+          <div className="flex flex-col gap-1.5">
+            <label
+              htmlFor="title"
+              className="text-sm font-medium text-foreground"
+            >
+              タイトル
+            </label>
+            <Input
+              id="title"
+              type="text"
+              value={title}
+              onChange={(e) => {
+                setTitle(e.target.value);
+                setTitleError(''); // エラーメッセージをクリア
+              }}
+              maxLength={32}
+              placeholder="Todoのタイトル（32文字以内）"
+              aria-label="タイトル"
+              aria-invalid={!!titleError}
+              className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
+            />
+            {titleError && (
+              <span className="text-danger text-sm" role="alert">
+                {titleError}
+              </span>
+            )}
+          </div>
 
           {/* 説明入力欄 */}
-          <TextArea
-            id="description"
-            label="説明"
-            placeholder="Todoの説明（128文字以内）"
-            value={description}
-            onChange={(e) => {
-              setDescription(e.target.value);
-              setDescriptionError(''); // エラーメッセージをクリア
-            }}
-            maxLength={128}
-            isInvalid={!!descriptionError}
-            errorMessage={descriptionError}
-          />
+          <div className="flex flex-col gap-1.5">
+            <label
+              htmlFor="description"
+              className="text-sm font-medium text-foreground"
+            >
+              説明
+            </label>
+            <TextArea
+              id="description"
+              placeholder="Todoの説明（128文字以内）"
+              value={description}
+              onChange={(e) => {
+                setDescription(e.target.value);
+                setDescriptionError(''); // エラーメッセージをクリア
+              }}
+              maxLength={128}
+              aria-label="説明"
+              aria-invalid={!!descriptionError}
+              rows={4}
+              className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
+            />
+            {descriptionError && (
+              <span className="text-danger text-sm" role="alert">
+                {descriptionError}
+              </span>
+            )}
+          </div>
 
           {/* Todo作成ボタン */}
           <div className="flex justify-end">

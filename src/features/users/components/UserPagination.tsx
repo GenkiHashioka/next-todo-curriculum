@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@heroui/react';
+import { Button, Card } from '@heroui/react';
 import type { PaginationInfo } from './types';
 
 /**
@@ -35,7 +35,7 @@ export function UserPagination({
         type="button"
         onPress={() => onPageChange(currentPage - 1)}
         isDisabled={currentPage === 1}
-        variant={currentPage === 1 ? 'flat' : 'solid'}
+        variant={currentPage === 1 ? 'secondary' : 'primary'}
         className="px-6 py-2.5"
       >
         前のページ
@@ -49,7 +49,7 @@ export function UserPagination({
         type="button"
         onPress={() => onPageChange(currentPage + 1)}
         isDisabled={currentPage === paginationInfo.totalPages}
-        variant={currentPage === paginationInfo.totalPages ? 'flat' : 'solid'}
+        variant={currentPage === paginationInfo.totalPages ? 'secondary' : 'primary'}
         className="px-6 py-2.5"
       >
         次のページ

@@ -1,18 +1,20 @@
 'use client';
 import {
   Button,
+  buttonVariants,
   Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
   Input,
+  ListBox,
   Select,
-  SelectItem,
 } from '@heroui/react';
 import Link from 'next/link';
 import { type FormEvent, useState } from 'react';
 import { z } from 'zod';
 import { createUser } from '@/lib/api';
+
+/** 入力欄の共通クラス（HeroUI v2 bordered 相当） */
+const inputClass =
+  'w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30';
 
 /**
  * ロール番号とラベルの対応表。
@@ -205,122 +207,182 @@ export function UserCreateForm({ currentUserRole, onSuccess }: UserCreateFormPro
         <form onSubmit={handleSubmit} className="space-y-2">
           {/* ユーザー入力 */}
           <Card.Content>
-            {/* input → Input に変更 STEP3 MOD START */}
-            <Input
-              id="username"
-              label="ユーザー名"
-              type="text"
-              value={username}
-              onChange={(e) => {
-                setUsername(e.target.value);
-                setUsernameError('');
-              }}
-              placeholder="username"
-              isRequired
-              validationBehavior="aria"
-              isInvalid={!!usernameError}
-              errorMessage={usernameError}
-            />
-            {/* STEP3 MOD END */}
+            <div className="flex flex-col gap-1.5">
+              <label
+                htmlFor="username"
+                className="text-sm font-medium text-foreground"
+              >
+                ユーザー名
+              </label>
+              <Input
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                  setUsernameError('');
+                }}
+                placeholder="username"
+                aria-label="ユーザー名"
+                aria-invalid={!!usernameError}
+                className={inputClass}
+              />
+              {usernameError && (
+                <span className="text-danger text-sm" role="alert">
+                  {usernameError}
+                </span>
+              )}
+            </div>
             <p className="text-xs text-gray-500 mt-1">1～50文字で入力してください</p>
           </Card.Content>
 
           {/* パスワード入力 */}
           <Card.Content className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              {/* input → Input に変更 STEP3 MOD START */}
+            <div className="flex flex-col gap-1.5">
+              <label
+                htmlFor="password"
+                className="text-sm font-medium text-foreground"
+              >
+                パスワード
+              </label>
               <Input
                 id="password"
-                label="パスワード"
                 type="password"
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
                   setPasswordError('');
                 }}
-                isRequired
-                validationBehavior="aria"
                 placeholder="6文字以上"
-                isInvalid={!!passwordError}
-                errorMessage={passwordError}
+                aria-label="パスワード"
+                aria-invalid={!!passwordError}
+                className={inputClass}
               />
-              {/* STEP3 MOD END */}
+              {passwordError && (
+                <span className="text-danger text-sm" role="alert">
+                  {passwordError}
+                </span>
+              )}
               <p className="text-xs text-gray-500 mt-1">最小6文字</p>
             </div>
 
             {/* 確認用パスワード */}
-            <div>
+            <div className="flex flex-col gap-1.5">
+              <label
+                htmlFor="confirmPassword"
+                className="text-sm font-medium text-foreground"
+              >
+                確認用パスワード
+              </label>
               <Input
                 id="confirmPassword"
                 type="password"
-                label="確認用パスワード"
                 value={confirmPassword}
                 onChange={(e) => {
                   setConfirmPassword(e.target.value);
                   setConfirmPasswordError('');
                 }}
                 disabled={isCreating}
-                isRequired
-                validationBehavior="aria"
                 placeholder="パスワードを再入力"
-                isInvalid={!!confirmPasswordError}
-                errorMessage={confirmPasswordError}
+                aria-label="確認用パスワード"
+                aria-invalid={!!confirmPasswordError}
+                className={inputClass}
               />
+              {confirmPasswordError && (
+                <span className="text-danger text-sm" role="alert">
+                  {confirmPasswordError}
+                </span>
+              )}
             </div>
           </Card.Content>
 
           {/* 名前入力 */}
           <Card.Content className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* 姓 */}
-            <div>
+            <div className="flex flex-col gap-1.5">
+              <label
+                htmlFor="lastName"
+                className="text-sm font-medium text-foreground"
+              >
+                姓
+              </label>
               <Input
                 id="lastName"
-                label="姓"
                 type="text"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 placeholder="姓"
+                aria-label="姓"
+                className={inputClass}
               />
             </div>
 
             {/* 名 */}
-            <div>
+            <div className="flex flex-col gap-1.5">
+              <label
+                htmlFor="firstName"
+                className="text-sm font-medium text-foreground"
+              >
+                名
+              </label>
               <Input
                 id="firstName"
-                label="名"
                 type="text"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 placeholder="名"
+                aria-label="名"
+                className={inputClass}
               />
             </div>
           </Card.Content>
 
           {/* 権限選択 */}
           <Card.Content>
-            <Select
-              id="role"
-              label="ロール"
-              selectedKeys={[String(role)]}
-              onSelectionChange={(keys) => {
-                const selectedValue = Array.from(keys)[0];
-                setRole(Number(selectedValue));
-              }}
-              isRequired
-              validationBehavior="aria"
-              placeholder="ロールを選択してください"
-            >
-              {canCreateRole.map((role) => (
-                <SelectItem key={String(role.value)}>{role.label}</SelectItem>
-              ))}
-            </Select>
+            <div className="flex flex-col gap-1.5">
+              <label
+                htmlFor="role"
+                className="text-sm font-medium text-foreground"
+              >
+                ロール
+              </label>
+              <Select
+                aria-label="ロール"
+                selectedKey={String(role)}
+                onSelectionChange={(key) => setRole(Number(key))}
+              >
+                <Select.Trigger className={inputClass}>
+                  <Select.Value />
+                  <Select.Indicator />
+                </Select.Trigger>
+                <Select.Popover>
+                  <ListBox>
+                    {canCreateRole.map((r) => (
+                      <ListBox.Item
+                        key={String(r.value)}
+                        id={String(r.value)}
+                        textValue={r.label}
+                      >
+                        {r.label}
+                      </ListBox.Item>
+                    ))}
+                  </ListBox>
+                </Select.Popover>
+              </Select>
+            </div>
           </Card.Content>
 
           {/* 送信ボタン */}
           <Card.Footer className="justify-end gap-4 pt-6">
-            <Button as={Link} href="/users" className="font-medium">
+            <Link
+              href="/users"
+              className={buttonVariants({
+                variant: 'secondary',
+                className: 'font-medium',
+              })}
+            >
               キャンセル
-            </Button>
+            </Link>
             <Button
               type="submit"
               variant="primary"

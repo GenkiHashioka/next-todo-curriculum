@@ -1,17 +1,13 @@
 'use client';
 
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Input,
-  Select,
-  SelectItem,
-} from '@heroui/react';
+import { Button, Card, Input, ListBox, Select } from '@heroui/react';
 import { useState } from 'react';
 import type { User } from './types';
 import { roleLabels } from './types';
+
+/** 入力欄の共通クラス（HeroUI v2 bordered 相当） */
+const inputClass =
+  'w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30';
 
 /**
  * UserInfoEditFormのPropsタイプ定義
@@ -104,67 +100,91 @@ export function UserInfoEditForm({
         {/* 名前編集 */}
 
         {/* ユーザー名 */}
-        <div>
-          {/* Inputに変更 STEP3 MOD START */}
+        <div className="flex flex-col gap-1.5">
+          <label
+            htmlFor="username"
+            className="text-sm font-medium text-foreground"
+          >
+            ユーザー名
+          </label>
           <Input
             id="username"
             type="text"
-            isDisabled
-            isReadOnly
-            label="ユーザー名"
+            disabled
+            readOnly
+            aria-label="ユーザー名"
             defaultValue={user.username}
+            className="w-full rounded-medium border border-default-200 bg-default-100 px-3 py-2 text-foreground outline-none"
           />
-          {/* STEP3 MOD END */}
         </div>
 
         {/* 姓 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            {/* input → Input STEP3 MOD START */}
+          <div className="flex flex-col gap-1.5">
+            <label
+              htmlFor="lastName"
+              className="text-sm font-medium text-foreground"
+            >
+              姓
+            </label>
             <Input
               id="lastName"
-              label="姓"
               type="text"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               placeholder="姓"
+              aria-label="姓"
+              className={inputClass}
             />
-            {/* STEP3 MOD END */}
           </div>
 
           {/* 名 */}
-          <div>
-            {/* input → Input STEP3 MOD START */}
+          <div className="flex flex-col gap-1.5">
+            <label
+              htmlFor="firstName"
+              className="text-sm font-medium text-foreground"
+            >
+              名
+            </label>
             <Input
               id="firstName"
-              label="名"
               type="text"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               placeholder="名"
+              aria-label="名"
+              className={inputClass}
             />
-            {/* STEP3 MOD END */}
           </div>
         </div>
 
         {/* 権限編集 */}
-        <div>
-          {/* select → Select STEP3 MOD START */}
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="role" className="text-sm font-medium text-foreground">
+            ロール
+          </label>
           <Select
-            id="role"
-            label="ロール"
-            selectedKeys={[String(role)]}
-            onSelectionChange={(keys) => {
-              const selectedRole = Array.from(keys)[0];
-              setRole(Number(selectedRole));
-            }}
-            isRequired
-            validationBehavior="aria"
-            placeholder="ロールを選択してください"
+            aria-label="ロール"
+            selectedKey={String(role)}
+            onSelectionChange={(key) => setRole(Number(key))}
           >
-            {editableRoles.map((roleOption) => (
-              <SelectItem key={String(roleOption.value)}>{roleOption.label}</SelectItem>
-            ))}
+            <Select.Trigger className={inputClass}>
+              <Select.Value />
+              <Select.Indicator />
+            </Select.Trigger>
+            <Select.Popover>
+              <ListBox>
+                {editableRoles.map((roleOption) => (
+                  <ListBox.Item
+                    key={String(roleOption.value)}
+                    id={String(roleOption.value)}
+                    textValue={roleOption.label}
+                  >
+                    {roleOption.label}
+                  </ListBox.Item>
+                ))}
+              </ListBox>
+            </Select.Popover>
           </Select>
         </div>
       </Card.Content>

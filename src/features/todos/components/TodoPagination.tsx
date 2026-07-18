@@ -46,7 +46,7 @@ export function TodoPagination({
           type="button"
           onPress={() => onPageChange(currentPage - 1)}
           isDisabled={isPrevDisabled}
-          variant={isPrevDisabled ? 'flat' : 'solid'}
+          variant={isPrevDisabled ? 'secondary' : 'primary'}
           className="px-6 py-2.5"
         >
           前のページ
@@ -62,7 +62,7 @@ export function TodoPagination({
           type="button"
           onPress={() => onPageChange(currentPage + 1)}
           isDisabled={isNextDisabled}
-          variant={isNextDisabled ? 'flat' : 'solid'}
+          variant={isNextDisabled ? 'secondary' : 'primary'}
           className="px-6 py-2.5"
         >
           次のページ

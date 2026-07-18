@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, Checkbox } from '@heroui/react';
+import { Button, buttonVariants, Card, Checkbox } from '@heroui/react';
 import Link from 'next/link';
 import type { Todo } from './types';
 
@@ -34,7 +34,7 @@ export function TodoItem({ todo, onToggleComplete, onDelete }: TodoItemProps) {
           {/* 完了チェックボックス */}
           <Checkbox
             isSelected={todo.completed}
-            onValueChange={() => onToggleComplete(todo)}
+            onChange={() => onToggleComplete(todo)}
             className="mt-1 h-5"
           />
 
@@ -68,15 +68,12 @@ export function TodoItem({ todo, onToggleComplete, onDelete }: TodoItemProps) {
         {/* アクションボタン */}
         <div className="flex items-center gap-3 ml-4">
           {/* 詳細ボタン */}
-          <Button
-            type="button"
-            variant="primary"
-            as={Link}
+          <Link
             href={`/todos/${todo.id}`}
-            className="font-medium"
+            className={buttonVariants({ variant: 'primary', className: 'font-medium' })}
           >
             詳細
-          </Button>
+          </Link>
 
           {/* 削除ボタン */}
           <Button

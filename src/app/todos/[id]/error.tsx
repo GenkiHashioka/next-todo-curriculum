@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card } from '@heroui/react';
+import { Button, buttonVariants, Card } from '@heroui/react';
 import Link from 'next/link';
 
 export default function ErrorPage({
@@ -31,14 +31,12 @@ export default function ErrorPage({
           <Button variant="primary" onPress={reset} className="w-full">
             再試行
           </Button>
-          <Button
-            as={Link}
+          <Link
             href="/todos"
-            variant="secondary"
-            className="w-full"
+            className={buttonVariants({ variant: 'secondary', className: 'w-full' })}
           >
             Todo一覧に戻る
-          </Button>
+          </Link>
         </Card.Footer>
       </Card>
     </div>

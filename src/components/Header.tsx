@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Navbar, NavbarBrand, NavbarContent, NavbarItem } from '@heroui/react';
+import { Button } from '@heroui/react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -96,31 +96,27 @@ export function Header() {
   }
 
   return (
-    <Navbar>
-      <NavbarBrand>
+    <header className="border-b border-gray-200 bg-white">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+        {/* ブランド */}
         <Link href="/todos" className="hover:opacity-80 transition-opacity">
           <h1 className="text-3xl font-bold text-gray-900">Todoアプリ</h1>
         </Link>
-      </NavbarBrand>
-      <NavbarContent className="hidden sm:flex gap-4" justify="center">
-        <NavbarItem>
+
+        {/* ナビゲーション */}
+        <nav className="hidden sm:flex items-center gap-6">
           <Link
             href="/todos"
-            color="foreground"
             className={
               pathname.startsWith('/todos')
                 ? 'text-blue-500 font-medium'
                 : 'text-gray-700 hover:text-blue-500 font-medium'
             }
-            // className='border-b border-gray-200'
           >
             Todo一覧
           </Link>
-        </NavbarItem>
-        <NavbarItem>
           <Link
             href="/profile"
-            color="foreground"
             className={
               pathname.startsWith('/profile')
                 ? 'text-blue-500 font-medium'
@@ -129,12 +125,9 @@ export function Header() {
           >
             プロフィール
           </Link>
-        </NavbarItem>
-        {userRole <= 2 && (
-          <NavbarItem>
+          {userRole <= 2 && (
             <Link
               href="/users"
-              color="foreground"
               className={
                 pathname.startsWith('/users')
                   ? 'text-blue-500 font-medium'
@@ -143,16 +136,19 @@ export function Header() {
             >
               ユーザー管理
             </Link>
-          </NavbarItem>
-        )}
-      </NavbarContent>
-      <NavbarContent justify="end">
-        <NavbarItem>
-          <Button type="button" onPress={handleLogout} className="font-medium">
-            ログアウト
-          </Button>
-        </NavbarItem>
-      </NavbarContent>
-    </Navbar>
+          )}
+        </nav>
+
+        {/* ログアウト */}
+        <Button
+          type="button"
+          onPress={handleLogout}
+          variant="secondary"
+          className="font-medium"
+        >
+          ログアウト
+        </Button>
+      </div>
+    </header>
   );
 }

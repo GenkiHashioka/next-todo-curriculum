@@ -3,13 +3,8 @@
 import {
   Button,
   Card,
-  CardBody,
   Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  useDisclosure,
+  useOverlayState,
 } from '@heroui/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createTodo, deleteTodo, getTodoList, updateTodo } from '@/lib/api';
@@ -107,7 +102,7 @@ Props) {
   // ユーザー権限の状態
 
   // 削除確認モーダルの状態管理 STEP3
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, open, close } = useOverlayState();
   // delete対象のTodoを特定するためのstate
   const [todoToDelete, setTodoToDelete] = useState<number | null>(null);
 
@@ -227,7 +222,7 @@ Props) {
   const openDeleteModal = (todoId: number) => {
     // 削除対象のTodo IDをstateに設定し、モーダルを開く
     setTodoToDelete(todoId);
-    onOpen();
+    open();
   };
 
   /**
@@ -240,7 +235,7 @@ Props) {
     if (!todoToDelete) return;
 
     // モーダルを閉じる
-    onClose();
+    close();
 
     setIsLoading(true);
     try {
@@ -350,7 +345,7 @@ Props) {
             </div>
             <TodoList
               todos={todos}
-              isPending={isLoading}
+              isLoading={isLoading}
               onToggleComplete={toggleCompleteTodo}
               onDelete={openDeleteModal}
             />
@@ -366,22 +361,37 @@ Props) {
           </Card.Content>
         </Card>
 
-        <Modal isOpen={isOpen} onClose={onClose} isDismissable={false}>
-          <ModalContent>
-            <ModalHeader className="flex flex-col gap-1">削除確認</ModalHeader>
-            <ModalBody>
-              <p className="text-gray-700">このTodoを削除してもよろしいですか？</p>
-              <p className="text-sm text-gray-500 mt-2">
-                この操作は取り消すことができません。
-              </p>
-            </ModalBody>
-            <ModalFooter>
-              <Button onPress={onClose}>キャンセル</Button>
-              <Button variant="danger" onPress={handleDeleteTodo} isPending={isLoading}>
-                {isLoading ? '削除中' : '削除する'}
-              </Button>
-            </ModalFooter>
-          </ModalContent>
+        <Modal isOpen={isOpen} onOpenChange={(o) => !o && close()}>
+          <Modal.Backdrop>
+            <Modal.Container>
+              <Modal.Dialog>
+                <Modal.Header>
+                  <Modal.Heading>削除確認</Modal.Heading>
+                  <Modal.CloseTrigger />
+                </Modal.Header>
+                <Modal.Body>
+                  <p className="text-gray-700">
+                    このTodoを削除してもよろしいですか？
+                  </p>
+                  <p className="text-sm text-gray-500 mt-2">
+                    この操作は取り消すことができません。
+                  </p>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button variant="secondary" onPress={close}>
+                    キャンセル
+                  </Button>
+                  <Button
+                    variant="danger"
+                    onPress={handleDeleteTodo}
+                    isPending={isLoading}
+                  >
+                    {isLoading ? '削除中' : '削除する'}
+                  </Button>
+                </Modal.Footer>
+              </Modal.Dialog>
+            </Modal.Container>
+          </Modal.Backdrop>
         </Modal>
       </main>
     </div>

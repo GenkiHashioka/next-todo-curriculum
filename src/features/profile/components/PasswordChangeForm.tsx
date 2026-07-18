@@ -195,61 +195,94 @@ export function PasswordChangeForm() {
         // 変更フォーム
         <form onSubmit={handleChange}>
           <Card.Content className="space-y-6">
-            <Input
-              id="currentPassword"
-              type="password"
-              value={currentPassword}
-              onChange={(e) => {
-                setCurrentPassword(e.target.value);
-                setCurrentPasswordError('');
-                setError('');
-              }}
-              placeholder="現在のパスワード"
-              label="現在のパスワード"
-              isRequired
-              validationBehavior="aria"
-              isInvalid={!!currentPasswordError}
-              errorMessage={currentPasswordError}
-            />
-            <Input
-              id="newPassword"
-              type="password"
-              value={newPassword}
-              onChange={(e) => {
-                setNewPassword(e.target.value);
-                setNewPasswordError('');
-                setError('');
-              }}
-              placeholder="新しいパスワード(6文字以上)"
-              label="新しいパスワード"
-              isRequired
-              validationBehavior="aria"
-              isInvalid={!!newPasswordError}
-              errorMessage={newPasswordError}
-            />
-            <Input
-              id="confirmPassword"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => {
-                setConfirmPassword(e.target.value);
-                setConfirmPasswordError('');
-                setError('');
-              }}
-              placeholder="新しいパスワードを再入力"
-              label="新しいパスワード(確認)"
-              isRequired
-              validationBehavior="aria"
-              isInvalid={!!confirmPasswordError}
-              errorMessage={confirmPasswordError}
-            />
+            <div className="flex flex-col gap-1.5">
+              <label
+                htmlFor="currentPassword"
+                className="text-sm font-medium text-foreground"
+              >
+                現在のパスワード
+              </label>
+              <Input
+                id="currentPassword"
+                type="password"
+                value={currentPassword}
+                onChange={(e) => {
+                  setCurrentPassword(e.target.value);
+                  setCurrentPasswordError('');
+                  setError('');
+                }}
+                placeholder="現在のパスワード"
+                aria-label="現在のパスワード"
+                aria-invalid={!!currentPasswordError}
+                className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
+              />
+              {currentPasswordError && (
+                <span className="text-danger text-sm" role="alert">
+                  {currentPasswordError}
+                </span>
+              )}
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label
+                htmlFor="newPassword"
+                className="text-sm font-medium text-foreground"
+              >
+                新しいパスワード
+              </label>
+              <Input
+                id="newPassword"
+                type="password"
+                value={newPassword}
+                onChange={(e) => {
+                  setNewPassword(e.target.value);
+                  setNewPasswordError('');
+                  setError('');
+                }}
+                placeholder="新しいパスワード(6文字以上)"
+                aria-label="新しいパスワード"
+                aria-invalid={!!newPasswordError}
+                className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
+              />
+              {newPasswordError && (
+                <span className="text-danger text-sm" role="alert">
+                  {newPasswordError}
+                </span>
+              )}
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label
+                htmlFor="confirmPassword"
+                className="text-sm font-medium text-foreground"
+              >
+                新しいパスワード(確認)
+              </label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                  setConfirmPasswordError('');
+                  setError('');
+                }}
+                placeholder="新しいパスワードを再入力"
+                aria-label="新しいパスワード(確認)"
+                aria-invalid={!!confirmPasswordError}
+                className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
+              />
+              {confirmPasswordError && (
+                <span className="text-danger text-sm" role="alert">
+                  {confirmPasswordError}
+                </span>
+              )}
+            </div>
           </Card.Content>
 
           <Card.Footer className="justify-end gap-3">
             <Button
               type="button"
               onPress={handleCancel}
-              disabled={isSaving}
+              isDisabled={isSaving}
               className="font-medium"
             >
               キャンセル
