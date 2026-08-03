@@ -2,3 +2,20 @@
 @import "@heroui/react/styles";
 @source "../../node_modules/@heroui/react/dist/**/*.{js,mjs}";
 @custom-variant dark (&:is(.dark *));
+
+/**
+ * 入力欄の枠線を見えるようにする。
+ *
+ * HeroUI v3 の既定テーマは `--field-border: transparent`／背景を白にしており、
+ * 「グレーのページ背景の上に白い入力欄を置く」前提になっている。
+ * 本アプリは入力欄を白い Card の中に置くため、既定のままだと
+ * 「白い面に白い入力欄・枠線なし」となり輪郭がほとんど見えない
+ * （頼りは不透明度 4〜6% の影のみ。モニタによっては判別不能）。
+ *
+ * WCAG 1.4.11 は UI 部品の輪郭に 3:1 のコントラストを求めている。
+ * 既定の transparent は 1.0:1、`--border`(#dedee0) でも 1.34:1 と不足するため、
+ * 中間グレーの `--muted`（白に対し約 2.6:1）を枠線色に採用する。
+ */
+:root {
+  --field-border: var(--muted);
+}
