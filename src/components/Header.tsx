@@ -95,59 +95,55 @@ export function Header() {
     return null;
   }
 
+  // ナビゲーションの項目。ユーザー管理は ADMIN・MANAGER のみ表示する
+  const navItems = [
+    { href: '/todos', label: 'Todo一覧' },
+    { href: '/profile', label: 'プロフィール' },
+    ...(userRole <= 2 ? [{ href: '/users', label: 'ユーザー管理' }] : []),
+  ];
+
   return (
-    <header className="border-b border-gray-200 bg-white">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+    // sticky top-0: 下にスクロールしてもヘッダーが画面上部に留まる
+    <header className="sticky top-0 z-40 border-b border-gray-200 bg-white">
+      {/* flex-wrap: 画面が狭いときはナビゲーションが 2 段目に折り返す */}
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-3 sm:px-6 sm:py-4">
         {/* ブランド */}
-        <Link href="/todos" className="hover:opacity-80 transition-opacity">
-          <h1 className="text-3xl font-bold text-gray-900">Todoアプリ</h1>
+        <Link href="/todos" className="order-1 hover:opacity-80 transition-opacity">
+          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">Todoアプリ</h1>
         </Link>
 
-        {/* ナビゲーション */}
-        <nav className="hidden sm:flex items-center gap-6">
-          <Link
-            href="/todos"
-            className={
-              pathname.startsWith('/todos')
-                ? 'text-blue-500 font-medium'
-                : 'text-gray-700 hover:text-blue-500 font-medium'
-            }
-          >
-            Todo一覧
-          </Link>
-          <Link
-            href="/profile"
-            className={
-              pathname.startsWith('/profile')
-                ? 'text-blue-500 font-medium'
-                : 'text-gray-700 hover:text-blue-500 font-medium'
-            }
-          >
-            プロフィール
-          </Link>
-          {userRole <= 2 && (
+        {/*
+          ナビゲーション
+          狭い画面では w-full で 2 段目に回し、広い画面では 1 段目に並べる。
+          （以前は hidden sm:flex で消していたため、スマホからメニューに到達できなかった）
+        */}
+        <nav className="order-3 flex w-full items-center gap-6 sm:order-2 sm:w-auto">
+          {navItems.map((item) => (
             <Link
-              href="/users"
+              key={item.href}
+              href={item.href}
               className={
-                pathname.startsWith('/users')
+                pathname.startsWith(item.href)
                   ? 'text-blue-500 font-medium'
                   : 'text-gray-700 hover:text-blue-500 font-medium'
               }
             >
-              ユーザー管理
+              {item.label}
             </Link>
-          )}
+          ))}
         </nav>
 
-        {/* ログアウト */}
-        <Button
-          type="button"
-          onPress={handleLogout}
-          variant="secondary"
-          className="font-medium"
-        >
-          ログアウト
-        </Button>
+        {/* ログアウト（狭い画面では 1 段目の右端に置く） */}
+        <div className="order-2 sm:order-3">
+          <Button
+            type="button"
+            onPress={handleLogout}
+            variant="secondary"
+            className="font-medium"
+          >
+            ログアウト
+          </Button>
+        </div>
       </div>
     </header>
   );
