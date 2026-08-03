@@ -248,7 +248,7 @@ export class JWTService {
    * ```
    */
   extractTokenFromHeader(authHeader: string | undefined): string | null {
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!authHeader?.startsWith('Bearer ')) {
       return null;
     }
     return authHeader.substring(7);
