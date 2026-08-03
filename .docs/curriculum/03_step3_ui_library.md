@@ -43,18 +43,18 @@
 Step 1・Step 2 で Tailwind CSS のみで実装していた UI を、HeroUI のコンポーネントに置き換えます。
 
 **置き換え対象**:
-- フォーム要素（Input, Textarea, Button）
+- フォーム要素（Input, TextArea, Button）
 - カード（Card）
 - モーダル（Modal）
 - テーブル・リスト表示
-- ナビゲーション（Navbar）
-- ドロップダウン（Select, Dropdown）
+- ナビゲーション（v3 に Navbar は無いので素の `<header>` で自作）
+- ドロップダウン（Select）
 - エラー表示（Error Boundary）
 - ローディング表示（Loading State）
 
 ### 1.3 制約条件
 - **コンポーネントの分割は行わない**（Step 4 で実施）
-- **カスタムフックの作成は行わない**（Step 5 で実施）
+- **カスタムフックの作成は行わない**（本カリキュラムの対象外）
 - **ファイル構成は変更しない**
 
 ---
@@ -73,20 +73,40 @@ HeroUI は React ベースの UI コンポーネントライブラリで、Next.
 
 ### 2.2 セットアップ確認
 
-プロジェクトには既に HeroUI がインストールされています（`package.json` 確認済み）。
+プロジェクトには既に HeroUI v3 がインストールされています（`package.json` 確認済み）。
+
+> **📌 HeroUI v3 について**
+> HeroUI は v3 で **React Aria ベースに再設計**され、v2 とは API が大きく変わりました。
+> 具体的な v2→v3 の対応は `.docs/heroui-v2-to-v3-migration.md` にまとまっています。
+> 本 Step では **v3 の書き方**で進めます（v2 のフラットな `CardBody` 等は使いません）。
+
+**スタイルの読み込み（`globals.css`）**:
+HeroUI v3 は Tailwind CSS v4 の CSS-first 方式です。`@import` でスタイルを読み込みます。
+
+```css
+/* src/app/globals.css */
+@import "tailwindcss";
+@import "@heroui/react/styles";
+@source "../../node_modules/@heroui/react/dist/**/*.{js,mjs}";
+@custom-variant dark (&:is(.dark *));
+```
 
 **Provider の設定**:
+HeroUI v3 では **`HeroUIProvider` によるラッパーは不要**になりました。
+トースト（通知）を使う場合のみ `Toast.Provider` を設置します。
+
 ```typescript
 // src/app/providers.tsx
 'use client'
 
-import { HeroUIProvider } from '@heroui/react'
+import { Toast } from '@heroui/react'
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <HeroUIProvider>
+    <>
       {children}
-    </HeroUIProvider>
+      <Toast.Provider />
+    </>
   )
 }
 ```
@@ -126,24 +146,39 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 />
 ```
 
-**After (HeroUI)**:
+**After (HeroUI v3)**:
 ```typescript
 import { Input } from '@heroui/react'
 
-<Input
-  type="text"
-  label="ユーザー名"
-  placeholder="ユーザー名を入力"
-  value={username}
-  onChange={(e) => setUsername(e.target.value)}
-  isRequired
-/>
+{/* v3 の Input は「素の入力要素」。ラベルとエラーは外側に自分で置く */}
+<div className="flex flex-col gap-1.5">
+  <label htmlFor="username" className="text-sm font-medium text-foreground">
+    ユーザー名
+  </label>
+  <Input
+    id="username"
+    type="text"
+    placeholder="ユーザー名を入力"
+    value={username}
+    onChange={(e) => setUsername(e.target.value)}
+    aria-label="ユーザー名"
+    aria-invalid={!!usernameError}
+    className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
+  />
+  {usernameError && (
+    <span className="text-danger text-sm" role="alert">
+      {usernameError}
+    </span>
+  )}
+</div>
 ```
 
-**ポイント**:
-- `label` プロパティでラベルを設定
-- `isRequired` で必須マークを表示
-- `errorMessage` でエラーメッセージを設定可能
+**ポイント（v3 の重要な変更点）**:
+- v3 の `Input` は React Aria ベースの**素の入力要素**。v2 にあった `label` /
+  `errorMessage` / `isRequired` プロパティは**なくなった**。
+- ラベルは外側の `<label htmlFor>`、エラーは外側の `<span role="alert">` で表現する。
+- `value` / `onChange`（イベント型 `e.target.value`）はそのまま使える。
+- 見た目は `className` で付ける（v2 のような既定の枠線は付かない）。
 
 ---
 
@@ -160,18 +195,30 @@ import { Input } from '@heroui/react'
 />
 ```
 
-**After (HeroUI)**:
+**After (HeroUI v3)**:
 ```typescript
-import { Textarea } from '@heroui/react'
+// v3 では「Textarea」→「TextArea」（大文字 A）に名称変更
+import { TextArea } from '@heroui/react'
 
-<Textarea
-  label="説明"
-  placeholder="説明を入力"
-  value={descriptions}
-  onChange={(e) => setDescriptions(e.target.value)}
-  minRows={4}
-/>
+<div className="flex flex-col gap-1.5">
+  <label htmlFor="descriptions" className="text-sm font-medium text-foreground">
+    説明
+  </label>
+  <TextArea
+    id="descriptions"
+    placeholder="説明を入力"
+    value={descriptions}
+    onChange={(e) => setDescriptions(e.target.value)}
+    rows={4}
+    aria-label="説明"
+    className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
+  />
+</div>
 ```
+
+**ポイント**:
+- コンポーネント名が `Textarea` → **`TextArea`**（大文字 A）に変わった。
+- `Input` と同じく素の入力要素なので、ラベル・エラーは外側に置く。`rows` で行数指定。
 
 ---
 
@@ -188,30 +235,45 @@ import { Textarea } from '@heroui/react'
 </button>
 ```
 
-**After (HeroUI)**:
+**After (HeroUI v3)**:
 ```typescript
 import { Button } from '@heroui/react'
 
 <Button
-  color="primary"
+  variant="primary"
   onPress={handleSubmit}
-  isLoading={isLoading}
+  isPending={isLoading}
 >
   送信
 </Button>
 ```
 
-**カラーバリエーション**:
-- `primary`: プライマリカラー（青系）
-- `secondary`: セカンダリカラー（紫系）
-- `success`: 成功（緑系）
-- `warning`: 警告（黄系）
-- `danger`: 危険（赤系）
+**ポイント（v3 の重要な変更点）**:
+- v2 の `color` プロパティは廃止 → **`variant`** で色・種類を指定する。
+- v2 の `isLoading` は **`isPending`** に、`disabled` は **`isDisabled`** に変わった。
+
+**variant バリエーション（v3）**:
+- `primary`: プライマリ（ブランド色）
+- `secondary`: セカンダリ
+- `danger` / `danger-soft`: 危険（赤系）
+- `ghost` / `outline`: 控えめ（背景なし／枠線）
 
 **サイズバリエーション**:
 - `sm`: 小
 - `md`: 中（デフォルト）
 - `lg`: 大
+
+> **リンクをボタン風にしたいとき**（画面遷移する「ボタン」）
+> v3 の `Button` は `as={Link}` を受け付けない。Next.js の `Link` に
+> `buttonVariants()` のクラスを付ける。
+> ```typescript
+> import { buttonVariants } from '@heroui/react'
+> import Link from 'next/link'
+>
+> <Link href="/todos" className={buttonVariants({ variant: 'primary' })}>
+>   Todo一覧へ
+> </Link>
+> ```
 
 ---
 
@@ -225,22 +287,26 @@ import { Button } from '@heroui/react'
 </div>
 ```
 
-**After (HeroUI)**:
+**After (HeroUI v3)**:
 ```typescript
-import { Card, CardHeader, CardBody, CardFooter } from '@heroui/react'
+// v3 は複合コンポーネント方式。CardBody は Card.Content に、
+// CardHeader/CardFooter も Card.Header / Card.Footer に変わった
+import { Card } from '@heroui/react'
 
 <Card>
-  <CardHeader>
+  <Card.Header>
     <h2 className="text-xl font-bold">タイトル</h2>
-  </CardHeader>
-  <CardBody>
+  </Card.Header>
+  <Card.Content>
     <p>コンテンツ</p>
-  </CardBody>
-  <CardFooter>
+  </Card.Content>
+  <Card.Footer>
     {/* フッター要素 */}
-  </CardFooter>
+  </Card.Footer>
 </Card>
 ```
+
+**ポイント**: `import` するのは `Card` だけ。中身は `Card.Header` / **`Card.Content`**（← 旧 `CardBody`）/ `Card.Footer` のように「ドットで繋いだ」複合 API を使う。
 
 ---
 
@@ -259,37 +325,57 @@ import { Card, CardHeader, CardBody, CardFooter } from '@heroui/react'
 )}
 ```
 
-**After (HeroUI)**:
+**After (HeroUI v3)**:
 ```typescript
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from '@heroui/react'
+// v2 の useDisclosure は廃止 → useOverlayState（open / close を使う）
+// Modal も複合 API（Modal.Backdrop / Container / Dialog / ...）に変わった
+import { Modal, Button, useOverlayState } from '@heroui/react'
 
-const { isOpen, onOpen, onClose } = useDisclosure()
+const { isOpen, open, close } = useOverlayState()
 
 <>
-  <Button onPress={onOpen}>モーダルを開く</Button>
-  
-  <Modal isOpen={isOpen} onClose={onClose}>
-    <ModalContent>
-      <ModalHeader>モーダルタイトル</ModalHeader>
-      <ModalBody>
-        <p>モーダルコンテンツ</p>
-      </ModalBody>
-      <ModalFooter>
-        <Button color="danger" variant="light" onPress={onClose}>
-          キャンセル
-        </Button>
-        <Button color="primary" onPress={onClose}>
-          OK
-        </Button>
-      </ModalFooter>
-    </ModalContent>
+  <Button onPress={open}>モーダルを開く</Button>
+
+  <Modal isOpen={isOpen} onOpenChange={(o) => !o && close()}>
+    <Modal.Backdrop>
+      <Modal.Container>
+        <Modal.Dialog>
+          <Modal.Header>
+            <Modal.Heading>モーダルタイトル</Modal.Heading>
+            <Modal.CloseTrigger />
+          </Modal.Header>
+          <Modal.Body>
+            <p>モーダルコンテンツ</p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onPress={close}>
+              キャンセル
+            </Button>
+            <Button variant="primary" onPress={close}>
+              OK
+            </Button>
+          </Modal.Footer>
+        </Modal.Dialog>
+      </Modal.Container>
+    </Modal.Backdrop>
   </Modal>
 </>
 ```
 
+**ポイント（v3 の重要な変更点）**:
+- 開閉フックは `useDisclosure` → **`useOverlayState`**。返り値も `{ isOpen, open, close }`
+  （v2 の `onOpen` / `onClose` は `open` / `close`）。
+- `Modal` の中身は `Modal.Backdrop → Modal.Container → Modal.Dialog` の入れ子で、
+  その中に `Modal.Header`（`Modal.Heading` + `Modal.CloseTrigger`）/ `Modal.Body` / `Modal.Footer`。
+- 閉じる制御は `onClose` ではなく **`onOpenChange`** で受ける。
+
 ---
 
 ### 3.4 ナビゲーション
+
+> **⚠️ HeroUI v3 では `Navbar` コンポーネントは廃止されました。**
+> v2 の `Navbar` / `NavbarBrand` / `NavbarContent` / `NavbarItem` は v3 に存在しません。
+> ナビゲーションは **素の `<header>` + Tailwind CSS** で自分で組みます（実装もそうなっています）。
 
 **Before (Tailwind CSS)**:
 ```typescript
@@ -304,35 +390,33 @@ const { isOpen, onOpen, onClose } = useDisclosure()
 </nav>
 ```
 
-**After (HeroUI)**:
+**After (HeroUI v3 — 素の header + Button)**:
 ```typescript
-import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link } from '@heroui/react'
+import { Button } from '@heroui/react'
+import Link from 'next/link'
 
-<Navbar>
-  <NavbarBrand>
-    <p className="font-bold text-inherit">Todo App</p>
-  </NavbarBrand>
-  <NavbarContent className="hidden sm:flex gap-4" justify="center">
-    <NavbarItem>
-      <Link color="foreground" href="/todos">
+<header className="border-b border-gray-200 bg-white">
+  <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+    <Link href="/todos" className="text-xl font-bold hover:opacity-80">
+      Todo App
+    </Link>
+    <nav className="hidden sm:flex items-center gap-6">
+      <Link href="/todos" className="text-gray-700 hover:text-primary font-medium">
         Todos
       </Link>
-    </NavbarItem>
-    <NavbarItem>
-      <Link color="foreground" href="/profile">
+      <Link href="/profile" className="text-gray-700 hover:text-primary font-medium">
         Profile
       </Link>
-    </NavbarItem>
-  </NavbarContent>
-  <NavbarContent justify="end">
-    <NavbarItem>
-      <Button as={Link} color="primary" href="/login" variant="flat">
-        Login
-      </Button>
-    </NavbarItem>
-  </NavbarContent>
-</Navbar>
+    </nav>
+    <Button variant="secondary" onPress={handleLogout} className="font-medium">
+      ログアウト
+    </Button>
+  </div>
+</header>
 ```
+
+**ポイント**: ナビのリンクは Next.js の `Link`、ボタン相当は HeroUI の `Button`。
+「HeroUI が Navbar を用意してくれる」時代は終わり、レイアウトは自分で Tailwind で組む。
 
 ---
 
@@ -351,20 +435,36 @@ import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link } from '@heroui/re
 </select>
 ```
 
-**After (HeroUI)**:
+**After (HeroUI v3)**:
 ```typescript
-import { Select, SelectItem } from '@heroui/react'
+// v2 の SelectItem は廃止 → Select の複合 API + ListBox.Item を使う
+import { Select, ListBox } from '@heroui/react'
 
 <Select
-  label="フィルター"
-  selectedKeys={[completedFilter]}
-  onChange={(e) => setCompletedFilter(e.target.value)}
+  aria-label="フィルター"
+  selectedKey={completedFilter}
+  onSelectionChange={(key) => setCompletedFilter(key as string)}
 >
-  <SelectItem key="all" value="all">すべて</SelectItem>
-  <SelectItem key="completed" value="completed">完了済み</SelectItem>
-  <SelectItem key="incomplete" value="incomplete">未完了</SelectItem>
+  <Select.Trigger className="flex w-full items-center justify-between rounded-medium border border-default-200 bg-default-50 px-3 py-2">
+    <Select.Value />
+    <Select.Indicator />
+  </Select.Trigger>
+  <Select.Popover>
+    <ListBox>
+      <ListBox.Item id="all" textValue="すべて">すべて</ListBox.Item>
+      <ListBox.Item id="completed" textValue="完了済み">完了済み</ListBox.Item>
+      <ListBox.Item id="incomplete" textValue="未完了">未完了</ListBox.Item>
+    </ListBox>
+  </Select.Popover>
 </Select>
 ```
+
+**ポイント（v3 の重要な変更点）**:
+- `<SelectItem>` は廃止 → **`Select.Trigger`（`Select.Value` + `Select.Indicator`）+
+  `Select.Popover`（`ListBox` > `ListBox.Item`）** の構造に変わった。
+- 選択値は `selectedKeys`（Set）→ **`selectedKey`（単数の文字列）**。
+- `onSelectionChange` は**選択された 1 つの key** を受け取る（`onChange` のイベントではない）。
+- 各項目は `ListBox.Item` に `id`（選択値）と `textValue`（表示用テキスト）を渡す。
 
 ---
 
@@ -380,17 +480,20 @@ import { Select, SelectItem } from '@heroui/react'
 />
 ```
 
-**After (HeroUI)**:
+**After (HeroUI v3)**:
 ```typescript
 import { Checkbox } from '@heroui/react'
 
 <Checkbox
   isSelected={todo.completed}
-  onValueChange={() => handleToggleComplete(todo.id)}
+  onChange={() => handleToggleComplete(todo.id)}
 >
   {todo.title}
 </Checkbox>
 ```
+
+**ポイント**: v2 の `onValueChange` は v3 では **`onChange`**（真偽値を受け取る）に変わった。
+選択状態は `isSelected` のまま。
 
 ---
 
@@ -416,25 +519,30 @@ import { Checkbox } from '@heroui/react'
 </table>
 ```
 
-**After (HeroUI)**:
+**After (HeroUI v3)**:
 ```typescript
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react'
+// v3 の Table も複合 API（Table.Header / Column / Body / Row / Cell）
+import { Table } from '@heroui/react'
 
 <Table aria-label="Todo一覧">
-  <TableHeader>
-    <TableColumn>タイトル</TableColumn>
-    <TableColumn>状態</TableColumn>
-  </TableHeader>
-  <TableBody>
+  <Table.Header>
+    <Table.Column>タイトル</Table.Column>
+    <Table.Column>状態</Table.Column>
+  </Table.Header>
+  <Table.Body>
     {todos.map((todo) => (
-      <TableRow key={todo.id}>
-        <TableCell>{todo.title}</TableCell>
-        <TableCell>{todo.completed ? '完了' : '未完了'}</TableCell>
-      </TableRow>
+      <Table.Row key={todo.id}>
+        <Table.Cell>{todo.title}</Table.Cell>
+        <Table.Cell>{todo.completed ? '完了' : '未完了'}</Table.Cell>
+      </Table.Row>
     ))}
-  </TableBody>
+  </Table.Body>
 </Table>
 ```
+
+> **📌 補足**: 本 Todo アプリの一覧表示は HeroUI の `Table` ではなく、`Card` と
+> `map()` による**自前のリスト/カード表示**で実装しています（`TodoList` / `UserList` 等）。
+> `Table` の使い方は参考として掲載していますが、本カリキュラムの実装では使いません。
 
 ---
 
@@ -469,12 +577,12 @@ export default function Error({
 }
 ```
 
-**After (HeroUI)**:
+**After (HeroUI v3)**:
 ```typescript
 // error.tsx
 'use client'
 
-import { Card, CardHeader, CardBody, CardFooter, Button } from '@heroui/react'
+import { Card, Button } from '@heroui/react'
 
 export default function Error({
   error,
@@ -486,24 +594,24 @@ export default function Error({
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="max-w-md w-full">
-        <CardHeader className="flex flex-col items-start gap-1">
+        <Card.Header className="flex flex-col items-start gap-1">
           <h2 className="text-2xl font-bold text-danger">エラーが発生しました</h2>
           {error.digest && (
             <p className="text-small text-default-500">エラーID: {error.digest}</p>
           )}
-        </CardHeader>
-        <CardBody>
+        </Card.Header>
+        <Card.Content>
           <p className="text-default-700">{error.message}</p>
-        </CardBody>
-        <CardFooter>
+        </Card.Content>
+        <Card.Footer>
           <Button
-            color="primary"
+            variant="primary"
             onPress={reset}
             className="w-full"
           >
             再試行
           </Button>
-        </CardFooter>
+        </Card.Footer>
       </Card>
     </div>
   )
@@ -511,10 +619,9 @@ export default function Error({
 ```
 
 **ポイント**:
-- `Card` でエラー表示を構造化
-- `text-danger` でエラーを視覚的に強調
-- `error.digest` がある場合はエラーIDを表示
-- `Button` の `color="primary"` で再試行アクションを明確化
+- `Card` の中身は複合 API（`Card.Header` / `Card.Content` / `Card.Footer`）で構造化。
+- `text-danger` でエラーを視覚的に強調、`error.digest` があればエラーIDを表示。
+- `Button` は `variant="primary"`（v2 の `color` ではない）で再試行アクションを明確化。
 
 ---
 
@@ -535,39 +642,37 @@ export default function Loading() {
 }
 ```
 
-**After (HeroUI)**:
+**After (HeroUI v3)**:
 ```typescript
 // loading.tsx
-import { Spinner, Card, CardBody } from '@heroui/react'
+import { Spinner, Card } from '@heroui/react'
 
 export default function Loading() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="max-w-md w-full">
-        <CardBody className="flex flex-col items-center justify-center py-12 gap-4">
-          <Spinner size="lg" color="primary" />
+        <Card.Content className="flex flex-col items-center justify-center py-12 gap-4">
+          <Spinner size="lg" color="accent" />
           <p className="text-default-600">読み込み中...</p>
-        </CardBody>
+        </Card.Content>
       </Card>
     </div>
   )
 }
 ```
 
-**Spinner のバリエーション**:
+**Spinner のバリエーション（v3）**:
 
 **サイズ**:
 - `sm`: 小（16px）
 - `md`: 中（32px、デフォルト）
 - `lg`: 大（64px）
 
-**カラー**:
-- `primary`: プライマリカラー
-- `secondary`: セカンダリカラー
+**カラー**（v3 では選べる色が変わった。`primary` は無く、ブランド色は **`accent`**）:
+- `accent`: アクセント（ブランド色）
 - `success`: 成功色
 - `warning`: 警告色
 - `danger`: 危険色
-- `default`: デフォルト色
 - `current`: 現在のテキスト色
 
 **シンプルなローディング表示**:
@@ -587,22 +692,24 @@ export default function Loading() {
 **カスタムメッセージ付きローディング**:
 ```typescript
 // loading.tsx
+// v3 の Spinner は label プロパティを持たない。テキストは隣に自分で置く
 import { Spinner } from '@heroui/react'
 
 export default function Loading() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-      <Spinner size="lg" color="primary" label="データを取得中..." />
+      <Spinner size="lg" color="accent" />
+      <p className="text-default-600">データを取得中...</p>
     </div>
   )
 }
 ```
 
 **ポイント**:
-- `Spinner` コンポーネントで統一されたローディングアニメーション
-- `label` プロパティで直接テキストを表示可能
-- `Card` で囲むことで、より目立つローディング画面に
-- サイズとカラーを状況に応じて使い分ける
+- `Spinner` コンポーネントで統一されたローディングアニメーション。
+- v2 の `label` プロパティは**なくなった**ので、テキストは `<p>` などで隣に置く。
+- `Card` で囲むことで、より目立つローディング画面にできる。
+- サイズ（`sm`/`md`/`lg`）とカラー（`accent` 等）を状況に応じて使い分ける。
 
 ---
 
@@ -618,7 +725,7 @@ export default function Loading() {
 **実装のポイント**:
 - フォーム全体を `Card` で囲む
 - `Input` の `type="password"` でパスワード入力
-- エラーメッセージは `Input` の `errorMessage` プロパティを使用
+- エラーメッセージは `Input` の外側に `<span role="alert">` で表示
 
 ---
 
@@ -684,11 +791,11 @@ export default function Loading() {
 - Select（ロール選択）
 - Button（作成、キャンセル）
 - Card（作成フォーム全体）
-- Navbar（ヘッダーナビゲーション）
+- ヘッダーナビゲーション（v3 に Navbar は無いので素の `<header>` で実装）
 
 **実装のポイント**:
 - パスワード確認フィールドも `Input` の `type="password"` を使用
-- ロール選択は `Select` + `SelectItem` で実装
+- ロール選択は `Select`（`Select.Trigger` / `Select.Popover`）+ `ListBox.Item` で実装
 - ADMINとMANAGERで作成可能なロールを制限
 - フォームバリデーションエラーは独自の表示エリアで対応
 
@@ -702,12 +809,12 @@ export default function Loading() {
 - Button（編集、保存、削除、キャンセル）
 - Card（ユーザー情報、Todo一覧）
 - Modal（削除確認）
-- Navbar（ヘッダーナビゲーション）
+- ヘッダーナビゲーション（v3 に Navbar は無いので素の `<header>` で実装）
 
 **実装のポイント**:
 - 編集モードと表示モードの切り替え
 - ユーザー名は編集不可（`isDisabled` を使用）
-- 削除確認は `Modal` + `useDisclosure` で実装
+- 削除確認は `Modal`（複合API）+ `useOverlayState` で実装
 - ADMINのみが編集・削除可能
 
 ---
@@ -720,13 +827,13 @@ export default function Loading() {
 - Button（新規作成、詳細、削除、ページネーション）
 - Card（フィルターエリア、ユーザー一覧、ページネーション）
 - Modal（削除確認）
-- Navbar（ヘッダーナビゲーション）
+- ヘッダーナビゲーション（v3 に Navbar は無いので素の `<header>` で実装）
 
 **実装のポイント**:
 - 検索・フィルター・ソートを `Card` 内でグリッド配置
 - ユーザーカードを `Card` で表現
 - ページネーションは `Card` + `Button` の組み合わせ
-- 削除確認は `Modal` + `useDisclosure` で実装
+- 削除確認は `Modal`（複合API）+ `useOverlayState` で実装
 - ADMINのみが削除ボタンを表示
 
 ---
@@ -741,7 +848,7 @@ export default function Loading() {
 // src/app/todos/error.tsx
 'use client'
 
-import { Card, CardHeader, CardBody, CardFooter, Button } from '@heroui/react'
+import { Card, Button } from '@heroui/react'
 import { useEffect } from 'react'
 
 export default function Error({
@@ -759,35 +866,34 @@ export default function Error({
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="max-w-md w-full">
-        <CardHeader className="flex flex-col items-start gap-1">
+        <Card.Header className="flex flex-col items-start gap-1">
           <h2 className="text-2xl font-bold text-danger">エラーが発生しました</h2>
           {error.digest && (
             <p className="text-small text-default-500">エラーID: {error.digest}</p>
           )}
-        </CardHeader>
-        <CardBody>
+        </Card.Header>
+        <Card.Content>
           <p className="text-default-700 mb-2">
             Todoページの読み込み中にエラーが発生しました。
           </p>
           <p className="text-small text-default-500">{error.message}</p>
-        </CardBody>
-        <CardFooter className="gap-2">
+        </Card.Content>
+        <Card.Footer className="gap-2">
           <Button
-            color="default"
-            variant="flat"
+            variant="secondary"
             onPress={() => window.location.href = '/todos'}
             className="flex-1"
           >
             Todoページに戻る
           </Button>
           <Button
-            color="primary"
+            variant="primary"
             onPress={reset}
             className="flex-1"
           >
             再試行
           </Button>
-        </CardFooter>
+        </Card.Footer>
       </Card>
     </div>
   )
@@ -800,7 +906,7 @@ export default function Error({
 // src/app/todos/[id]/error.tsx
 'use client'
 
-import { Card, CardHeader, CardBody, CardFooter, Button } from '@heroui/react'
+import { Card, Button, buttonVariants } from '@heroui/react'
 import Link from 'next/link'
 
 export default function Error({
@@ -813,38 +919,35 @@ export default function Error({
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="max-w-md w-full">
-        <CardHeader className="flex flex-col items-start gap-1">
+        <Card.Header className="flex flex-col items-start gap-1">
           <h2 className="text-2xl font-bold text-danger">Todo詳細の読み込みエラー</h2>
           {error.digest && (
             <p className="text-small text-default-500">エラーID: {error.digest}</p>
           )}
-        </CardHeader>
-        <CardBody>
+        </Card.Header>
+        <Card.Content>
           <p className="text-default-700 mb-4">
             指定されたTodoの詳細を取得できませんでした。
           </p>
           <div className="bg-danger-50 border-l-4 border-danger p-3 rounded">
             <p className="text-small text-danger-800">{error.message}</p>
           </div>
-        </CardBody>
-        <CardFooter className="flex flex-col gap-2">
+        </Card.Content>
+        <Card.Footer className="flex flex-col gap-2">
           <Button
-            color="primary"
+            variant="primary"
             onPress={reset}
             className="w-full"
           >
             再試行
           </Button>
-          <Button
-            as={Link}
+          <Link
             href="/todos"
-            color="default"
-            variant="flat"
-            className="w-full"
+            className={buttonVariants({ variant: 'secondary', className: 'w-full' })}
           >
             Todo一覧に戻る
-          </Button>
-        </CardFooter>
+          </Link>
+        </Card.Footer>
       </Card>
     </div>
   )
@@ -868,19 +971,19 @@ export default function Error({
 
 ```typescript
 // src/app/todos/loading.tsx
-import { Spinner, Card, CardBody } from '@heroui/react'
+import { Spinner, Card } from '@heroui/react'
 
 export default function Loading() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="max-w-md w-full">
-        <CardBody className="flex flex-col items-center justify-center py-12 gap-4">
-          <Spinner size="lg" color="primary" />
+        <Card.Content className="flex flex-col items-center justify-center py-12 gap-4">
+          <Spinner size="lg" color="accent" />
           <div className="text-center">
             <p className="text-default-700 font-medium">Todoを読み込み中...</p>
             <p className="text-small text-default-500 mt-1">しばらくお待ちください</p>
           </div>
-        </CardBody>
+        </Card.Content>
       </Card>
     </div>
   )
@@ -891,7 +994,7 @@ export default function Loading() {
 
 ```typescript
 // src/app/todos/loading.tsx
-import { Card, CardHeader, CardBody, Skeleton } from '@heroui/react'
+import { Card, Skeleton } from '@heroui/react'
 
 export default function Loading() {
   return (
@@ -906,13 +1009,13 @@ export default function Loading() {
       <div className="space-y-4">
         {[...Array(5)].map((_, index) => (
           <Card key={index}>
-            <CardHeader>
+            <Card.Header>
               <Skeleton className="w-3/4 h-6 rounded-lg" />
-            </CardHeader>
-            <CardBody>
+            </Card.Header>
+            <Card.Content>
               <Skeleton className="w-full h-4 rounded-lg mb-2" />
               <Skeleton className="w-2/3 h-4 rounded-lg" />
-            </CardBody>
+            </Card.Content>
           </Card>
         ))}
       </div>
@@ -930,7 +1033,7 @@ import { Spinner } from '@heroui/react'
 export default function Loading() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-      <Spinner size="lg" color="primary" label="Todo詳細を読み込み中..." />
+      <Spinner size="lg" color="accent" />
     </div>
   )
 }
@@ -940,27 +1043,27 @@ export default function Loading() {
 
 ```typescript
 // src/app/users/loading.tsx
-import { Card, CardBody, Skeleton } from '@heroui/react'
+import { Card, Skeleton } from '@heroui/react'
 
 export default function Loading() {
   return (
     <div className="container mx-auto p-4 max-w-6xl">
       {/* 検索・フィルタースケルトン */}
       <Card className="mb-6">
-        <CardBody>
+        <Card.Content>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Skeleton className="w-full h-10 rounded-lg" />
             <Skeleton className="w-full h-10 rounded-lg" />
             <Skeleton className="w-full h-10 rounded-lg" />
           </div>
-        </CardBody>
+        </Card.Content>
       </Card>
 
       {/* ユーザーカードスケルトン */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {[...Array(6)].map((_, index) => (
           <Card key={index}>
-            <CardBody className="gap-3">
+            <Card.Content className="gap-3">
               <Skeleton className="w-full h-6 rounded-lg" />
               <Skeleton className="w-3/4 h-4 rounded-lg" />
               <Skeleton className="w-1/2 h-4 rounded-lg" />
@@ -968,7 +1071,7 @@ export default function Loading() {
                 <Skeleton className="flex-1 h-10 rounded-lg" />
                 <Skeleton className="flex-1 h-10 rounded-lg" />
               </div>
-            </CardBody>
+            </Card.Content>
           </Card>
         ))}
       </div>
@@ -1009,13 +1112,13 @@ HeroUI は Tailwind CSS ベースなので、Tailwind のレスポンシブク�
 
 ```typescript
 // プライマリアクション
-<Button color="primary">保存</Button>
+<Button variant="primary">保存</Button>
 
 // 危険なアクション
-<Button color="danger">削除</Button>
+<Button variant="danger">削除</Button>
 
 // セカンダリアクション
-<Button color="default" variant="flat">キャンセル</Button>
+<Button variant="secondary">キャンセル</Button>
 ```
 
 ### 5.3 スペーシングの統一
@@ -1023,7 +1126,7 @@ HeroUI は Tailwind CSS ベースなので、Tailwind のレスポンシブク�
 ```typescript
 <div className="space-y-4">
   <Input {...props} />
-  <Textarea {...props} />
+  <TextArea {...props} />
   <Button {...props} />
 </div>
 ```

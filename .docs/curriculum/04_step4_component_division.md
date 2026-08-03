@@ -17,7 +17,7 @@ Step 1〜3 で 1 ファイルに実装していたコンポーネントを、適
 - 可読性とメンテナンス性（ファイルサイズが大きすぎる場合）
 
 ### 1.3 制約条件
-- **カスタムフックの作成は行わない**（Step 5 で実施）
+- **カスタムフックの作成は行わない**（本カリキュラムの対象外）
 - **ロジックの分離は最小限に**（状態管理は主にページコンポーネントに残す）
 
 ---
@@ -400,7 +400,7 @@ export interface Todo {
 
 #### 4.0.1 設計方針
 
-各ページで重複していたヘッダー（Navbar）部分を共通コンポーネントとして切り出し、`layout.tsx` で全ページに適用します。
+各ページで重複していたヘッダー部分を共通コンポーネントとして切り出し、`layout.tsx` で全ページに適用します。
 
 **メリット**:
 - コードの重複を削減
@@ -474,13 +474,8 @@ export default function RootLayout({
 ```typescript
 'use client';
 
-import {
-  Navbar,
-  NavbarBrand,
-  NavbarContent,
-  NavbarItem,
-  Button,
-} from '@heroui/react';
+// v3 に Navbar は無いので、ヘッダーは素の <header> + Tailwind で組む
+import { Button } from '@heroui/react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -546,15 +541,15 @@ export function Header() {
   }
 
   return (
-    <Navbar>
-      <NavbarBrand>
-        <Link href="/todos" className="text-2xl font-bold">
+    <header className="border-b border-gray-200 bg-white">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+        {/* ブランド */}
+        <Link href="/todos" className="text-2xl font-bold hover:opacity-80">
           Todo アプリ
         </Link>
-      </NavbarBrand>
 
-      <NavbarContent className="hidden sm:flex gap-4" justify="center">
-        <NavbarItem>
+        {/* ナビゲーション */}
+        <nav className="hidden sm:flex items-center gap-6">
           <Link
             href="/todos"
             className={
@@ -565,9 +560,7 @@ export function Header() {
           >
             Todo一覧
           </Link>
-        </NavbarItem>
 
-        <NavbarItem>
           <Link
             href="/profile"
             className={
@@ -578,11 +571,9 @@ export function Header() {
           >
             プロフィール
           </Link>
-        </NavbarItem>
 
-        {/* ADMIN・MANAGER のみアクセス可能 */}
-        {userRole <= 2 && (
-          <NavbarItem>
+          {/* ADMIN・MANAGER のみアクセス可能 */}
+          {userRole <= 2 && (
             <Link
               href="/users"
               className={
@@ -593,18 +584,15 @@ export function Header() {
             >
               ユーザー管理
             </Link>
-          </NavbarItem>
-        )}
-      </NavbarContent>
+          )}
+        </nav>
 
-      <NavbarContent justify="end">
-        <NavbarItem>
-          <Button color="default" variant="flat" onPress={handleLogout}>
-            ログアウト
-          </Button>
-        </NavbarItem>
-      </NavbarContent>
-    </Navbar>
+        {/* ログアウト */}
+        <Button variant="secondary" onPress={handleLogout}>
+          ログアウト
+        </Button>
+      </div>
+    </header>
   );
 }
 ```
@@ -636,16 +624,13 @@ export function Header() {
 
 **削除する要素**:
 ```typescript
-// ❌ 削除: Navbar 関連のインポート
-import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from '@heroui/react';
-
-// ❌ 削除: ヘッダー部分の JSX
-<Navbar>
-  <NavbarBrand>
+// ❌ 削除: 各ページに書いていたヘッダー部分の JSX（共通 Header に集約）
+<header className="border-b border-gray-200 bg-white">
+  <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
     <h1 className="text-2xl font-bold">Todo アプリ</h1>
-  </NavbarBrand>
-  {/* ... */}
-</Navbar>
+    {/* ... ナビゲーション・ログアウトボタン ... */}
+  </div>
+</header>
 
 // ❌ 削除: ログアウト処理（Header に移動）
 const handleLogout = async () => { /* ... */ };
@@ -669,7 +654,7 @@ export function TodoListPage() {
 
 - [ ] `src/components/Header.tsx` を作成
 - [ ] `src/app/layout.tsx` に `<Header />` を追加
-- [ ] 各ページコンポーネントから Navbar 部分を削除
+- [ ] 各ページコンポーネントからヘッダー部分を削除
 - [ ] 認証状態に応じたヘッダー表示を確認
 - [ ] ロールに応じたメニュー表示を確認
 - [ ] パスに応じたアクティブ状態を確認
@@ -700,7 +685,7 @@ export function LoginPage() {
       <form onSubmit={handleSubmit}>
         <Input value={username} onChange={(e) => setUsername(e.target.value)} />
         <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-        <Button type="submit" isLoading={isLoading}>ログイン</Button>
+        <Button type="submit" isPending={isLoading}>ログイン</Button>
         {error && <p>{error}</p>}
       </form>
     </div>
@@ -735,7 +720,7 @@ export function LoginPage() {
 'use client'
 
 import { useState } from 'react'
-import { Input, Button, Card, CardBody } from '@heroui/react'
+import { Input, Button, Card, } from '@heroui/react'
 import { useRouter } from 'next/navigation'
 
 export function LoginForm() {
@@ -772,32 +757,44 @@ export function LoginForm() {
   
   return (
     <Card>
-      <CardBody>
+      <Card.Content>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            label="ユーザー名"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            isRequired
-          />
-          <Input
-            label="パスワード"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            isRequired
-          />
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="username" className="text-sm font-medium text-foreground">
+              ユーザー名
+            </label>
+            <Input
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              aria-label="ユーザー名"
+              className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="password" className="text-sm font-medium text-foreground">
+              パスワード
+            </label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              aria-label="パスワード"
+              className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
+            />
+          </div>
           {error && <p className="text-red-500 text-sm">{error}</p>}
           <Button
             type="submit"
-            color="primary"
+            variant="primary"
             className="w-full"
-            isLoading={isLoading}
+            isPending={isLoading}
           >
             ログイン
           </Button>
         </form>
-      </CardBody>
+      </Card.Content>
     </Card>
   )
 }
@@ -913,7 +910,7 @@ export function TodoListPage({ initialData }: Props) {
 // src/features/todos/components/TodoItem.tsx
 'use client'
 
-import { Card, CardBody, Checkbox, Button } from '@heroui/react'
+import { Card, Checkbox, Button } from '@heroui/react'
 import Link from 'next/link'
 import type { Todo } from '@/types'
 
@@ -926,10 +923,10 @@ interface Props {
 export function TodoItem({ todo, onDelete, onToggleComplete }: Props) {
   return (
     <Card>
-      <CardBody className="flex flex-row items-center justify-between">
+      <Card.Content className="flex flex-row items-center justify-between">
         <Checkbox
           isSelected={todo.completed}
-          onValueChange={(checked) => onToggleComplete(todo.id, checked)}
+          onChange={(checked) => onToggleComplete(todo.id, checked)}
         >
           <Link href={`/todos/${todo.id}`}>
             <span className={todo.completed ? 'line-through text-gray-500' : ''}>
@@ -939,13 +936,13 @@ export function TodoItem({ todo, onDelete, onToggleComplete }: Props) {
         </Checkbox>
         
         <Button
-          color="danger"
+          variant="danger"
           size="sm"
           onPress={() => onDelete(todo.id)}
         >
           削除
         </Button>
-      </CardBody>
+      </Card.Content>
     </Card>
   )
 }
@@ -995,7 +992,8 @@ export function TodoList({ todos, onDelete, onToggleComplete, isLoading }: Props
 // src/features/todos/components/TodoFilter.tsx
 'use client'
 
-import { Select, SelectItem } from '@heroui/react'
+// v3: SelectItem は廃止 → Select 複合 API + ListBox.Item
+import { Select, ListBox } from '@heroui/react'
 
 interface Props {
   value: 'all' | 'completed' | 'incomplete'
@@ -1004,16 +1002,30 @@ interface Props {
 
 export function TodoFilter({ value, onChange }: Props) {
   return (
-    <Select
-      label="フィルター"
-      selectedKeys={[value]}
-      onChange={(e) => onChange(e.target.value as 'all' | 'completed' | 'incomplete')}
-      className="max-w-xs"
-    >
-      <SelectItem key="all" value="all">すべて</SelectItem>
-      <SelectItem key="completed" value="completed">完了済み</SelectItem>
-      <SelectItem key="incomplete" value="incomplete">未完了</SelectItem>
-    </Select>
+    <div className="flex flex-col gap-1.5 max-w-xs">
+      <label htmlFor="filter" className="text-sm font-medium text-foreground">
+        フィルター
+      </label>
+      <Select
+        aria-label="フィルター"
+        selectedKey={value}
+        onSelectionChange={(key) =>
+          onChange(key as 'all' | 'completed' | 'incomplete')
+        }
+      >
+        <Select.Trigger className="flex w-full items-center justify-between rounded-medium border border-default-200 bg-default-50 px-3 py-2">
+          <Select.Value />
+          <Select.Indicator />
+        </Select.Trigger>
+        <Select.Popover>
+          <ListBox>
+            <ListBox.Item id="all" textValue="すべて">すべて</ListBox.Item>
+            <ListBox.Item id="completed" textValue="完了済み">完了済み</ListBox.Item>
+            <ListBox.Item id="incomplete" textValue="未完了">未完了</ListBox.Item>
+          </ListBox>
+        </Select.Popover>
+      </Select>
+    </div>
   )
 }
 ```
@@ -1255,7 +1267,7 @@ export function ProfilePage({ initialUser, initialStats, initialTodos }: Props) 
 // src/features/profile/components/ProfileInfo.tsx
 'use client'
 
-import { Button, Card, CardBody, CardHeader, Input } from '@heroui/react'
+import { Button, Card, Input } from '@heroui/react'
 import { type FormEvent, useState } from 'react'
 import type { User } from './types'
 
@@ -1298,15 +1310,15 @@ export function ProfileInfo({ user, onUpdate }: ProfileInfoProps) {
 
   return (
     <Card>
-      <CardHeader className="flex items-center justify-between">
+      <Card.Header className="flex items-center justify-between">
         <h2 className="text-xl font-bold text-gray-900">プロフィール</h2>
         {!isEditing && (
-          <Button color="primary" onPress={() => setIsEditing(true)}>
+          <Button variant="primary" onPress={() => setIsEditing(true)}>
             編集
           </Button>
         )}
-      </CardHeader>
-      <CardBody>
+      </Card.Header>
+      <Card.Content>
         {error && (
           <div className="text-red-500 text-sm bg-red-50 border border-red-200 rounded-md p-3 mb-4">
             {error}
@@ -1315,40 +1327,61 @@ export function ProfileInfo({ user, onUpdate }: ProfileInfoProps) {
 
         {isEditing ? (
           <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              type="text"
-              label="ユーザー名"
-              value={user.username}
-              isDisabled
-              description="ユーザー名は変更できません"
-            />
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="username" className="text-sm font-medium text-foreground">
+                ユーザー名
+              </label>
+              <Input
+                id="username"
+                type="text"
+                value={user.username}
+                disabled
+                aria-label="ユーザー名"
+                className="w-full rounded-medium border border-default-200 bg-default-100 px-3 py-2 outline-none"
+              />
+              <span className="text-xs text-gray-500">ユーザー名は変更できません</span>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input
-                type="text"
-                label="姓"
-                placeholder="姓"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                isDisabled={isSaving}
-              />
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="lastName" className="text-sm font-medium text-foreground">
+                  姓
+                </label>
+                <Input
+                  id="lastName"
+                  type="text"
+                  placeholder="姓"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  disabled={isSaving}
+                  aria-label="姓"
+                  className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
+                />
+              </div>
 
-              <Input
-                type="text"
-                label="名"
-                placeholder="名"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                isDisabled={isSaving}
-              />
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="firstName" className="text-sm font-medium text-foreground">
+                  名
+                </label>
+                <Input
+                  id="firstName"
+                  type="text"
+                  placeholder="名"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  disabled={isSaving}
+                  aria-label="名"
+                  className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
+                />
+              </div>
             </div>
 
             <div className="flex items-center gap-4 pt-4">
-              <Button type="submit" color="primary" isLoading={isSaving}>
+              <Button type="submit" variant="primary" isPending={isSaving}>
                 保存
               </Button>
               <Button
-                color="default"
+                variant="secondary"
                 variant="flat"
                 onPress={handleCancel}
                 isDisabled={isSaving}
@@ -1376,7 +1409,7 @@ export function ProfileInfo({ user, onUpdate }: ProfileInfoProps) {
             </div>
           </div>
         )}
-      </CardBody>
+      </Card.Content>
     </Card>
   )
 }
@@ -1417,7 +1450,7 @@ export function ProfileInfo({ user, onUpdate }: ProfileInfoProps) {
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Button } from '@heroui/react'
+import { Button } from '@heroui/react'
 import Link from 'next/link'
 import { UserCreateForm } from './components/UserCreateForm'
 
@@ -1451,37 +1484,27 @@ export function CreateUserPage() {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* ヘッダー */}
-      <Navbar>
-        <NavbarBrand>
+      <header className="border-b border-gray-200 bg-white">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <h1 className="text-2xl font-bold">Todo アプリ</h1>
-        </NavbarBrand>
-        <NavbarContent className="hidden sm:flex gap-4" justify="center">
-          <NavbarItem>
+          <nav className="hidden sm:flex items-center gap-6">
             <Link href="/todos" className="text-gray-700 hover:text-blue-500 font-medium">
               Todo一覧
             </Link>
-          </NavbarItem>
-          <NavbarItem>
             <Link href="/profile" className="text-gray-700 hover:text-blue-500 font-medium">
               プロフィール
             </Link>
-          </NavbarItem>
-          {currentUserRole <= 2 && (
-            <NavbarItem>
+            {currentUserRole <= 2 && (
               <Link href="/users" className="text-blue-500 font-medium">
                 ユーザー管理
               </Link>
-            </NavbarItem>
-          )}
-        </NavbarContent>
-        <NavbarContent justify="end">
-          <NavbarItem>
-            <Button color="default" variant="flat" onPress={handleLogout}>
-              ログアウト
-            </Button>
-          </NavbarItem>
-        </NavbarContent>
-      </Navbar>
+            )}
+          </nav>
+          <Button variant="secondary" onPress={handleLogout}>
+            ログアウト
+          </Button>
+        </div>
+      </header>
 
       <main className="max-w-4xl mx-auto px-4 py-8">
         <div className="mb-4">
@@ -1507,7 +1530,7 @@ export function CreateUserPage() {
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Button, useDisclosure } from '@heroui/react'
+import { Button, useOverlayState } from '@heroui/react'
 import Link from 'next/link'
 import { UserInfoDisplay } from './components/UserInfoDisplay'
 import { UserInfoEditForm } from './components/UserInfoEditForm'
@@ -1556,9 +1579,9 @@ export function UserDetailPage({ userId }: Props) {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* ヘッダー */}
-      <Navbar>
+      <header>
         {/* ... */}
-      </Navbar>
+      </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-4">
@@ -1619,7 +1642,7 @@ export function UserDetailPage({ userId }: Props) {
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Button, useDisclosure } from '@heroui/react'
+import { Button, useOverlayState } from '@heroui/react'
 import Link from 'next/link'
 import { UserSearchFilter } from './components/UserSearchFilter'
 import { UserSortSelect } from './components/UserSortSelect'
@@ -1663,16 +1686,19 @@ export function UserListPage() {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* ヘッダー */}
-      <Navbar>
+      <header>
         {/* ... */}
-      </Navbar>
+      </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-3xl font-bold text-gray-900">ユーザー管理</h2>
-          <Button as={Link} href="/users/create" color="primary">
+          <Link
+            href="/users/create"
+            className={buttonVariants({ variant: 'primary' })}
+          >
             新規ユーザー作成
-          </Button>
+          </Link>
         </div>
 
         {/* 検索・フィルター・ソート */}
@@ -1858,7 +1884,8 @@ Step 4 完了後、以下を確認してください。
 - [ ] Props の型定義が明確
 - [ ] すべての機能が正常に動作する
 
-これらが完了したら、**Step 5: カスタムフックの定義** に進みましょう。
+これらが完了したら、**本カリキュラムは修了**です。おつかれさまでした。近代化済みの
+参照実装（見本）と見比べながら、細部の作り込みやリファクタリングに挑戦してみましょう。
 
 ---
 
@@ -1955,31 +1982,42 @@ export function TodoCreateForm({ onSuccess }: TodoCreateFormProps) {
 HeroUI の Modal コンポーネントを使用して、削除確認を実装：
 
 ```typescript
-// 例: TodoItem.tsx
-import { useDisclosure } from '@heroui/react';
+// 例: TodoItem.tsx（v3: useDisclosure→useOverlayState、Modal は複合 API）
+import { Modal, Button, useOverlayState } from '@heroui/react';
 
 export function TodoItem({ todo, onUpdate }: TodoItemProps) {
   const {
     isOpen: isDeleteOpen,
-    onOpen: onDeleteOpen,
-    onClose: onDeleteClose,
-  } = useDisclosure();
+    open: openDelete,
+    close: closeDelete,
+  } = useOverlayState();
 
   return (
     <>
-      <Button onPress={onDeleteOpen}>削除</Button>
-      
-      <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
-        <ModalContent>
-          <ModalHeader>確認</ModalHeader>
-          <ModalBody>
-            <p>このTodoを削除してもよろしいですか?</p>
-          </ModalBody>
-          <ModalFooter>
-            <Button onPress={onDeleteClose}>キャンセル</Button>
-            <Button color="danger" onPress={handleDelete}>削除</Button>
-          </ModalFooter>
-        </ModalContent>
+      <Button onPress={openDelete}>削除</Button>
+
+      <Modal isOpen={isDeleteOpen} onOpenChange={(o) => !o && closeDelete()}>
+        <Modal.Backdrop>
+          <Modal.Container>
+            <Modal.Dialog>
+              <Modal.Header>
+                <Modal.Heading>確認</Modal.Heading>
+                <Modal.CloseTrigger />
+              </Modal.Header>
+              <Modal.Body>
+                <p>このTodoを削除してもよろしいですか?</p>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onPress={closeDelete}>
+                  キャンセル
+                </Button>
+                <Button variant="danger" onPress={handleDelete}>
+                  削除
+                </Button>
+              </Modal.Footer>
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
       </Modal>
     </>
   );
@@ -2023,7 +2061,7 @@ export function ProfileInfo({ user, onUpdate }: ProfileInfoProps) {
 #### ❌ Header コンポーネント（優先度: 🔴 高）
 
 **現状の問題点**:
-- 全ページで Navbar のコードが重複
+- 全ページでヘッダーのコードが重複
 - ヘッダーの変更時に複数ファイルの修正が必要
 - メンテナンス性の低下
 
@@ -2043,7 +2081,7 @@ export function ProfileInfo({ user, onUpdate }: ProfileInfoProps) {
 // src/components/Header.tsx
 'use client';
 
-import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Button } from '@heroui/react';
+import { Button } from '@heroui/react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -2109,15 +2147,15 @@ export function Header() {
   }
 
   return (
-    <Navbar>
-      <NavbarBrand>
-        <Link href="/todos" className="text-2xl font-bold">
+    <header className="border-b border-gray-200 bg-white">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+        {/* ブランド */}
+        <Link href="/todos" className="text-2xl font-bold hover:opacity-80">
           Todo アプリ
         </Link>
-      </NavbarBrand>
 
-      <NavbarContent className="hidden sm:flex gap-4" justify="center">
-        <NavbarItem>
+        {/* ナビゲーション */}
+        <nav className="hidden sm:flex items-center gap-6">
           <Link
             href="/todos"
             className={
@@ -2128,9 +2166,7 @@ export function Header() {
           >
             Todo一覧
           </Link>
-        </NavbarItem>
 
-        <NavbarItem>
           <Link
             href="/profile"
             className={
@@ -2141,11 +2177,9 @@ export function Header() {
           >
             プロフィール
           </Link>
-        </NavbarItem>
 
-        {/* ADMIN・MANAGER のみアクセス可能 */}
-        {userRole <= 2 && (
-          <NavbarItem>
+          {/* ADMIN・MANAGER のみアクセス可能 */}
+          {userRole <= 2 && (
             <Link
               href="/users"
               className={
@@ -2156,18 +2190,15 @@ export function Header() {
             >
               ユーザー管理
             </Link>
-          </NavbarItem>
-        )}
-      </NavbarContent>
+          )}
+        </nav>
 
-      <NavbarContent justify="end">
-        <NavbarItem>
-          <Button color="default" variant="flat" onPress={handleLogout}>
-            ログアウト
-          </Button>
-        </NavbarItem>
-      </NavbarContent>
-    </Navbar>
+        {/* ログアウト */}
+        <Button variant="secondary" onPress={handleLogout}>
+          ログアウト
+        </Button>
+      </div>
+    </header>
   );
 }
 ```

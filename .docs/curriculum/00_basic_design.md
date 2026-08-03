@@ -14,7 +14,7 @@ React + Next.js の初心者が、API との連携を学習するための Todo 
 - クライアントコンポーネントでの状態管理とAPIフェッチの理解
 - サーバーコンポーネントとクライアントコンポーネントの使い分け
 - UIライブラリ（HeroUI）を活用したモダンなUI構築
-- コンポーネント設計とカスタムフックによるロジック分離
+- コンポーネント設計による責務の分離と再利用性の向上
 
 ---
 
@@ -53,16 +53,16 @@ React + Next.js の初心者が、API との連携を学習するための Todo 
 ## 3. 技術スタック
 
 ### 3.1 フロントエンド
-- **フレームワーク**: Next.js 15.4.3 (App Router)
-- **UI ライブラリ**: React 19.1.0
-- **スタイリング**: Tailwind CSS 4.0, HeroUI 2.8.1
-- **型定義**: TypeScript 5.8.3
+- **フレームワーク**: Next.js 16.2.10 (App Router)
+- **UI ライブラリ**: React 19.2.7
+- **スタイリング**: Tailwind CSS 4.3, HeroUI 3.2.2
+- **型定義**: TypeScript 6.0.3
 - **状態管理**: React Hooks（useState, useEffect, etc.）
 
 ### 3.2 バックエンド（既存API）
 - **認証**: JWT（JSON Web Token）
 - **データベース**: PostgreSQL
-- **バリデーション**: Zod
+- **バリデーション**: Zod 4.4.3
 
 ---
 
@@ -207,17 +207,14 @@ src/
 ├── features/                 # 機能別UIコンポーネント
 │   ├── auth/                 # 認証機能
 │   │   ├── components/       # UIコンポーネント（Step 4以降）
-│   │   ├── hooks/            # カスタムフック（Step 5以降）
 │   │   ├── LoginPage.tsx     # ログインページコンポーネント
 │   │   └── RegisterPage.tsx  # 登録ページコンポーネント
 │   ├── todos/                # Todo機能
 │   │   ├── components/       # UIコンポーネント（Step 4以降）
-│   │   ├── hooks/            # カスタムフック（Step 5以降）
 │   │   ├── TodoListPage.tsx  # Todo一覧ページコンポーネント
 │   │   └── TodoDetailPage.tsx # Todo詳細ページコンポーネント
 │   └── profile/              # プロフィール機能
 │       ├── components/       # UIコンポーネント（Step 4以降）
-│       ├── hooks/            # カスタムフック（Step 5以降）
 │       └── ProfilePage.tsx   # プロフィールページコンポーネント
 ├── lib/                      # ユーティリティ・共通ロジック（既存）
 └── types/                    # 型定義（既存）
@@ -245,15 +242,10 @@ src/
 - **作業**: Tailwind CSSで実装したUIをHeroUIコンポーネントに置き換え
 - **成果物**: 洗練されたUIのTodoアプリ
 
-### Step 4: UIコンポーネントの分割
+### Step 4: UIコンポーネントの分割（最終ステップ）
 - **目標**: コンポーネント設計の基礎を学ぶ
 - **作業**: 1ファイルで実装していたコンポーネントを適切な粒度に分割
 - **成果物**: メンテナンス性の高いコンポーネント構成
-
-### Step 5: カスタムフックの定義
-- **目標**: ロジックとUIの分離を理解する
-- **作業**: コンポーネントからビジネスロジックをカスタムフックに切り出し
-- **成果物**: 再利用性とテスタビリティの高いコード
 
 ---
 
@@ -320,7 +312,6 @@ src/
 - [Step 2: サーバーコンポーネントへのリプレイス](./02_step2_server_component.md)
 - [Step 3: UIライブラリを使用した画面のリプレイス](./03_step3_ui_library.md)
 - [Step 4: UIコンポーネントの分割](./04_step4_component_division.md)
-- [Step 5: カスタムフックの定義](./05_step5_custom_hooks.md)
 
 ---
 

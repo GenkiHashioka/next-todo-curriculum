@@ -23,7 +23,7 @@ Step 1 で実装したクライアントコンポーネントから、以下の�
 ### 1.3 制約条件
 - **UI の変更は行わない**（Tailwind CSS のまま）
 - **コンポーネントの分割は行わない**（Step 4 で実施）
-- **カスタムフックの作成は行わない**（Step 5 で実施）
+- **カスタムフックの作成は行わない**（本カリキュラムの対象外）
 
 ---
 
@@ -315,7 +315,7 @@ export function TodoListPage({ initialData, currentUserRole: initialUserRole }: 
 2. **エラーハンドリングの簡素化**: Server Actionsが統一された形式で結果を返す
 3. **リダイレクトの自動化**: `logout()`内で`redirect('/login')`が実行されるため、クライアント側での処理不要
 4. **useRouterの削除**: `window.location.href`またはServer Actions内の`redirect()`を使用
-- Next.js 15 では `searchParams` が Promise 型なので `await searchParams` で取得
+- Next.js 16 では `searchParams` が Promise 型なので `await searchParams` で取得
 - サーバーコンポーネントで取得したデータはシリアライズ可能な形式である必要がある
 - `Date` オブジェクトは文字列に変換する（API側で対応済み）
 - クライアントコンポーネントでは初期データがない場合のフォールバックを実装
@@ -387,7 +387,7 @@ export function TodoDetailPage({ initialTodo }: Props) {
 ```
 
 **注意点**:
-- Next.js 15 では `params` が Promise 型なので `await params` で取得
+- Next.js 16 では `params` が Promise 型なので `await params` で取得
 - クライアントコンポーネントでは初期データがない場合のフォールバックを実装
 
 ---
@@ -1179,7 +1179,7 @@ export async function fetchTodos() {
 ```
 
 **重要ポイント**:
-- `cookies()` は Next.js 15 から Promise を返すため、`await cookies()` で取得
+- `cookies()` は Next.js 16 から Promise を返すため、`await cookies()` で取得
 - Cookie 名は `auth_token`（プロジェクトの認証仕様に合わせる）
 - `cache: 'no-store'` で常に最新データを取得
 
