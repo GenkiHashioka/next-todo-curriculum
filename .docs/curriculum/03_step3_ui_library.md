@@ -1248,5 +1248,15 @@ Step 3 完了後、以下を確認してください。
 
 ---
 
-**Document Version**: 1.1.0  
-**Last Updated**: 2025-10-27
+**Document Version**: 2.0.0  
+**Last Updated**: 2026-07-19  
+**Author**: jugeeem（原著）  
+**Reviser**: Genki Hashioka（HeroUI v3・近代化スタックへの改訂）  
+**Changes**:
+- v2.0.0 (2026-07-19): HeroUI v3 への全面改訂
+  - セットアップを v3 方式へ（`HeroUIProvider` 廃止→`Toast.Provider`、`globals.css` の `@import` 方式）
+  - 全コンポーネント例を v3 の複合 API へ（`Card.Content` / `Select`+`ListBox.Item` /
+    `Modal`+`useOverlayState` / 素の `Input`+外部ラベル / Navbar 廃止→素の `<header>` /
+    Button `variant`・`isPending` / Spinner `color="accent"` / `as={Link}`→`buttonVariants` 等）
+  - Step 5 削除に伴う参照整理、版数を近代化スタックへ更新
+- v1.1.0 (2025-10-27): 初版（HeroUI v2 準拠）

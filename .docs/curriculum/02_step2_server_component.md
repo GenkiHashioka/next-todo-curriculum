@@ -975,6 +975,12 @@ export async function logout() {
 }
 ```
 
+#### 5. その他のフェッチ関数の実装例（`src/lib/api.ts` の続き）
+
+> 実際のプロジェクトでは、認証が必要なフェッチは §4.3・§5.1 で示した
+> `fetchWithAuth` を使う実装に統一してください（下記は基本形の一覧です）。
+
+```typescript
 // Todo 一覧取得
 export async function fetchTodos(params?: {
   page?: number
@@ -989,86 +995,72 @@ export async function fetchTodos(params?: {
   if (params?.completedFilter) searchParams.set('completedFilter', params.completedFilter)
   if (params?.sortBy) searchParams.set('sortBy', params.sortBy)
   if (params?.sortOrder) searchParams.set('sortOrder', params.sortOrder)
-  
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/todos?${searchParams.toString()}`,
-    {
-      cache: 'no-store', // 常に最新データを取得
-    }
+
+  // 認証付きフェッチ（§4.3・§5.1 で定義した fetchWithAuth / API_URL を使用）
+  const response = await fetchWithAuth(
+    `${API_URL}/api/todos?${searchParams.toString()}`
   )
-  
+
   if (!response.ok) {
+    if (response.status === 401) throw new Error('Unauthorized')
     throw new Error('Failed to fetch todos')
   }
-  
+
   return response.json()
 }
 
 // Todo 詳細取得
 export async function fetchTodoById(id: string) {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/todos/${id}`,
-    {
-      cache: 'no-store',
-    }
-  )
-  
+  const response = await fetchWithAuth(`${API_URL}/api/todos/${id}`)
+
   if (!response.ok) {
+    if (response.status === 401) throw new Error('Unauthorized')
     throw new Error('Failed to fetch todo')
   }
-  
+
   const result = await response.json()
   return result.data
 }
 
 // ユーザー情報取得
 export async function fetchCurrentUser() {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/users/me`,
-    {
-      cache: 'no-store',
-    }
-  )
-  
+  const response = await fetchWithAuth(`${API_URL}/api/users/me`)
+
   if (!response.ok) {
+    if (response.status === 401) throw new Error('Unauthorized')
     throw new Error('Failed to fetch user')
   }
-  
+
   const result = await response.json()
   return result.data
 }
 
 // Todo 統計取得
 export async function fetchTodoStats() {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/users/me/todos/stats`,
-    {
-      cache: 'no-store',
-    }
-  )
-  
+  const response = await fetchWithAuth(`${API_URL}/api/users/me/todos/stats`)
+
   if (!response.ok) {
+    if (response.status === 401) throw new Error('Unauthorized')
     throw new Error('Failed to fetch stats')
   }
-  
+
   const result = await response.json()
   return result.data
 }
 
 // ユーザーの Todo 一覧取得
 export async function fetchUserTodos(userId?: string) {
-  const endpoint = userId 
-    ? `${process.env.NEXT_PUBLIC_API_URL}/api/users/${userId}/todos`
-    : `${process.env.NEXT_PUBLIC_API_URL}/api/users/me/todos`
-  
-  const response = await fetch(endpoint, {
-    cache: 'no-store',
-  })
-  
+  const endpoint = userId
+    ? `${API_URL}/api/users/${userId}/todos`
+    : `${API_URL}/api/users/me/todos`
+
+  const response = await fetchWithAuth(endpoint)
+
   if (!response.ok) {
+    if (response.status === 401) throw new Error('Unauthorized')
     throw new Error('Failed to fetch user todos')
   }
-  
+
   const result = await response.json()
   return result.data
 }
@@ -1091,34 +1083,28 @@ export async function fetchUsers(params?: {
   if (params?.sortBy) searchParams.set('sortBy', params.sortBy)
   if (params?.sortOrder) searchParams.set('sortOrder', params.sortOrder)
   if (params?.search) searchParams.set('search', params.search)
-  
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/users?${searchParams.toString()}`,
-    {
-      cache: 'no-store',
-    }
+
+  const response = await fetchWithAuth(
+    `${API_URL}/api/users?${searchParams.toString()}`
   )
-  
+
   if (!response.ok) {
+    if (response.status === 401) throw new Error('Unauthorized')
     throw new Error('Failed to fetch users')
   }
-  
+
   return response.json()
 }
 
 // ユーザー詳細取得（ADMIN・MANAGER専用）
 export async function fetchUserById(id: string) {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}`,
-    {
-      cache: 'no-store',
-    }
-  )
-  
+  const response = await fetchWithAuth(`${API_URL}/api/users/${id}`)
+
   if (!response.ok) {
+    if (response.status === 401) throw new Error('Unauthorized')
     throw new Error('Failed to fetch user')
   }
-  
+
   const result = await response.json()
   return result.data
 }
@@ -1659,9 +1645,17 @@ Step 2 完了後、以下を確認してください。
 
 ---
 
-**Document Version**: 1.2.0  
-**Last Updated**: 2025-10-28  
+**Document Version**: 2.0.0  
+**Last Updated**: 2026-07-19  
+**Author**: jugeeem（原著）  
+**Reviser**: Genki Hashioka（HeroUI v3・近代化スタックへの改訂）  
 **Changes**:
+- v2.0.0 (2026-07-19): 近代化スタックへの改訂
+  - Next.js 16 対応（`searchParams` / `params` / `cookies()` の Promise 型の記述を更新）
+  - Step 5（カスタムフック）の削除に伴う参照の整理（カリキュラムは Step 4 完結）
+  - §4「その他のフェッチ関数」のコードブロックが開始フェンス欠落で Markdown 崩れしていたのを修正
+  - §4 の `fetchXxx` 関数群を直 `fetch` から `fetchWithAuth` + `API_URL` に統一し、
+    401 時の `Unauthorized` スローを追加（§5.1 の認証付きフェッチと整合）
 - v1.2.0 (2025-10-28): Server Actionsの実装を追加
   - `'use server'` ディレクティブによるServer Actionsの有効化
   - `src/lib/api.ts`に Server Actions を追加（`getXxx/createXxx/updateXxx/deleteXxx`形式）

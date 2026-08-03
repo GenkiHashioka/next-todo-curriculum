@@ -983,8 +983,14 @@ Step 1 完了後、以下を確認してください。
 
 ---
 
-**Document Version**: 1.3.0  
-**Last Updated**: 2025-10-27  
+**Document Version**: 2.0.0  
+**Last Updated**: 2026-07-19  
+**Author**: jugeeem（原著）  
+**Reviser**: Genki Hashioka（近代化に伴う版数・メタ情報の統一）  
+**Changes**:
+- v2.0.0 (2026-07-19): カリキュラム v2.0.0 リリースに伴う版数・メタ情報の統一
+  （本 Step は Tailwind CSS のみで HeroUI を使わないため、内容の変更はなし）
+- v1.3.0 (2025-10-27): 初版
 **Changes**:
 - v1.3.0 (2025-10-27): TodoDetailPage と ProfilePage のヘッダーナビゲーションにユーザー管理リンクの実装詳細を追加
 - v1.2.0 (2025-10-26): TodoListPageのヘッダーナビゲーションにユーザー管理リンクの実装詳細を追加

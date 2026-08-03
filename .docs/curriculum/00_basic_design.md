@@ -191,33 +191,46 @@ React + Next.js の初心者が、API との連携を学習するための Todo 
 
 ## 5. ディレクトリ構成
 
+> 完成形（見本）の構成です。`app/` は薄いルーティング層で、各ルートは
+> `page.tsx`（+ `error.tsx` / `loading.tsx`）から `features/` 側のコンポーネントを呼び出します。
+
 ```
 src/
-├── app/                      # Next.js App Router
-│   ├── layout.tsx            # ルートレイアウト
-│   ├── page.tsx              # ホームページ
-│   ├── api/                  # APIルート（既存）
-│   ├── (auth)/               # 認証関連ページ
-│   │   ├── login/
-│   │   └── register/
-│   └── (protected)/          # 認証必須ページ
-│       ├── todos/
-│       ├── profile/
-│       └── settings/
-├── features/                 # 機能別UIコンポーネント
-│   ├── auth/                 # 認証機能
-│   │   ├── components/       # UIコンポーネント（Step 4以降）
-│   │   ├── LoginPage.tsx     # ログインページコンポーネント
-│   │   └── RegisterPage.tsx  # 登録ページコンポーネント
-│   ├── todos/                # Todo機能
-│   │   ├── components/       # UIコンポーネント（Step 4以降）
-│   │   ├── TodoListPage.tsx  # Todo一覧ページコンポーネント
-│   │   └── TodoDetailPage.tsx # Todo詳細ページコンポーネント
-│   └── profile/              # プロフィール機能
-│       ├── components/       # UIコンポーネント（Step 4以降）
-│       └── ProfilePage.tsx   # プロフィールページコンポーネント
-├── lib/                      # ユーティリティ・共通ロジック（既存）
-└── types/                    # 型定義（既存）
+├── app/                          # Next.js App Router（薄いルーティング層）
+│   ├── layout.tsx                # ルートレイアウト（Header を配置）
+│   ├── page.tsx                  # ホームページ
+│   ├── globals.css               # グローバルCSS（Tailwind + HeroUI）
+│   ├── providers.tsx             # Toast.Provider 等
+│   ├── api/                      # APIルート（既存・変更しない）
+│   ├── login/                    # /login
+│   ├── register/                 # /register
+│   ├── todos/                    # /todos
+│   │   └── [id]/                 # /todos/[id]
+│   ├── profile/                  # /profile
+│   └── users/                    # /users（ADMIN・MANAGER のみ）
+│       ├── [id]/                 # /users/[id]
+│       └── create/               # /users/create
+├── components/                   # 全ページ共通のUI
+│   └── Header.tsx                # 共通ヘッダー（Step 4 で切り出し）
+├── features/                     # 機能別UIコンポーネント
+│   ├── auth/                     # 認証機能
+│   │   ├── components/           # 分割コンポーネント（Step 4 以降）
+│   │   ├── LoginPage.tsx         # ログインページコンポーネント
+│   │   └── RegisterPage.tsx      # 登録ページコンポーネント
+│   ├── todos/                    # Todo機能
+│   │   ├── components/           # 分割コンポーネント（Step 4 以降）
+│   │   ├── TodoListPage.tsx      # Todo一覧ページコンポーネント
+│   │   └── TodoDetailPage.tsx    # Todo詳細ページコンポーネント
+│   ├── profile/                  # プロフィール機能
+│   │   ├── components/           # 分割コンポーネント（Step 4 以降）
+│   │   └── ProfilePage.tsx       # プロフィールページコンポーネント
+│   └── users/                    # ユーザー管理機能
+│       ├── components/           # 分割コンポーネント（Step 4 以降）
+│       ├── UserListPage.tsx      # ユーザー一覧ページコンポーネント
+│       ├── UserDetailPage.tsx    # ユーザー詳細ページコンポーネント
+│       └── CreateUserPage.tsx    # ユーザー作成ページコンポーネント
+├── lib/                          # ユーティリティ・共通ロジック（既存）
+└── types/                        # 型定義（既存）
 ```
 
 ---
@@ -315,6 +328,7 @@ src/
 
 ---
 
-**Document Version**: 1.0.0  
-**Last Updated**: 2025-10-24  
-**Author**: jugeeem
+**Document Version**: 2.0.0  
+**Last Updated**: 2026-07-19  
+**Author**: jugeeem（原著）  
+**Reviser**: Genki Hashioka（HeroUI v3・近代化スタックへの改訂）

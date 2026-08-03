@@ -2318,9 +2318,17 @@ export default function RootLayout({
 
 ---
 
-**Document Version**: 1.3.0  
-**Last Updated**: 2025-10-28  
+**Document Version**: 2.0.0  
+**Last Updated**: 2026-07-19  
+**Author**: jugeeem（原著）  
+**Reviser**: Genki Hashioka（HeroUI v3・近代化スタックへの改訂）  
 **Changes**: 
+- v2.0.0 (2026-07-19): HeroUI v3・近代化スタックへの改訂
+  - コンポーネント分割のコード例を v3 API へ（`Card` 複合API / `Select`+`ListBox.Item` /
+    `Modal`+`useOverlayState` / 共通ヘッダーを Navbar 廃止→素の `<header>` /
+    Button `variant`・`isPending` / `as={Link}`→`buttonVariants` / 素の `Input`+外部ラベル 等）
+  - Step 5 削除に伴う参照整理（Step 4 を最終ステップに）
+- v1.3.0 以前:
 - 型定義ファイル（types.ts）に関するセクションを追加
 - ProfileInfo コンポーネントの一体型実装パターンを追加
 - TodoStatsDisplay の命名を正確に反映
