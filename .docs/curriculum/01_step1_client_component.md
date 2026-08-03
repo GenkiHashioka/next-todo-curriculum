@@ -129,6 +129,18 @@ const [currentUserRole, setCurrentUserRole] = useState<number>(4) // 現在の�
 - `useEffect` でページ読み込み時と、ページ・フィルター・ソート変更時にデータ取得
 - 作成・削除後は一覧を再取得して最新状態を反映
 - ページネーション情報（総ページ数、現在ページ）を表示
+- **日時の表示**: API から返る `createdAt` / `updatedAt` は ISO 形式の文字列です。
+  画面に出すときは `src/lib/date-utils.ts` の `formatJST()` を使ってください。
+
+  ```typescript
+  import { formatJST } from '@/lib/date-utils';
+
+  <p>作成: {formatJST(todo.createdAt)}</p>   // 2024/1/1 9:00:00
+  ```
+
+  > 💡 `new Date(x).toLocaleString('ja-JP')` でも一見それらしく表示されますが、
+  > **見ている人の端末のタイムゾーン任せ**になります。海外から見ると時刻がずれます。
+  > `formatJST()` は日本時間で固定して表示します。
 - **APIレスポンス構造**: レスポンスは入れ子構造になっている
   ```typescript
   // APIレスポンス: { success: true, data: { data: [...], total, page, perPage, totalPages } }
