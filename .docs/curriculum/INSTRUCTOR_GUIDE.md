@@ -242,6 +242,6 @@ UI に関わる更新は、デプロイされた画面も確認することを�
 
 ---
 
-**Document Version**: 1.0.0
+**Document Version**: 1.1.0
 **Last Updated**: 2026-08-03
 **Author**: Genki Hashioka
