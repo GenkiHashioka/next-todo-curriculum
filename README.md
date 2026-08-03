@@ -38,7 +38,13 @@
 git clone https://github.com/GenkiHashioka/next-todo-curriculum.git
 cd next-todo-curriculum
 npm install
+
+# main へ誤って push しないようにする（この 1 回だけ）
+git config core.hooksPath .githooks
 ```
+
+> 最後のコマンドは、`main` への `git push` を止めるだけのものです。
+> `main` は受講者全員の出発点なので変更しません（[ブランチの使い方](#-ブランチの使い方)）。
 
 ### 2. 環境変数を設定
 
