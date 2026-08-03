@@ -76,9 +76,22 @@ class Database {
    * ```
    */
   constructor() {
+    // 接続文字列の解決。
+    // ローカル開発は DB_URL を使うが、Vercel の Neon 統合を使うと
+    // DATABASE_URL / POSTGRES_URL という名前で自動注入されるため、それらも受け付ける。
+    const connectionString =
+      process.env.DB_URL || process.env.DATABASE_URL || process.env.POSTGRES_URL;
+
+    // SSL の要否。
+    // ローカルの Docker PostgreSQL は SSL 非対応、Neon などのマネージド DB は必須。
+    // 接続文字列に sslmode=require が含まれるか、本番環境なら SSL を有効にする。
+    const needsSsl =
+      /sslmode=require/.test(connectionString ?? '') ||
+      process.env.NODE_ENV === 'production';
+
     this.pool = new Pool({
-      connectionString: process.env.DB_URL,
-      ssl: false, // 開発環境用設定。本番環境では true に変更を推奨
+      connectionString,
+      ssl: needsSsl ? { rejectUnauthorized: false } : false,
     });
   }
 
