@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  Button,
-  buttonVariants,
-  Link,
-  Modal,
-  useOverlayState,
-} from '@heroui/react';
+import { Button, buttonVariants, Link, Modal, useOverlayState } from '@heroui/react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { deleteUser as deleteUserAction, updateUser } from '@/lib/api';

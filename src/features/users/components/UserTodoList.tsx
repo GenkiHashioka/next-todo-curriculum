@@ -45,32 +45,27 @@ export function UserTodoList({
     setDisplayTodoCount((prevState) => prevState + 10);
   };
   /** MANAGER権限でTodoの表示権限があるかどうかを判定する変数 */
-  const cannotViewTodos =
-    currentUserRole === 2 && currentUserId !== targetUserId;
+  const cannotViewTodos = currentUserRole === 2 && currentUserId !== targetUserId;
 
   return (
-    <Card className='p-8'>
-      <Card.Header className='justify-between'>
-        <h3 className='text-2xl font-semibold text-gray-900 mb-6'>
-          最近のTodo
-        </h3>
+    <Card className="p-8">
+      <Card.Header className="justify-between">
+        <h3 className="text-2xl font-semibold text-gray-900 mb-6">最近のTodo</h3>
         {todos.length > 0 && <span>全{todos.length}件</span>}
       </Card.Header>
 
       {/* Todoが一件もない場合の表示 */}
       {!cannotViewTodos && todos.length === 0 && (
-        <Card.Content className='text-center py-12'>
-          <p className='text-gray-500'>Todoがありません</p>
+        <Card.Content className="text-center py-12">
+          <p className="text-gray-500">Todoがありません</p>
         </Card.Content>
       )}
 
       {/* MANAGER権限でほかのユーザーの詳細ページを参照している場合 */}
       {cannotViewTodos && (
-        <Card.Content className='text-center py-12'>
-          <p className='text-gray-500 text-sm'>
-            他のユーザーのTodoは閲覧できません
-          </p>
-          <p className='text-gray-400 text-xs mt-2'>
+        <Card.Content className="text-center py-12">
+          <p className="text-gray-500 text-sm">他のユーザーのTodoは閲覧できません</p>
+          <p className="text-gray-400 text-xs mt-2">
             MANAGER権限では自分のTodoのみ閲覧可能です
           </p>
         </Card.Content>

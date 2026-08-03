@@ -1,11 +1,6 @@
 'use client';
 
-import {
-  Button,
-  Card,
-  Modal,
-  useOverlayState,
-} from '@heroui/react';
+import { Button, Card, Modal, useOverlayState } from '@heroui/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createTodo, deleteTodo, getTodoList, updateTodo } from '@/lib/api';
 import { TodoCreateForm } from './components/TodoCreateForm';
@@ -370,9 +365,7 @@ Props) {
                   <Modal.CloseTrigger />
                 </Modal.Header>
                 <Modal.Body>
-                  <p className="text-gray-700">
-                    このTodoを削除してもよろしいですか？
-                  </p>
+                  <p className="text-gray-700">このTodoを削除してもよろしいですか？</p>
                   <p className="text-sm text-gray-500 mt-2">
                     この操作は取り消すことができません。
                   </p>

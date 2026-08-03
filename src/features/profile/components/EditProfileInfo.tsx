@@ -154,7 +154,12 @@ export function EditProfileInfo({ user, onSuccess, onCancel }: EditProfileInfoPr
       <form onSubmit={handleUpdate}>
         <Card.Content className="space-y-6">
           {/* ユーザー名は変更不可のため読み取り専用 */}
-          <TextField validationBehavior="aria" fullWidth isDisabled value={user.username}>
+          <TextField
+            validationBehavior="aria"
+            fullWidth
+            isDisabled
+            value={user.username}
+          >
             <Label>ユーザー名</Label>
             <Input type="text" readOnly />
           </TextField>

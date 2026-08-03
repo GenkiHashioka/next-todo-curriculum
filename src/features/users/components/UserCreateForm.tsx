@@ -15,7 +15,6 @@ import { type FormEvent, useState } from 'react';
 import { z } from 'zod';
 import { createUser } from '@/lib/api';
 
-
 /**
  * ロール番号とラベルの対応表。
  * ユーザー作成フォームのロール選択で使用します。
@@ -268,13 +267,23 @@ export function UserCreateForm({ currentUserRole, onSuccess }: UserCreateFormPro
           {/* 名前入力 */}
           <Card.Content className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* 姓 */}
-            <TextField validationBehavior="aria" fullWidth value={lastName} onChange={setLastName}>
+            <TextField
+              validationBehavior="aria"
+              fullWidth
+              value={lastName}
+              onChange={setLastName}
+            >
               <Label>姓</Label>
               <Input type="text" placeholder="姓" />
             </TextField>
 
             {/* 名 */}
-            <TextField validationBehavior="aria" fullWidth value={firstName} onChange={setFirstName}>
+            <TextField
+              validationBehavior="aria"
+              fullWidth
+              value={firstName}
+              onChange={setFirstName}
+            >
               <Label>名</Label>
               <Input type="text" placeholder="名" />
             </TextField>

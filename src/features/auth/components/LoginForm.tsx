@@ -167,10 +167,7 @@ export function LoginForm() {
       <div className="mt-6 text-center">
         <p className="text-sm text-gray-600 flex items-center justify-center gap-1">
           アカウントをお持ちでない場合は
-          <Link
-            href="/register"
-            className="text-primary font-medium hover:underline"
-          >
+          <Link href="/register" className="text-primary font-medium hover:underline">
             新規登録
           </Link>
         </p>

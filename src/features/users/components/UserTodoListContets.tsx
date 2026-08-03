@@ -37,7 +37,7 @@ export function UserTodoListContents({
   return (
     <div>
       {/* Todoリストコンテンツ */}
-      <Card.Content className='space-y-4'>
+      <Card.Content className="space-y-4">
         {displayTodos.map((todo) => (
           <UserTodoItem key={todo.id} todo={todo} />
         ))}
@@ -45,12 +45,12 @@ export function UserTodoListContents({
 
       {/* もっと見るボタン */}
       {hasMoreTodos && (
-        <Card.Footer className='justify-center mt-4'>
+        <Card.Footer className="justify-center mt-4">
           <Button
-            type='button'
+            type="button"
             onPress={onLoadMoreTodos}
-            variant='primary'
-            className='font-medium'
+            variant="primary"
+            className="font-medium"
           >
             もっと見る
           </Button>
@@ -59,10 +59,8 @@ export function UserTodoListContents({
 
       {/* 全件表示完了メッセージ */}
       {isAllDisplayed && (
-        <Card.Footer className='justify-center mt-4'>
-          <p className='text-sm text-gray-500'>
-            すべてのTodoが表示されています
-          </p>
+        <Card.Footer className="justify-center mt-4">
+          <p className="text-sm text-gray-500">すべてのTodoが表示されています</p>
         </Card.Footer>
       )}
     </div>

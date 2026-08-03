@@ -5,7 +5,6 @@ import { useState } from 'react';
 import type { User } from './types';
 import { roleLabels } from './types';
 
-
 /**
  * UserInfoEditFormのPropsタイプ定義
  *
@@ -104,12 +103,22 @@ export function UserInfoEditForm({
 
         {/* 姓・名 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <TextField validationBehavior="aria" fullWidth value={lastName} onChange={setLastName}>
+          <TextField
+            validationBehavior="aria"
+            fullWidth
+            value={lastName}
+            onChange={setLastName}
+          >
             <Label>姓</Label>
             <Input type="text" placeholder="姓" />
           </TextField>
 
-          <TextField validationBehavior="aria" fullWidth value={firstName} onChange={setFirstName}>
+          <TextField
+            validationBehavior="aria"
+            fullWidth
+            value={firstName}
+            onChange={setFirstName}
+          >
             <Label>名</Label>
             <Input type="text" placeholder="名" />
           </TextField>
@@ -122,23 +131,23 @@ export function UserInfoEditForm({
           onSelectionChange={(key) => setRole(Number(key))}
         >
           <Label>ロール</Label>
-            <Select.Trigger>
-              <Select.Value />
-              <Select.Indicator />
-            </Select.Trigger>
-            <Select.Popover>
-              <ListBox>
-                {editableRoles.map((roleOption) => (
-                  <ListBox.Item
-                    key={String(roleOption.value)}
-                    id={String(roleOption.value)}
-                    textValue={roleOption.label}
-                  >
-                    {roleOption.label}
-                  </ListBox.Item>
-                ))}
-              </ListBox>
-            </Select.Popover>
+          <Select.Trigger>
+            <Select.Value />
+            <Select.Indicator />
+          </Select.Trigger>
+          <Select.Popover>
+            <ListBox>
+              {editableRoles.map((roleOption) => (
+                <ListBox.Item
+                  key={String(roleOption.value)}
+                  id={String(roleOption.value)}
+                  textValue={roleOption.label}
+                >
+                  {roleOption.label}
+                </ListBox.Item>
+              ))}
+            </ListBox>
+          </Select.Popover>
         </Select>
       </Card.Content>
     </Card>

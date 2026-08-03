@@ -3,7 +3,6 @@
 import { Input, Label, ListBox, Select, TextField } from '@heroui/react';
 import type { RoleFilter, SortBy, SortOrder } from './types';
 
-
 /**
  * UserSearchFilterのPropsタイプ定義
  *
@@ -49,7 +48,12 @@ export function UserSearchFilter({
   return (
     <div className="space-y-4">
       {/* 検索ボックス */}
-      <TextField validationBehavior="aria" fullWidth value={searchQuery} onChange={onSearchChange}>
+      <TextField
+        validationBehavior="aria"
+        fullWidth
+        value={searchQuery}
+        onChange={onSearchChange}
+      >
         <Label>ユーザー名</Label>
         <Input type="text" placeholder="ユーザー名で検索" />
       </TextField>
@@ -64,29 +68,29 @@ export function UserSearchFilter({
           }
         >
           <Label>ロールフィルター</Label>
-            <Select.Trigger>
-              <Select.Value />
-              <Select.Indicator />
-            </Select.Trigger>
-            <Select.Popover>
-              <ListBox>
-                <ListBox.Item id="all" textValue="すべて">
-                  すべて
-                </ListBox.Item>
-                <ListBox.Item id="1" textValue="ADMIN">
-                  ADMIN
-                </ListBox.Item>
-                <ListBox.Item id="2" textValue="MANAGER">
-                  MANAGER
-                </ListBox.Item>
-                <ListBox.Item id="3" textValue="USER">
-                  USER
-                </ListBox.Item>
-                <ListBox.Item id="4" textValue="GUEST">
-                  GUEST
-                </ListBox.Item>
-              </ListBox>
-            </Select.Popover>
+          <Select.Trigger>
+            <Select.Value />
+            <Select.Indicator />
+          </Select.Trigger>
+          <Select.Popover>
+            <ListBox>
+              <ListBox.Item id="all" textValue="すべて">
+                すべて
+              </ListBox.Item>
+              <ListBox.Item id="1" textValue="ADMIN">
+                ADMIN
+              </ListBox.Item>
+              <ListBox.Item id="2" textValue="MANAGER">
+                MANAGER
+              </ListBox.Item>
+              <ListBox.Item id="3" textValue="USER">
+                USER
+              </ListBox.Item>
+              <ListBox.Item id="4" textValue="GUEST">
+                GUEST
+              </ListBox.Item>
+            </ListBox>
+          </Select.Popover>
         </Select>
 
         {/* ソート項目 */}
@@ -96,29 +100,29 @@ export function UserSearchFilter({
           onSelectionChange={(key) => onSortByChange(key as SortBy)}
         >
           <Label>並び順</Label>
-            <Select.Trigger>
-              <Select.Value />
-              <Select.Indicator />
-            </Select.Trigger>
-            <Select.Popover>
-              <ListBox>
-                <ListBox.Item id="createdAt" textValue="作成日時">
-                  作成日時
-                </ListBox.Item>
-                <ListBox.Item id="username" textValue="ユーザー名">
-                  ユーザー名
-                </ListBox.Item>
-                <ListBox.Item id="firstName" textValue="名前">
-                  名前
-                </ListBox.Item>
-                <ListBox.Item id="lastName" textValue="姓">
-                  姓
-                </ListBox.Item>
-                <ListBox.Item id="role" textValue="ロール">
-                  ロール
-                </ListBox.Item>
-              </ListBox>
-            </Select.Popover>
+          <Select.Trigger>
+            <Select.Value />
+            <Select.Indicator />
+          </Select.Trigger>
+          <Select.Popover>
+            <ListBox>
+              <ListBox.Item id="createdAt" textValue="作成日時">
+                作成日時
+              </ListBox.Item>
+              <ListBox.Item id="username" textValue="ユーザー名">
+                ユーザー名
+              </ListBox.Item>
+              <ListBox.Item id="firstName" textValue="名前">
+                名前
+              </ListBox.Item>
+              <ListBox.Item id="lastName" textValue="姓">
+                姓
+              </ListBox.Item>
+              <ListBox.Item id="role" textValue="ロール">
+                ロール
+              </ListBox.Item>
+            </ListBox>
+          </Select.Popover>
         </Select>
 
         {/* ソート順序 */}

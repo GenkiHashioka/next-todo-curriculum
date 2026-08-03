@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  Button,
-  buttonVariants,
-  Card,
-  Modal,
-  useOverlayState,
-} from '@heroui/react';
+import { Button, buttonVariants, Card, Modal, useOverlayState } from '@heroui/react';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { deleteUser } from '@/lib/api';

@@ -15,8 +15,8 @@
  * @since 1.0.0
  */
 
-import bcrypt from 'bcryptjs';
 import { randomUUID } from 'node:crypto';
+import bcrypt from 'bcryptjs';
 import {
   type CreateUserInput,
   type UpdateUserInput,

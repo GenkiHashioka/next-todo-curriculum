@@ -1,10 +1,6 @@
 'use client';
 
-import {
-  Button,
-  Modal,
-  useOverlayState,
-} from '@heroui/react';
+import { Button, Modal, useOverlayState } from '@heroui/react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -239,9 +235,7 @@ export default function TodoDetailPage({
                   <Modal.CloseTrigger />
                 </Modal.Header>
                 <Modal.Body>
-                  <p className="text-gray-700">
-                    このTodoを削除してもよろしいですか？
-                  </p>
+                  <p className="text-gray-700">このTodoを削除してもよろしいですか？</p>
                   <p className="text-sm text-gray-500 mt-2">
                     この操作は取り消すことができません。
                   </p>

@@ -3,7 +3,6 @@
 import { Label, ListBox, Select } from '@heroui/react';
 import type { CompletedFilter, SortBy, SortOrder } from './types';
 
-
 /**
  * TodoFilterのPropsインターフェース。
  *
