@@ -41,7 +41,20 @@ Neon 単体でプロジェクトを作ろうとすると「Vercel の Neon Postg
    |---|---|
    | Framework Preset | Next.js（自動検出される） |
    | Build Command / Root Directory | 既定のまま |
-   | Environment Variables | ここで `JWT_SECRET` と `NODE_ENV=production` を入れておくと後が楽 |
+   | Environment Variables | ここで `JWT_SECRET` を入れておくと後が楽（値は下記参照） |
+
+   **`JWT_SECRET` は新しく生成する。ローカルの `.env` の値は流用しない。**
+
+   ```bash
+   openssl rand -base64 64    # Git Bash / WSL で実行し、出力を貼り付ける
+   ```
+
+   > ⚠️ 開発機と本番で同じ秘密鍵を使うと、ローカルの `.env` が漏れた時点で本番も
+   > 破られる。本番用の鍵は本番にしか存在しない値にすること。
+   > （この鍵はログイン状態の署名に使うだけなので、ローカルと違う値で問題ない）
+
+   > ℹ️ **`NODE_ENV` は設定しない。** Vercel が本番デプロイで自動的に `production` を
+   > 設定するため、手動で入れる必要はない。
 
    > ℹ️ **インポート画面に「Production Branch」の項目はない。**
    > デプロイ対象ブランチはプロジェクト作成後に変更する（次の手順 2）。
@@ -107,15 +120,21 @@ Vercel の Storage 画面から Neon のコンソールを開く（または htt
 
 ## 5. 残りの環境変数を設定して再デプロイ
 
-Vercel の **Settings → Environment Variables** で、以下を追加する。
+手順 1 で `JWT_SECRET` を設定済みならこの章は不要。まだなら
+Vercel の **Settings → Environment Variables** で追加する。
 
 | 変数名 | 値 |
 |---|---|
-| `JWT_SECRET` | 長いランダム文字列（`openssl rand -base64 64` で生成） |
-| `NODE_ENV` | `production` |
+| `JWT_SECRET` | **新しく生成した**長いランダム文字列（`openssl rand -base64 64`） |
 
-> 💡 `DB_URL` は不要（統合が入れる `DATABASE_URL` が使われる）。
-> `NEXT_PUBLIC_API_URL` も不要（Vercel が渡す `VERCEL_URL` で自己解決する）。
+**設定しなくてよいもの:**
+
+| 変数名 | 理由 |
+|---|---|
+| `NODE_ENV` | Vercel が本番デプロイで自動的に `production` を設定する |
+| `DB_URL` | Neon 統合が入れる `DATABASE_URL` がそのまま使われる |
+| `NEXT_PUBLIC_API_URL` | Vercel が渡す `VERCEL_URL` で自己解決する |
+| `DB_HOST` / `DB_NAME` などの個別項目 | ローカルの Docker 用。Vercel では接続文字列だけあればよい |
 
 設定したら **Deployments → 最新のデプロイ → Redeploy** で再デプロイする
 （環境変数はビルド時に読み込まれるため、追加後は再デプロイが必要）。
