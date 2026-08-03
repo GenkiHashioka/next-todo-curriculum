@@ -12,7 +12,8 @@
     "test:coverage": "jest --coverage",
     "format": "biome format --write src/",
     "lint": "biome lint src/",
-    "check": "biome check src/ --write --unsafe"
+    "check": "biome check src/ --write --unsafe",
+    "submit-check": "node scripts/submit-check.mjs"
   },
   "dependencies": {
     "@biomejs/biome": "^2.5.6",
