@@ -1,5 +1,5 @@
 'use client';
-import { Button, Card, Input } from '@heroui/react';
+import { Button, Card, FieldError, Input, Label, TextField } from '@heroui/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { type FormEvent, useCallback, useState } from 'react';
@@ -113,61 +113,37 @@ export function LoginForm() {
       {/* ログインフォーム */}
       <form onSubmit={handleSubmit} className="space-y-6">
         {/*ユーザー名の入力 */}
-        <div className="flex flex-col gap-1.5">
-          <label
-            htmlFor="username"
-            className="text-sm font-medium text-foreground"
-          >
-            ユーザー名
-          </label>
-          <Input
-            id="username"
-            type="text"
-            value={username}
-            onChange={(e) => {
-              setUsername(e.target.value);
-              setUsernameError(''); // エラーメッセージをクリア
-            }}
-            disabled={isLoading}
-            placeholder="ユーザー名を入力"
-            aria-label="ユーザー名"
-            aria-invalid={!!usernameError}
-            className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
-          />
-          {usernameError && (
-            <span className="text-danger text-sm" role="alert">
-              {usernameError}
-            </span>
-          )}
-        </div>
+        <TextField
+          isRequired
+          fullWidth
+          isDisabled={isLoading}
+          isInvalid={!!usernameError}
+          value={username}
+          onChange={(next) => {
+            setUsername(next);
+            setUsernameError(''); // エラーメッセージをクリア
+          }}
+        >
+          <Label>ユーザー名</Label>
+          <Input type="text" placeholder="ユーザー名を入力" />
+          <FieldError>{usernameError}</FieldError>
+        </TextField>
         {/*パスワードの入力 */}
-        <div className="flex flex-col gap-1.5">
-          <label
-            htmlFor="password"
-            className="text-sm font-medium text-foreground"
-          >
-            パスワード
-          </label>
-          <Input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              setPasswordError(''); // エラーメッセージをクリア
-            }}
-            disabled={isLoading}
-            placeholder="パスワードを入力"
-            aria-label="パスワード"
-            aria-invalid={!!passwordError}
-            className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
-          />
-          {passwordError && (
-            <span className="text-danger text-sm" role="alert">
-              {passwordError}
-            </span>
-          )}
-        </div>
+        <TextField
+          isRequired
+          fullWidth
+          isDisabled={isLoading}
+          isInvalid={!!passwordError}
+          value={password}
+          onChange={(next) => {
+            setPassword(next);
+            setPasswordError(''); // エラーメッセージをクリア
+          }}
+        >
+          <Label>パスワード</Label>
+          <Input type="password" placeholder="パスワードを入力" />
+          <FieldError>{passwordError}</FieldError>
+        </TextField>
 
         {/*ログイン時エラーメッセージの表示 */}
         {error && (

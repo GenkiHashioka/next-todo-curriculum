@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, Input } from '@heroui/react';
+import { Button, Card, FieldError, Input, Label, TextField } from '@heroui/react';
 import Link from 'next/link';
 import { useCallback, useState } from 'react';
 import { z } from 'zod';
@@ -117,104 +117,62 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
       {/* 登録フォーム */}
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* ユーザー名入力 */}
-        <div className="flex flex-col gap-1.5">
-          <label
-            htmlFor="username"
-            className="text-sm font-medium text-foreground"
-          >
-            ユーザー名
-          </label>
-          <Input
-            id="username"
-            type="text"
-            value={username}
-            onChange={(e) => {
-              setUsername(e.target.value);
-              setUsernameError('');
-            }}
-            disabled={isLoading}
-            placeholder="ユーザー名を入力"
-            aria-label="ユーザー名"
-            aria-invalid={!!usernameError}
-            className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
-          />
-          {usernameError && (
-            <span className="text-danger text-sm" role="alert">
-              {usernameError}
-            </span>
-          )}
-        </div>
+        <TextField
+          isRequired
+          fullWidth
+          isDisabled={isLoading}
+          isInvalid={!!usernameError}
+          value={username}
+          onChange={(next) => {
+            setUsername(next);
+            setUsernameError('');
+          }}
+        >
+          <Label>ユーザー名</Label>
+          <Input type="text" placeholder="ユーザー名を入力" />
+          <FieldError>{usernameError}</FieldError>
+        </TextField>
 
         {/* パスワード入力 */}
-        <div className="flex flex-col gap-1.5">
-          <label
-            htmlFor="password"
-            className="text-sm font-medium text-foreground"
-          >
-            パスワード
-          </label>
-          <Input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              setPasswordError('');
-            }}
-            disabled={isLoading}
-            placeholder="パスワードを入力"
-            aria-label="パスワード"
-            aria-invalid={!!passwordError}
-            className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
-          />
-          {passwordError && (
-            <span className="text-danger text-sm" role="alert">
-              {passwordError}
-            </span>
-          )}
-        </div>
+        <TextField
+          isRequired
+          fullWidth
+          isDisabled={isLoading}
+          isInvalid={!!passwordError}
+          value={password}
+          onChange={(next) => {
+            setPassword(next);
+            setPasswordError('');
+          }}
+        >
+          <Label>パスワード</Label>
+          <Input type="password" placeholder="パスワードを入力" />
+          <FieldError>{passwordError}</FieldError>
+        </TextField>
 
         {/* 名前入力 */}
         <div className="grid grid-cols-2 gap-3">
           {/* 姓の入力 */}
-          <div className="flex flex-col gap-1.5">
-            <label
-              htmlFor="lastName"
-              className="text-sm font-medium text-foreground"
-            >
-              姓
-            </label>
-            <Input
-              id="lastName"
-              type="text"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              disabled={isLoading}
-              placeholder="姓（任意）"
-              aria-label="姓"
-              className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
-            />
-          </div>
+          <TextField
+            fullWidth
+            isDisabled={isLoading}
+            value={lastName}
+            onChange={setLastName}
+          >
+            <Label>姓</Label>
+            <Input type="text" placeholder="姓（任意）" />
+          </TextField>
 
           {/* 名の入力 */}
-          <div className="flex flex-col gap-1.5">
-            <label
-              htmlFor="firstName"
-              className="text-sm font-medium text-foreground"
-            >
-              名
-            </label>
-            <Input
-              id="firstName"
-              type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              disabled={isLoading}
-              placeholder="名（任意）"
-              aria-label="名"
-              className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
-            />
-          </div>
+          <TextField
+            fullWidth
+            isDisabled={isLoading}
+            value={firstName}
+            onChange={setFirstName}
+          >
+            <Label>名</Label>
+            <Input type="text" placeholder="名（任意）" />
+          </TextField>
         </div>
 
         {/* エラーメッセージ表示 */}
