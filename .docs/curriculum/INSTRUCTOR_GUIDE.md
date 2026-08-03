@@ -31,11 +31,20 @@ main（不変）
 ### `main` の保護について
 
 **無料の Private リポジトリではブランチ保護が使えません**（GitHub Pro 以上が必要）。
-そのため `main` の不変は**規約とレビューで担保**します。
+そのため、次の 3 段構えで担保します。
 
-- 受講者には `main` へ直接 push しないことを README と `AGENTS.md` で明示済み
-- 万一 `main` が変更された場合は、`reference/v3-complete` から復旧できる
-- 将来 Org へ移管して Team プランになれば、ブランチ保護を有効化する
+1. **git hook**（`.githooks/pre-push`）— `main` への push を拒否する
+   セットアップ時に受講者が有効化します（README のセットアップ手順に記載）。
+   ```bash
+   git config core.hooksPath .githooks
+   ```
+   講師が教材更新で `main` に push するときは `--no-verify` で回避できます。
+   > ⚠️ 有効化しなければ効きません（hook は clone しても自動では有効になりません）。
+   > あくまで**うっかり防止**であり、強制力はありません。
+2. **規約** — README と `AGENTS.md` で「`main` へ直接 push しない」と明示
+3. **復旧手段** — 万一 `main` が変更されても `reference/v3-complete` から復旧できる
+
+将来 Org へ移管して Team プランになれば、GitHub のブランチ保護を有効化してください。
 
 ---
 
