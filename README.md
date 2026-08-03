@@ -1,6 +1,9 @@
 # Todo アプリ 参考実装（reference/v3-complete）
 
 このブランチは、カリキュラムを **Step 1 〜 Step 4 まで完走した実装例のひとつ** です。
+デプロイしてあるので、環境構築なしでそのまま触れます。
+
+**https://next-todo-curriculum.vercel.app**
 
 > 📘 **受講者の方へ — ここは「唯一の正解」ではありません**
 >
