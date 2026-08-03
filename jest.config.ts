@@ -6,6 +6,11 @@
 import type {Config} from 'jest';
 import nextJest from 'next/jest.js'
 
+// テスト実行時のタイムゾーンを JST に固定する。
+// 本アプリは日時を JST で扱う（src/lib/date-utils.ts）ため、実行環境の TZ に
+// 依存すると UTC 環境（CI や海外の開発機）で日時比較が 9 時間ずれて失敗する。
+process.env.TZ = 'Asia/Tokyo';
+
 const createJestConfig = nextJest({
   // Provide the path to your Next.js app to load next.config.js and .env files in your test environment
   dir: './',
