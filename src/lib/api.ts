@@ -9,14 +9,27 @@ import { redirect } from 'next/navigation';
  * このファイルはサーバー側で動き、同じアプリの API ルート（/api/*）を絶対 URL で呼ぶ。
  * そのため実行環境ごとに「自分自身の URL」を解決する必要がある。
  *
- * 1. NEXT_PUBLIC_API_URL … 明示指定があれば最優先
- * 2. VERCEL_URL           … Vercel が自動で渡すデプロイ先のドメイン
- *                           （本番・プレビューとも自分自身を指すので設定不要）
- * 3. localhost:3000       … ローカル開発
+ * 1. NEXT_PUBLIC_API_URL          … 明示指定があれば最優先
+ * 2. VERCEL_PROJECT_PRODUCTION_URL … Vercel の本番ドメイン
+ * 3. VERCEL_URL                    … デプロイ固有の URL（本番ドメインが無い場合の保険）
+ * 4. localhost:3000                … ローカル開発
+ *
+ * ⚠️ 2 と 3 の順序が重要。
+ * Vercel の Deployment Protection（Standard Protection）は「本番ドメイン以外」を保護する。
+ * VERCEL_URL はデプロイ固有 URL なので保護対象になり、サーバーから自己アクセスすると
+ * 認証 Cookie を持たないため SSO ログイン画面の HTML が返る。
+ * その結果 response.json() が `Unexpected token '<'` で失敗する。
+ * 保護対象外である本番ドメイン（VERCEL_PROJECT_PRODUCTION_URL）を優先すること。
  */
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+function resolveApiUrl(): string {
+  if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL)
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return 'http://localhost:3000';
+}
+
+const API_URL = resolveApiUrl();
 
 // ===============================================
 // サーバーコンポーネント専用のフェッチ関数
