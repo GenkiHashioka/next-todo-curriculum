@@ -148,37 +148,40 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 **After (HeroUI v3)**:
 ```typescript
-import { Input } from '@heroui/react'
+import { FieldError, Input, Label, TextField } from '@heroui/react'
 
-{/* v3 の Input は「素の入力要素」。ラベルとエラーは外側に自分で置く */}
-<div className="flex flex-col gap-1.5">
-  <label htmlFor="username" className="text-sm font-medium text-foreground">
-    ユーザー名
-  </label>
-  <Input
-    id="username"
-    type="text"
-    placeholder="ユーザー名を入力"
-    value={username}
-    onChange={(e) => setUsername(e.target.value)}
-    aria-label="ユーザー名"
-    aria-invalid={!!usernameError}
-    className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
-  />
-  {usernameError && (
-    <span className="text-danger text-sm" role="alert">
-      {usernameError}
-    </span>
-  )}
-</div>
+{/* v3 は TextField でひとまとまりにする。値・検証状態は TextField が持つ */}
+<TextField
+  validationBehavior="aria"
+  isRequired
+  fullWidth
+  isInvalid={!!usernameError}
+  value={username}
+  onChange={(next) => setUsername(next)}
+>
+  <Label>ユーザー名</Label>
+  <Input type="text" placeholder="ユーザー名を入力" />
+  <FieldError>{usernameError}</FieldError>
+</TextField>
 ```
 
 **ポイント（v3 の重要な変更点）**:
-- v3 の `Input` は React Aria ベースの**素の入力要素**。v2 にあった `label` /
-  `errorMessage` / `isRequired` プロパティは**なくなった**。
-- ラベルは外側の `<label htmlFor>`、エラーは外側の `<span role="alert">` で表現する。
-- `value` / `onChange`（イベント型 `e.target.value`）はそのまま使える。
-- 見た目は `className` で付ける（v2 のような既定の枠線は付かない）。
+- v2 の `label` / `errorMessage` プロパティは廃止。代わりに **`TextField` で囲み、
+  `Label` / `Input` / `FieldError` を子として並べる**（React Aria の作法）。
+- **`value` / `onChange` は `TextField` 側に付ける**。`onChange` は
+  イベントではなく**入力値そのもの（文字列）**を受け取る。
+- エラー表示は `isInvalid` と `FieldError` が連動する。`isInvalid` が `false` の間、
+  `FieldError` は何も描画しない。
+- **`className` でスタイルを書く必要はない。** `Input` / `Label` / `FieldError` は
+  それぞれ枠線・背景・フォーカス・エラー時の赤枠まで既定のスタイルを持っている。
+
+> ⚠️ **`validationBehavior="aria"` を必ず付けること。**
+> 省略するとブラウザ標準のバリデーションが先に働き、`isRequired` の項目が空のときに
+> **フォーム送信自体がブロックされて、自前の検証（Zod）が動かない**。
+> その結果「エラーメッセージが出ない」という不具合になる。
+
+> ⚠️ **`className` で `rounded-*` や `bg-*` を上書きしない。**
+> HeroUI の既定クラスと衝突して打ち消し合い、枠線や角丸が消えることがある。
 
 ---
 
@@ -198,27 +201,26 @@ import { Input } from '@heroui/react'
 **After (HeroUI v3)**:
 ```typescript
 // v3 では「Textarea」→「TextArea」（大文字 A）に名称変更
-import { TextArea } from '@heroui/react'
+import { FieldError, Label, TextArea, TextField } from '@heroui/react'
 
-<div className="flex flex-col gap-1.5">
-  <label htmlFor="descriptions" className="text-sm font-medium text-foreground">
-    説明
-  </label>
-  <TextArea
-    id="descriptions"
-    placeholder="説明を入力"
-    value={descriptions}
-    onChange={(e) => setDescriptions(e.target.value)}
-    rows={4}
-    aria-label="説明"
-    className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
-  />
-</div>
+<TextField
+  validationBehavior="aria"
+  fullWidth
+  maxLength={128}
+  isInvalid={!!descriptionsError}
+  value={descriptions}
+  onChange={(next) => setDescriptions(next)}
+>
+  <Label>説明</Label>
+  <TextArea placeholder="説明を入力" rows={4} />
+  <FieldError>{descriptionsError}</FieldError>
+</TextField>
 ```
 
 **ポイント**:
 - コンポーネント名が `Textarea` → **`TextArea`**（大文字 A）に変わった。
-- `Input` と同じく素の入力要素なので、ラベル・エラーは外側に置く。`rows` で行数指定。
+- 使い方は `Input` と同じで、**`TextField` で囲んで `Label` / `TextArea` / `FieldError`**
+  を並べる。`rows` で行数、文字数制限は `TextField` の `maxLength` で指定する。
 
 ---
 
@@ -438,14 +440,15 @@ import Link from 'next/link'
 **After (HeroUI v3)**:
 ```typescript
 // v2 の SelectItem は廃止 → Select の複合 API + ListBox.Item を使う
-import { Select, ListBox } from '@heroui/react'
+import { Label, ListBox, Select } from '@heroui/react'
 
 <Select
-  aria-label="フィルター"
+  fullWidth
   selectedKey={completedFilter}
   onSelectionChange={(key) => setCompletedFilter(key as string)}
 >
-  <Select.Trigger className="flex w-full items-center justify-between rounded-medium border border-default-200 bg-default-50 px-3 py-2">
+  <Label>フィルター</Label>
+  <Select.Trigger>
     <Select.Value />
     <Select.Indicator />
   </Select.Trigger>
@@ -465,6 +468,8 @@ import { Select, ListBox } from '@heroui/react'
 - 選択値は `selectedKeys`（Set）→ **`selectedKey`（単数の文字列）**。
 - `onSelectionChange` は**選択された 1 つの key** を受け取る（`onChange` のイベントではない）。
 - 各項目は `ListBox.Item` に `id`（選択値）と `textValue`（表示用テキスト）を渡す。
+- ラベルは `Label` を `Select` の子として置く。幅は `fullWidth` で指定する。
+- **`Select.Trigger` に `className` でスタイルを書く必要はない**（枠線・背景は既定で付く）。
 
 ---
 
@@ -484,16 +489,31 @@ import { Select, ListBox } from '@heroui/react'
 ```typescript
 import { Checkbox } from '@heroui/react'
 
+{/* v3 の Checkbox は複合コンポーネント。中身を書かないと何も表示されない */}
 <Checkbox
+  aria-label="完了にする"
   isSelected={todo.completed}
   onChange={() => handleToggleComplete(todo.id)}
 >
-  {todo.title}
+  <Checkbox.Content>
+    <Checkbox.Control>
+      <Checkbox.Indicator />
+    </Checkbox.Control>
+    {todo.title}
+  </Checkbox.Content>
 </Checkbox>
 ```
 
-**ポイント**: v2 の `onValueChange` は v3 では **`onChange`**（真偽値を受け取る）に変わった。
-選択状態は `isSelected` のまま。
+**ポイント（v3 の重要な変更点）**:
+- v2 の `onValueChange` は **`onChange`**（真偽値を受け取る）に変わった。
+  選択状態は `isSelected` のまま。
+- **`Checkbox` は複合コンポーネント**になった。
+  `Checkbox.Content`（クリック領域）の中に `Checkbox.Control`（四角い枠）と
+  `Checkbox.Indicator`（チェックマーク）を置く。
+  ラベル文字を付けたい場合は `Checkbox.Content` の中に並べる。
+
+> ⚠️ `<Checkbox isSelected onChange />` と**中身を書かずに閉じると、
+> 見た目が何も描画されず操作もできない**。v2 の感覚で書くと必ずハマる。
 
 ---
 
@@ -597,7 +617,7 @@ export default function Error({
         <Card.Header className="flex flex-col items-start gap-1">
           <h2 className="text-2xl font-bold text-danger">エラーが発生しました</h2>
           {error.digest && (
-            <p className="text-small text-default-500">エラーID: {error.digest}</p>
+            <p className="text-xs text-muted">エラーID: {error.digest}</p>
           )}
         </Card.Header>
         <Card.Content>
@@ -869,14 +889,14 @@ export default function Error({
         <Card.Header className="flex flex-col items-start gap-1">
           <h2 className="text-2xl font-bold text-danger">エラーが発生しました</h2>
           {error.digest && (
-            <p className="text-small text-default-500">エラーID: {error.digest}</p>
+            <p className="text-xs text-muted">エラーID: {error.digest}</p>
           )}
         </Card.Header>
         <Card.Content>
           <p className="text-default-700 mb-2">
             Todoページの読み込み中にエラーが発生しました。
           </p>
-          <p className="text-small text-default-500">{error.message}</p>
+          <p className="text-xs text-muted">{error.message}</p>
         </Card.Content>
         <Card.Footer className="gap-2">
           <Button
@@ -922,7 +942,7 @@ export default function Error({
         <Card.Header className="flex flex-col items-start gap-1">
           <h2 className="text-2xl font-bold text-danger">Todo詳細の読み込みエラー</h2>
           {error.digest && (
-            <p className="text-small text-default-500">エラーID: {error.digest}</p>
+            <p className="text-xs text-muted">エラーID: {error.digest}</p>
           )}
         </Card.Header>
         <Card.Content>
@@ -930,7 +950,7 @@ export default function Error({
             指定されたTodoの詳細を取得できませんでした。
           </p>
           <div className="bg-danger-50 border-l-4 border-danger p-3 rounded">
-            <p className="text-small text-danger-800">{error.message}</p>
+            <p className="text-sm text-danger-800">{error.message}</p>
           </div>
         </Card.Content>
         <Card.Footer className="flex flex-col gap-2">
@@ -981,7 +1001,7 @@ export default function Loading() {
           <Spinner size="lg" color="accent" />
           <div className="text-center">
             <p className="text-default-700 font-medium">Todoを読み込み中...</p>
-            <p className="text-small text-default-500 mt-1">しばらくお待ちください</p>
+            <p className="text-xs text-muted mt-1">しばらくお待ちください</p>
           </div>
         </Card.Content>
       </Card>
@@ -1248,11 +1268,17 @@ Step 3 完了後、以下を確認してください。
 
 ---
 
-**Document Version**: 2.0.0  
-**Last Updated**: 2026-07-19  
+**Document Version**: 2.1.0  
+**Last Updated**: 2026-08-03  
 **Author**: jugeeem（原著）  
 **Reviser**: Genki Hashioka（HeroUI v3・近代化スタックへの改訂）  
 **Changes**:
+- v2.1.0 (2026-08-03): 実装との突き合わせによる修正
+  - フォームを TextField/Label/Input/FieldError の正規構成へ（手書きの label・className を廃止）
+  - validationBehavior="aria" の必要性を明記（省略すると自前検証が動かない）
+  - Checkbox を複合構造（Content/Control/Indicator）に修正
+  - Select は Label 内包・className 不要に
+  - v3 に存在しないクラス（rounded-medium / default-* / text-small）を一掃
 - v2.0.0 (2026-07-19): HeroUI v3 への全面改訂
   - セットアップを v3 方式へ（`HeroUIProvider` 廃止→`Toast.Provider`、`globals.css` の `@import` 方式）
   - 全コンポーネント例を v3 の複合 API へ（`Card.Content` / `Select`+`ListBox.Item` /

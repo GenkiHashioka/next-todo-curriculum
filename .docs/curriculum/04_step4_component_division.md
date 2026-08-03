@@ -720,7 +720,7 @@ export function LoginPage() {
 'use client'
 
 import { useState } from 'react'
-import { Input, Button, Card, } from '@heroui/react'
+import { Button, Card, Input, Label, TextField } from '@heroui/react'
 import { useRouter } from 'next/navigation'
 
 export function LoginForm() {
@@ -759,31 +759,24 @@ export function LoginForm() {
     <Card>
       <Card.Content>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="username" className="text-sm font-medium text-foreground">
-              ユーザー名
-            </label>
-            <Input
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              aria-label="ユーザー名"
-              className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
-            />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="password" className="text-sm font-medium text-foreground">
-              パスワード
-            </label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              aria-label="パスワード"
-              className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
-            />
-          </div>
+          <TextField
+            validationBehavior="aria"
+            fullWidth
+            value={username}
+            onChange={setUsername}
+          >
+            <Label>ユーザー名</Label>
+            <Input type="text" />
+          </TextField>
+          <TextField
+            validationBehavior="aria"
+            fullWidth
+            value={password}
+            onChange={setPassword}
+          >
+            <Label>パスワード</Label>
+            <Input type="password" />
+          </TextField>
           {error && <p className="text-red-500 text-sm">{error}</p>}
           <Button
             type="submit"
@@ -924,16 +917,23 @@ export function TodoItem({ todo, onDelete, onToggleComplete }: Props) {
   return (
     <Card>
       <Card.Content className="flex flex-row items-center justify-between">
+        {/* v3 の Checkbox は複合コンポーネント（中身を書かないと表示されない） */}
         <Checkbox
+          aria-label="完了にする"
           isSelected={todo.completed}
           onChange={(checked) => onToggleComplete(todo.id, checked)}
         >
-          <Link href={`/todos/${todo.id}`}>
-            <span className={todo.completed ? 'line-through text-gray-500' : ''}>
-              {todo.title}
-            </span>
-          </Link>
+          <Checkbox.Content>
+            <Checkbox.Control>
+              <Checkbox.Indicator />
+            </Checkbox.Control>
+          </Checkbox.Content>
         </Checkbox>
+        <Link href={`/todos/${todo.id}`}>
+          <span className={todo.completed ? 'line-through text-gray-500' : ''}>
+            {todo.title}
+          </span>
+        </Link>
         
         <Button
           variant="danger"
@@ -993,7 +993,7 @@ export function TodoList({ todos, onDelete, onToggleComplete, isLoading }: Props
 'use client'
 
 // v3: SelectItem は廃止 → Select 複合 API + ListBox.Item
-import { Select, ListBox } from '@heroui/react'
+import { Label, ListBox, Select } from '@heroui/react'
 
 interface Props {
   value: 'all' | 'completed' | 'incomplete'
@@ -1002,18 +1002,16 @@ interface Props {
 
 export function TodoFilter({ value, onChange }: Props) {
   return (
-    <div className="flex flex-col gap-1.5 max-w-xs">
-      <label htmlFor="filter" className="text-sm font-medium text-foreground">
-        フィルター
-      </label>
+    <div className="max-w-xs">
       <Select
-        aria-label="フィルター"
+        fullWidth
         selectedKey={value}
         onSelectionChange={(key) =>
           onChange(key as 'all' | 'completed' | 'incomplete')
         }
       >
-        <Select.Trigger className="flex w-full items-center justify-between rounded-medium border border-default-200 bg-default-50 px-3 py-2">
+        <Label>フィルター</Label>
+        <Select.Trigger>
           <Select.Value />
           <Select.Indicator />
         </Select.Trigger>
@@ -1267,7 +1265,7 @@ export function ProfilePage({ initialUser, initialStats, initialTodos }: Props) 
 // src/features/profile/components/ProfileInfo.tsx
 'use client'
 
-import { Button, Card, Input } from '@heroui/react'
+import { Button, Card, Description, Input, Label, TextField } from '@heroui/react'
 import { type FormEvent, useState } from 'react'
 import type { User } from './types'
 
@@ -1327,53 +1325,35 @@ export function ProfileInfo({ user, onUpdate }: ProfileInfoProps) {
 
         {isEditing ? (
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="username" className="text-sm font-medium text-foreground">
-                ユーザー名
-              </label>
-              <Input
-                id="username"
-                type="text"
-                value={user.username}
-                disabled
-                aria-label="ユーザー名"
-                className="w-full rounded-medium border border-default-200 bg-default-100 px-3 py-2 outline-none"
-              />
-              <span className="text-xs text-gray-500">ユーザー名は変更できません</span>
-            </div>
+            {/* ユーザー名は変更不可 */}
+            <TextField validationBehavior="aria" fullWidth isDisabled value={user.username}>
+              <Label>ユーザー名</Label>
+              <Input type="text" readOnly />
+              <Description>ユーザー名は変更できません</Description>
+            </TextField>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="lastName" className="text-sm font-medium text-foreground">
-                  姓
-                </label>
-                <Input
-                  id="lastName"
-                  type="text"
-                  placeholder="姓"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  disabled={isSaving}
-                  aria-label="姓"
-                  className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
-                />
-              </div>
+              <TextField
+                validationBehavior="aria"
+                fullWidth
+                isDisabled={isSaving}
+                value={lastName}
+                onChange={setLastName}
+              >
+                <Label>姓</Label>
+                <Input type="text" placeholder="姓" />
+              </TextField>
 
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="firstName" className="text-sm font-medium text-foreground">
-                  名
-                </label>
-                <Input
-                  id="firstName"
-                  type="text"
-                  placeholder="名"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  disabled={isSaving}
-                  aria-label="名"
-                  className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
-                />
-              </div>
+              <TextField
+                validationBehavior="aria"
+                fullWidth
+                isDisabled={isSaving}
+                value={firstName}
+                onChange={setFirstName}
+              >
+                <Label>名</Label>
+                <Input type="text" placeholder="名" />
+              </TextField>
             </div>
 
             <div className="flex items-center gap-4 pt-4">
@@ -2318,11 +2298,14 @@ export default function RootLayout({
 
 ---
 
-**Document Version**: 2.0.0  
-**Last Updated**: 2026-07-19  
+**Document Version**: 2.1.0  
+**Last Updated**: 2026-08-03  
 **Author**: jugeeem（原著）  
 **Reviser**: Genki Hashioka（HeroUI v3・近代化スタックへの改訂）  
 **Changes**: 
+- v2.1.0 (2026-08-03): 実装との突き合わせによる修正
+  - コード例を TextField 構成・Checkbox 複合構造・Select の Label 内包へ
+  - v3 に存在しないクラスを一掃し、import 文を実際の例に合わせた
 - v2.0.0 (2026-07-19): HeroUI v3・近代化スタックへの改訂
   - コンポーネント分割のコード例を v3 API へ（`Card` 複合API / `Select`+`ListBox.Item` /
     `Modal`+`useOverlayState` / 共通ヘッダーを Navbar 廃止→素の `<header>` /
