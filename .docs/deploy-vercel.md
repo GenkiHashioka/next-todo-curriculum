@@ -71,12 +71,16 @@ Neon 単体でプロジェクトを作ろうとすると「Vercel の Neon Postg
 `main` はスターター（`src/features/` が空）なので、そのままでは中身の無いアプリが
 公開され続ける。**完成見本のブランチに切り替える。**
 
-1. プロジェクト → **Settings** → 左メニュー **Git**
-2. **Production Branch** を `main` から **`reference/v3-complete`** に変更して保存
+1. プロジェクト → **Settings** → 左メニュー **Environments**
+2. **Production** をクリック
+3. **Branch Tracking** の項目で、`main` から **`reference/v3-complete`** に変更して **Save**
 
-3. 設定を変えただけでは本番 URL は切り替わらないので、どちらかで反映させる
-   - **Deployments** タブ →`reference/v3-complete` のデプロイの **⋯ → Promote to Production**
-   - または `reference/v3-complete` に何か push して再デプロイを走らせる
+   > ℹ️ 以前は Settings → Git にあったが、現在は **Environments** 配下に移動している。
+   > Git の画面には Production Branch の項目は無い。
+
+4. 設定を変えただけでは本番 URL は切り替わらないので、どちらかで反映させる
+   - **Deployments** タブ → `reference/v3-complete` のデプロイの **⋯ → Promote to Production**
+   - または `reference/v3-complete` に何か push して本番デプロイを走らせる
 
 ---
 
@@ -170,7 +174,7 @@ Vercel の **Settings → Environment Variables** で追加する。
 
 | 症状 | 原因と対処 |
 |---|---|
-| 画面が真っ白・404 だらけ | Production Branch が `main`（スターター）になっている可能性大 |
+| 画面が真っ白・404 だらけ | Settings → Environments → Production の Branch Tracking が `main`（スターター）のままの可能性大 |
 | 500 エラー・DB に繋がらない | Neon の統合が入っているか、環境変数に `DATABASE_URL` があるか確認 |
 | `self signed certificate` などの SSL エラー | 接続文字列に `sslmode=require` が付いているか確認 |
 | ビルドは通るが API が 500 | Neon にテーブルが作られていない（手順 4 の SQL を実行したか確認） |
