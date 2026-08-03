@@ -17,5 +17,18 @@
  * 中間グレーの `--muted`（白に対し約 2.6:1）を枠線色に採用する。
  */
 :root {
+  /* 枠線をはっきり見せる（既定 transparent → 白に対し約 4.8:1） */
   --field-border: var(--muted);
+
+  /**
+   * 入力欄の背景を白から薄いグレーへ。
+   *
+   * v3 既定は「白い入力欄 × グレーのページ背景」を想定しているが、
+   * 本アプリは白い Card の中に入力欄を置くため、既定のままだと
+   * カードと入力欄が同じ白で同化してしまう。
+   * 面としての差を出すため、カード(白)より一段暗いグレーを敷く。
+   */
+  --field-background: var(--surface-tertiary);
+  --field-hover: var(--surface-secondary);
+  --field-focus: var(--white);
 }

@@ -95,6 +95,7 @@ export function TodoCreateForm({ onSubmit, isCreating }: TodoCreateFormProps) {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* タイトル入力欄 */}
           <TextField
+            validationBehavior="aria"
             isRequired
             fullWidth
             maxLength={32}
@@ -112,6 +113,7 @@ export function TodoCreateForm({ onSubmit, isCreating }: TodoCreateFormProps) {
 
           {/* 説明入力欄 */}
           <TextField
+            validationBehavior="aria"
             fullWidth
             maxLength={128}
             isInvalid={!!descriptionError}

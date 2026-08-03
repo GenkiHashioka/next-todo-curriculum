@@ -33,10 +33,17 @@ export function TodoItem({ todo, onToggleComplete, onDelete }: TodoItemProps) {
         <div className="flex items-start gap-4 flex-1">
           {/* 完了チェックボックス */}
           <Checkbox
+            aria-label={todo.completed ? '未完了に戻す' : '完了にする'}
             isSelected={todo.completed}
             onChange={() => onToggleComplete(todo)}
-            className="mt-1 h-5"
-          />
+            className="mt-1"
+          >
+            <Checkbox.Content>
+              <Checkbox.Control>
+                <Checkbox.Indicator />
+              </Checkbox.Control>
+            </Checkbox.Content>
+          </Checkbox>
 
           <div className="flex-1">
             {/* タイトル */}

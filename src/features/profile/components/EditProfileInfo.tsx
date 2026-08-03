@@ -141,7 +141,7 @@ export function EditProfileInfo({ user, onSuccess, onCancel }: EditProfileInfoPr
 
   return (
     <Card className="p-6 mb-8">
-      <Card.Header className="justify-between mb-4">
+      <Card.Header className="flex-row items-center justify-between mb-4">
         <h2 className="text-2xl font-semibold text-gray-900">プロフィール情報</h2>
       </Card.Header>
       {/* エラーメッセージ */}
@@ -154,12 +154,13 @@ export function EditProfileInfo({ user, onSuccess, onCancel }: EditProfileInfoPr
       <form onSubmit={handleUpdate}>
         <Card.Content className="space-y-6">
           {/* ユーザー名は変更不可のため読み取り専用 */}
-          <TextField fullWidth isDisabled value={user.username}>
+          <TextField validationBehavior="aria" fullWidth isDisabled value={user.username}>
             <Label>ユーザー名</Label>
             <Input type="text" readOnly />
           </TextField>
 
           <TextField
+            validationBehavior="aria"
             fullWidth
             isInvalid={!!lastNameError}
             value={lastName}
@@ -174,6 +175,7 @@ export function EditProfileInfo({ user, onSuccess, onCancel }: EditProfileInfoPr
           </TextField>
 
           <TextField
+            validationBehavior="aria"
             fullWidth
             isInvalid={!!firstNameError}
             value={firstName}
@@ -188,7 +190,7 @@ export function EditProfileInfo({ user, onSuccess, onCancel }: EditProfileInfoPr
           </TextField>
         </Card.Content>
 
-        <Card.Footer className="justify-end gap-3">
+        <Card.Footer className="justify-end gap-3 pt-6">
           <Button
             type="button"
             onPress={handleCancel}

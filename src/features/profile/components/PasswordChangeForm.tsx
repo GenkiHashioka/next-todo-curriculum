@@ -163,7 +163,7 @@ export function PasswordChangeForm() {
 
   return (
     <Card className="p-6">
-      <Card.Header className="justify-between mb-4">
+      <Card.Header className="flex-row items-center justify-between mb-4">
         <h2 className="text-2xl font-semibold text-gray-900">パスワード変更</h2>
         {!isChanging && (
           <Button
@@ -196,6 +196,7 @@ export function PasswordChangeForm() {
         <form onSubmit={handleChange}>
           <Card.Content className="space-y-6">
             <TextField
+              validationBehavior="aria"
               isRequired
               fullWidth
               isInvalid={!!currentPasswordError}
@@ -212,6 +213,7 @@ export function PasswordChangeForm() {
             </TextField>
 
             <TextField
+              validationBehavior="aria"
               isRequired
               fullWidth
               isInvalid={!!newPasswordError}
@@ -228,6 +230,7 @@ export function PasswordChangeForm() {
             </TextField>
 
             <TextField
+              validationBehavior="aria"
               isRequired
               fullWidth
               isInvalid={!!confirmPasswordError}
@@ -244,7 +247,7 @@ export function PasswordChangeForm() {
             </TextField>
           </Card.Content>
 
-          <Card.Footer className="justify-end gap-3">
+          <Card.Footer className="justify-end gap-3 pt-6">
             <Button
               type="button"
               onPress={handleCancel}

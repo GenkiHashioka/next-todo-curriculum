@@ -37,7 +37,7 @@ export function UserInfoDisplay({
 }: UserInfoDisplayProps) {
   return (
     <Card className="p-8 mb-8">
-      <Card.Header className="flex items-center justify-between mb-6">
+      <Card.Header className="flex-row items-center justify-between mb-6">
         <h3 className="text-2xl font-semibold text-gray-900">ユーザー情報</h3>
         {/* 編集ボタン(ADMINのみ) */}
         {currentUserRole === 1 && (

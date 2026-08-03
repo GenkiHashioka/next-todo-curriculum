@@ -114,6 +114,7 @@ export function LoginForm() {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/*ユーザー名の入力 */}
         <TextField
+          validationBehavior="aria"
           isRequired
           fullWidth
           isDisabled={isLoading}
@@ -130,6 +131,7 @@ export function LoginForm() {
         </TextField>
         {/*パスワードの入力 */}
         <TextField
+          validationBehavior="aria"
           isRequired
           fullWidth
           isDisabled={isLoading}

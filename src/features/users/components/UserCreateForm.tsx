@@ -208,6 +208,7 @@ export function UserCreateForm({ currentUserRole, onSuccess }: UserCreateFormPro
           {/* ユーザー入力 */}
           <Card.Content>
             <TextField
+              validationBehavior="aria"
               isRequired
               fullWidth
               isInvalid={!!usernameError}
@@ -228,6 +229,7 @@ export function UserCreateForm({ currentUserRole, onSuccess }: UserCreateFormPro
           <Card.Content className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <TextField
+                validationBehavior="aria"
                 isRequired
                 fullWidth
                 isInvalid={!!passwordError}
@@ -246,6 +248,7 @@ export function UserCreateForm({ currentUserRole, onSuccess }: UserCreateFormPro
 
             {/* 確認用パスワード */}
             <TextField
+              validationBehavior="aria"
               isRequired
               fullWidth
               isDisabled={isCreating}
@@ -265,13 +268,13 @@ export function UserCreateForm({ currentUserRole, onSuccess }: UserCreateFormPro
           {/* 名前入力 */}
           <Card.Content className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* 姓 */}
-            <TextField fullWidth value={lastName} onChange={setLastName}>
+            <TextField validationBehavior="aria" fullWidth value={lastName} onChange={setLastName}>
               <Label>姓</Label>
               <Input type="text" placeholder="姓" />
             </TextField>
 
             {/* 名 */}
-            <TextField fullWidth value={firstName} onChange={setFirstName}>
+            <TextField validationBehavior="aria" fullWidth value={firstName} onChange={setFirstName}>
               <Label>名</Label>
               <Input type="text" placeholder="名" />
             </TextField>

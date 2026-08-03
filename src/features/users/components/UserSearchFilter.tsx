@@ -49,7 +49,7 @@ export function UserSearchFilter({
   return (
     <div className="space-y-4">
       {/* 検索ボックス */}
-      <TextField fullWidth value={searchQuery} onChange={onSearchChange}>
+      <TextField validationBehavior="aria" fullWidth value={searchQuery} onChange={onSearchChange}>
         <Label>ユーザー名</Label>
         <Input type="text" placeholder="ユーザー名で検索" />
       </TextField>

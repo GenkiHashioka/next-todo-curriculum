@@ -126,6 +126,7 @@ export function TodoEditForm({
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* タイトル入力欄 */}
           <TextField
+            validationBehavior="aria"
             isRequired
             fullWidth
             maxLength={32}
@@ -143,6 +144,7 @@ export function TodoEditForm({
 
           {/* 説明入力欄 */}
           <TextField
+            validationBehavior="aria"
             fullWidth
             maxLength={128}
             isInvalid={!!descriptionsError}

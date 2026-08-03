@@ -28,7 +28,7 @@ export function TodoDisplay({ todo, onEdit, onDelete }: TodoDisplayProps) {
 
   return (
     <Card className="mb-8">
-      <Card.Header className="flex items-center justify-between">
+      <Card.Header className="flex-row items-center justify-between">
         <h2 className="text-2xl font-semibold text-gray-900">Todo 詳細</h2>
 
         {/* 完了ステータス */}

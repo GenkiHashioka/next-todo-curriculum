@@ -21,7 +21,7 @@ interface ShowProfileInfoProps {
 export function ShowProfileInfo({ user, onEdit }: ShowProfileInfoProps) {
   return (
     <Card className="p-6 mb-8">
-      <Card.Header className="justify-between mb-4">
+      <Card.Header className="flex-row items-center justify-between mb-4">
         <h2 className="text-2xl font-semibold text-gray-900">プロフィール情報</h2>
         <Button type="button" onPress={onEdit} variant="primary" className="font-medium">
           編集

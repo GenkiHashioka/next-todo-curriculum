@@ -69,7 +69,7 @@ export function UserInfoEditForm({
 
   return (
     <Card className="p-8 mb-8">
-      <Card.Header className="flex items-center justify-between mb-6">
+      <Card.Header className="flex-row items-center justify-between mb-6">
         <h3 className="text-2xl font-semibold text-gray-900">ユーザー情報編集</h3>
         <div className="flex items-center gap-3">
           <Button
@@ -97,19 +97,19 @@ export function UserInfoEditForm({
         {/* 名前編集 */}
 
         {/* ユーザー名（変更不可） */}
-        <TextField fullWidth isDisabled value={user.username}>
+        <TextField validationBehavior="aria" fullWidth isDisabled value={user.username}>
           <Label>ユーザー名</Label>
           <Input type="text" readOnly />
         </TextField>
 
         {/* 姓・名 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <TextField fullWidth value={lastName} onChange={setLastName}>
+          <TextField validationBehavior="aria" fullWidth value={lastName} onChange={setLastName}>
             <Label>姓</Label>
             <Input type="text" placeholder="姓" />
           </TextField>
 
-          <TextField fullWidth value={firstName} onChange={setFirstName}>
+          <TextField validationBehavior="aria" fullWidth value={firstName} onChange={setFirstName}>
             <Label>名</Label>
             <Input type="text" placeholder="名" />
           </TextField>

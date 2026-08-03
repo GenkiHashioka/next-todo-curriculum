@@ -118,6 +118,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* ユーザー名入力 */}
         <TextField
+          validationBehavior="aria"
           isRequired
           fullWidth
           isDisabled={isLoading}
@@ -135,6 +136,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
 
         {/* パスワード入力 */}
         <TextField
+          validationBehavior="aria"
           isRequired
           fullWidth
           isDisabled={isLoading}
@@ -154,6 +156,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
         <div className="grid grid-cols-2 gap-3">
           {/* 姓の入力 */}
           <TextField
+            validationBehavior="aria"
             fullWidth
             isDisabled={isLoading}
             value={lastName}
@@ -165,6 +168,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
 
           {/* 名の入力 */}
           <TextField
+            validationBehavior="aria"
             fullWidth
             isDisabled={isLoading}
             value={firstName}
