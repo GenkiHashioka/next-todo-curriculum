@@ -1,0 +1,49 @@
+version: 2
+
+updates:
+  # ── npm パッケージ ────────────────────────────────
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Asia/Tokyo
+    # PR が溢れないように上限を設ける
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore
+      include: scope
+    labels:
+      - dependencies
+
+    # 更新をまとめて PR 数を減らす。
+    # patch / minor は「安全な更新」としてまとめ、CI が緑なら自動マージされる（auto-merge.yml）。
+    # major は別 PR に分離し、必ず人間が確認する。
+    groups:
+      safe-updates:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        update-types:
+          - patch
+          - minor
+      major-updates:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        update-types:
+          - major
+
+  # ── GitHub Actions 自体の更新 ──────────────────────
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+      timezone: Asia/Tokyo
+    commit-message:
+      prefix: chore
+      include: scope
+    labels:
+      - dependencies
+      - github-actions

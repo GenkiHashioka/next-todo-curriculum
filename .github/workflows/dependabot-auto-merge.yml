@@ -1,0 +1,44 @@
+name: Dependabot auto-merge
+
+# Dependabot の PR のうち「安全な更新（patch / minor）」だけを自動マージする。
+# メジャー更新は対象外。必ず人間が確認する。
+on: pull_request
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    # Dependabot が作った PR のみ対象
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      # PR がどの種類の更新か（patch / minor / major）を判定する
+      - name: Fetch Dependabot metadata
+        id: meta
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # patch / minor のみ auto-merge を有効化。
+      # 実際のマージは CI（build & test）が成功してから GitHub が行う。
+      - name: Enable auto-merge for patch / minor
+        if: |
+          steps.meta.outputs.update-type == 'version-update:semver-patch' ||
+          steps.meta.outputs.update-type == 'version-update:semver-minor'
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # メジャー更新は自動マージせず、コメントで人間に知らせる
+      - name: Comment on major updates
+        if: steps.meta.outputs.update-type == 'version-update:semver-major'
+        run: |
+          gh pr comment "$PR_URL" --body \
+            "⚠️ **メジャー更新のため自動マージしません。** 破壊的変更の可能性があるので、内容を確認してから手動でマージしてください。"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
