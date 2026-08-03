@@ -208,5 +208,27 @@ Vercel の **Settings → Environment Variables** で追加する。
 | 500 エラー・DB に繋がらない | Neon の統合が入っているか、環境変数に `DATABASE_URL` があるか確認 |
 | `self signed certificate` などの SSL エラー | 接続文字列に `sslmode=require` が付いているか確認 |
 | ビルドは通るが API が 500 | Neon にテーブルが無い、または DATABASE_URL とは別の DB に作ってしまっている（手順 4 の current_database() で確認） |
+| **ログインは通るが一覧ページでエラー**<br>`Unexpected token '<', "<!DOCTYPE "...` | サーバー側の自己 API 呼び出しが **Deployment Protection** に阻まれ、JSON ではなく SSO ログイン画面の HTML を受け取っている。下記「補足」参照 |
 | ログインできるがすぐ切れる | `JWT_SECRET` が未設定。設定後に再デプロイしたか確認 |
 | 環境変数を足したのに反映されない | 追加後に **Redeploy** が必要 |
+
+### 補足: Deployment Protection と自己 API 呼び出し
+
+このアプリのサーバーコンポーネントは、同じアプリの `/api/*` を**絶対 URL で呼ぶ**
+（`src/lib/api.ts`）。このとき使う URL の選び方に注意が必要。
+
+| 環境変数 | 指すもの | Deployment Protection |
+|---|---|---|
+| `VERCEL_PROJECT_PRODUCTION_URL` | 本番ドメイン | **保護対象外**（公開） |
+| `VERCEL_URL` | デプロイ固有 URL | **保護対象** |
+
+Standard Protection は「本番ドメイン以外」を保護するため、`VERCEL_URL` に自己アクセス
+すると認証 Cookie を持たないサーバー関数は SSO ログイン画面（HTML）を受け取る。
+`response.ok` は true のままなので `response.json()` が HTML をパースして失敗する。
+
+**ブラウザからの相対 URL 呼び出し（登録・ログイン）は成功するのに、
+サーバー側の自己呼び出しを使うページ（Todo 一覧など）だけ失敗する**のが特徴。
+
+コード側は `VERCEL_PROJECT_PRODUCTION_URL` を優先するよう対応済み。
+それでも解決しない場合は、Settings → **Deployment Protection** で
+Vercel Authentication を無効にする（この見本アプリは公開前提のため問題ない）。
