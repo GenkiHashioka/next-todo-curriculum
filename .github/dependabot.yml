@@ -20,7 +20,10 @@ updates:
     ignore:
       # TypeScript 7（ネイティブコンパイラ）は Next.js 16 の型チェックが認識できず、
       # typescript-eslint の peer も `<6.1.0` のため、現時点では採用できない。
-      # エコシステムが追随したらこの ignore を外してメジャー更新する。
+      #
+      # 解禁のタイミングは .github/workflows/ts7-readiness.yml が月 1 回自動で検査し、
+      # 使えるようになったら Issue で通知する。通知が来たらこの ignore を外すこと。
+      # （TS 6.x のパッチ / マイナー更新は通常どおり PR が作られる）
       - dependency-name: typescript
         versions:
           - ">=7"

@@ -1,0 +1,83 @@
+name: TypeScript 7 readiness check
+
+# TypeScript 7（ネイティブコンパイラ）は現在 Next.js 16 の型チェックと
+# typescript-eslint が未対応のため .github/dependabot.yml で除外している。
+# エコシステムが追随したことに気づけるよう、月 1 回だけ「TS 7 を入れたら通るか」を
+# 実際に試し、通るようになったら Issue で知らせる。
+on:
+  schedule:
+    - cron: "0 0 1 * *" # 毎月 1 日 09:00 JST（UTC 00:00）
+  workflow_dispatch: # 手動でも実行できる
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    name: TS 7 で build が通るか試す
+    runs-on: ubuntu-latest
+
+    env:
+      NODE_ENV: test
+      JWT_SECRET: ci-dummy-secret-for-build-only
+      DB_URL: postgresql://ci:ci@localhost:5432/ci
+      NEXT_PUBLIC_API_URL: http://localhost:3000
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # TS 7 を入れてみる。peer 不一致で失敗する場合もあるので --force で試行する。
+      - name: Try TypeScript 7
+        id: install
+        continue-on-error: true
+        run: npm install -D typescript@7 --force
+
+      # 型チェックを含む build が通るかどうかが本当の判定基準。
+      - name: Build with TypeScript 7
+        id: build
+        continue-on-error: true
+        run: npm run build
+
+      # 通った場合だけ Issue を作成して知らせる（普段は何も起きない）
+      - name: Open issue when TS 7 becomes usable
+        if: steps.install.outcome == 'success' && steps.build.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # 既に同じ Issue が開いていれば重複して立てない
+          existing=$(gh issue list --state open --search "TypeScript 7 in:title" --json number --jq 'length')
+          if [ "$existing" = "0" ]; then
+            gh issue create \
+              --title "TypeScript 7 が使えるようになった可能性があります" \
+              --body "月次チェックで **TypeScript 7 を入れた状態の \`npm run build\`（型チェック含む）が成功** しました。
+
+            エコシステムが追随した可能性があります。次の対応を検討してください。
+
+            1. \`.github/dependabot.yml\` の \`ignore\`（typescript \`>=7\`）を外す
+            2. TS 7 へメジャー更新する PR を確認してマージする
+            3. \`npm run lint\`（typescript-eslint）も問題ないか確認する
+
+            > このチェックは \`.github/workflows/ts7-readiness.yml\` が自動実行しています。
+            > まだ早いと判断した場合は、この Issue を閉じれば翌月また通知されます。" \
+              --label dependencies
+          fi
+
+      - name: Summary
+        run: |
+          echo "install: ${{ steps.install.outcome }} / build: ${{ steps.build.outcome }}" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.build.outcome }}" = "success" ]; then
+            echo "✅ TS 7 で build が通りました（Issue を作成）" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⏳ TS 7 はまだ使えません（想定内・次回チェックします）" >> $GITHUB_STEP_SUMMARY
+          fi
