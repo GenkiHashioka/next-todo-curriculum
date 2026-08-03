@@ -3,8 +3,20 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-/** APIのベースURL */
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+/**
+ * APIのベースURL
+ *
+ * このファイルはサーバー側で動き、同じアプリの API ルート（/api/*）を絶対 URL で呼ぶ。
+ * そのため実行環境ごとに「自分自身の URL」を解決する必要がある。
+ *
+ * 1. NEXT_PUBLIC_API_URL … 明示指定があれば最優先
+ * 2. VERCEL_URL           … Vercel が自動で渡すデプロイ先のドメイン
+ *                           （本番・プレビューとも自分自身を指すので設定不要）
+ * 3. localhost:3000       … ローカル開発
+ */
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
 
 // ===============================================
 // サーバーコンポーネント専用のフェッチ関数
