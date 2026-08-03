@@ -2,6 +2,7 @@
 
 import { Button, buttonVariants, Card, Checkbox } from '@heroui/react';
 import Link from 'next/link';
+import { formatJST } from '@/lib/date-utils';
 import type { Todo } from './types';
 
 /**
@@ -67,7 +68,7 @@ export function TodoItem({ todo, onToggleComplete, onDelete }: TodoItemProps) {
 
             {/* 作成・更新日時 */}
             <p className="text-xs text-gray-400 mt-3">
-              作成: {new Date(todo.createdAt).toLocaleString('ja-JP')}
+              作成: {formatJST(todo.createdAt)}
             </p>
           </div>
         </div>

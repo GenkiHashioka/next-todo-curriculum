@@ -1,6 +1,7 @@
 'use client';
 import { Button, buttonVariants, Card } from '@heroui/react';
 import Link from 'next/link';
+import { formatJST } from '@/lib/date-utils';
 import { getFullName, getRoleStyle, roleLabels, type User } from './types';
 
 /**
@@ -52,7 +53,7 @@ export function UserListItem({
 
             {/* 作成日時 */}
             <p className="text-xs text-gray-400 mt-3">
-              作成: {new Date(user.createdAt).toLocaleString('ja-JP')}
+              作成: {formatJST(user.createdAt)}
             </p>
           </div>
         </div>

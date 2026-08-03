@@ -29,7 +29,7 @@ import type {
   UserSortOptions,
 } from '@/domain/repositories/UserRepository';
 import { database } from '@/infrastructure/database/connection';
-import { dbNowJST, dbValueToJST } from '@/lib/date-utils';
+import { dbNow, dbValueToDate } from '@/lib/date-utils';
 
 /**
  * PostgreSQL ユーザーリポジトリ実装クラス
@@ -186,7 +186,7 @@ export class PostgresUserRepository implements UserRepository {
   async create(input: CreateUserInput): Promise<User> {
     const id = randomUUID();
     const hashedPassword = await bcrypt.hash(input.password, 12);
-    const now = dbNowJST();
+    const now = dbNow();
 
     const query = `
       INSERT INTO users (id, username, first_name, first_name_ruby, last_name, last_name_ruby, password_hash, role, created_at, updated_at)
@@ -280,7 +280,7 @@ export class PostgresUserRepository implements UserRepository {
     }
 
     updateFields.push(`updated_at = $${paramIndex++}`);
-    values.push(dbNowJST());
+    values.push(dbNow());
 
     values.push(id);
 
@@ -571,7 +571,7 @@ export class PostgresUserRepository implements UserRepository {
       RETURNING id, username, first_name, first_name_ruby, last_name, last_name_ruby, password_hash, role, created_at, created_by, updated_at, updated_by, deleted
     `;
 
-    const result = await database.query(query, [newPasswordHash, dbNowJST(), id]);
+    const result = await database.query(query, [newPasswordHash, dbNow(), id]);
 
     if (result.rows.length === 0) {
       throw new Error('パスワードの更新に失敗しました');
@@ -642,9 +642,9 @@ export class PostgresUserRepository implements UserRepository {
       lastNameRuby: row.last_name_ruby as string | undefined,
       passwordHash: row.password_hash as string,
       role: row.role as UserRole,
-      createdAt: dbValueToJST(row.created_at) ?? dbNowJST(),
+      createdAt: dbValueToDate(row.created_at) ?? dbNow(),
       createdBy: row.created_by as string,
-      updatedAt: dbValueToJST(row.updated_at) ?? dbNowJST(),
+      updatedAt: dbValueToDate(row.updated_at) ?? dbNow(),
       updatedBy: row.updated_by as string,
       deleted: row.deleted as boolean,
     };

@@ -1,78 +1,146 @@
 /**
- * @fileoverview JST日時ユーティリティのテスト
+ * @fileoverview 日時ユーティリティのテスト
+ *
+ * このユーティリティで一番大事なのは「**実行環境のタイムゾーンで結果が変わらない**」ことです。
+ * 以前は保存時に JST へずらす作りだったため、開発機（日本）では正しく見えるのに
+ * UTC で動くサーバーでは時刻がずれていました。
+ *
+ * 型が Date であることだけを確認するテストではこの不具合を検出できなかったので、
+ * ここでは**値そのもの**を検証します。
  */
 
 import {
-  dbNowJST,
-  dbValueToJST,
-  fromISOStringToJST,
+  DISPLAY_TIMEZONE,
+  dbNow,
+  dbValueToDate,
+  formatJST,
   isValidDate,
-  nowJST,
-  toJST,
 } from '../date-utils';
 
-describe('JST日時ユーティリティ', () => {
-  describe('nowJST', () => {
-    it('現在のJST日時を返すこと', () => {
-      const now = nowJST();
-      expect(now).toBeInstanceOf(Date);
+/** 指定したタイムゾーンで処理を実行する（実行後は元に戻す） */
+function withTimeZone(timeZone: string, fn: () => void): void {
+  const original = process.env.TZ;
+  process.env.TZ = timeZone;
+  try {
+    fn();
+  } finally {
+    process.env.TZ = original;
+  }
+}
+
+describe('日時ユーティリティ', () => {
+  describe('dbNow', () => {
+    it('現在時刻を返すこと', () => {
+      const before = Date.now();
+      const now = dbNow();
+      const after = Date.now();
+
       expect(isValidDate(now)).toBe(true);
+      expect(now.getTime()).toBeGreaterThanOrEqual(before);
+      expect(now.getTime()).toBeLessThanOrEqual(after);
     });
 
-    it('複数回呼び出しても有効な日時を返すこと', () => {
-      const now1 = nowJST();
-      const now2 = nowJST();
-      expect(now1).toBeInstanceOf(Date);
-      expect(now2).toBeInstanceOf(Date);
-      expect(now2.getTime()).toBeGreaterThanOrEqual(now1.getTime());
-    });
-  });
+    it('実行環境のタイムゾーンで値がずれないこと', () => {
+      // 保存する値をタイムゾーンでずらしてしまうと、UTC のサーバーで時刻が狂う
+      let jst: number | undefined;
+      let utc: number | undefined;
 
-  describe('toJST', () => {
-    it('UTC日時をJSTに変換すること', () => {
-      const utcDate = new Date('2024-01-01T00:00:00Z');
-      const jstDate = toJST(utcDate);
-      expect(jstDate).toBeInstanceOf(Date);
-      expect(isValidDate(jstDate)).toBe(true);
-    });
-
-    it('日付オブジェクトを正しく処理すること', () => {
-      const date = new Date('2024-06-15T12:00:00Z');
-      const jstDate = toJST(date);
-      expect(jstDate).toBeInstanceOf(Date);
-    });
-  });
-
-  describe('fromISOStringToJST', () => {
-    it('ISO文字列からJST日時を生成すること', () => {
-      const isoString = '2024-01-01T00:00:00.000Z';
-      const jstDate = fromISOStringToJST(isoString);
-      expect(jstDate).toBeInstanceOf(Date);
-      expect(isValidDate(jstDate)).toBe(true);
-    });
-
-    it('様々なISO形式の文字列を処理できること', () => {
-      const formats = [
-        '2024-01-01T00:00:00Z',
-        '2024-01-01T00:00:00.000Z',
-        '2024-12-31T23:59:59Z',
-      ];
-
-      formats.forEach((format) => {
-        const jstDate = fromISOStringToJST(format);
-        expect(jstDate).toBeInstanceOf(Date);
-        expect(isValidDate(jstDate)).toBe(true);
+      withTimeZone('Asia/Tokyo', () => {
+        jst = dbNow().getTime();
       });
+      withTimeZone('UTC', () => {
+        utc = dbNow().getTime();
+      });
+
+      // 同じ瞬間を指すはず（実行間隔ぶんの数ミリ秒しか違わない）
+      expect(Math.abs((utc as number) - (jst as number))).toBeLessThan(1000);
+    });
+  });
+
+  describe('dbValueToDate', () => {
+    it('Date を受け取ったとき、時刻をずらさずそのまま返すこと', () => {
+      const date = new Date('2024-01-01T00:00:00.000Z');
+      expect(dbValueToDate(date)?.toISOString()).toBe('2024-01-01T00:00:00.000Z');
+    });
+
+    it('ISO 文字列を受け取ったとき、時刻をずらさず変換すること', () => {
+      expect(dbValueToDate('2024-01-01T00:00:00.000Z')?.toISOString()).toBe(
+        '2024-01-01T00:00:00.000Z',
+      );
+    });
+
+    it('実行環境のタイムゾーンによって結果が変わらないこと', () => {
+      const iso = '2024-06-15T12:34:56.000Z';
+
+      for (const tz of ['Asia/Tokyo', 'UTC', 'America/New_York']) {
+        withTimeZone(tz, () => {
+          expect(dbValueToDate(iso)?.toISOString()).toBe(iso);
+        });
+      }
+    });
+
+    it('null / undefined に対して null を返すこと', () => {
+      expect(dbValueToDate(null)).toBeNull();
+      expect(dbValueToDate(undefined)).toBeNull();
+    });
+
+    it('無効な文字列に対して null を返すこと', () => {
+      expect(dbValueToDate('invalid-date')).toBeNull();
+      expect(dbValueToDate('not a date')).toBeNull();
+    });
+
+    it('無効な型に対して null を返すこと', () => {
+      expect(dbValueToDate(123456)).toBeNull();
+      expect(dbValueToDate({})).toBeNull();
+      expect(dbValueToDate([])).toBeNull();
+    });
+
+    it('無効な Date に対して null を返すこと', () => {
+      expect(dbValueToDate(new Date('invalid'))).toBeNull();
+    });
+  });
+
+  describe('formatJST', () => {
+    it('UTC の 0 時を、日本時間の 9 時として表示すること', () => {
+      // JST は UTC+9
+      expect(formatJST('2024-01-01T00:00:00.000Z')).toBe('2024/1/1 9:00:00');
+    });
+
+    it('実行環境のタイムゾーンに関係なく、常に日本時間で表示すること', () => {
+      const iso = '2024-01-01T00:00:00.000Z';
+
+      for (const tz of ['Asia/Tokyo', 'UTC', 'America/New_York']) {
+        withTimeZone(tz, () => {
+          expect(formatJST(iso)).toBe('2024/1/1 9:00:00');
+        });
+      }
+    });
+
+    it('日付をまたぐ場合も正しく表示すること', () => {
+      // UTC 2023-12-31 15:00 = JST 2024-01-01 00:00
+      expect(formatJST('2023-12-31T15:00:00.000Z')).toBe('2024/1/1 0:00:00');
+    });
+
+    it('表示形式を指定できること', () => {
+      expect(formatJST('2024-01-01T00:00:00.000Z', { dateStyle: 'medium' })).toBe(
+        '2024/01/01',
+      );
+    });
+
+    it('無効な値に対して空文字を返すこと', () => {
+      expect(formatJST(null)).toBe('');
+      expect(formatJST(undefined)).toBe('');
+      expect(formatJST('invalid-date')).toBe('');
     });
   });
 
   describe('isValidDate', () => {
-    it('有効なDateオブジェクトに対してtrueを返すこと', () => {
+    it('有効な Date に対して true を返すこと', () => {
       expect(isValidDate(new Date())).toBe(true);
       expect(isValidDate(new Date('2024-01-01'))).toBe(true);
     });
 
-    it('無効な値に対してfalseを返すこと', () => {
+    it('無効な値に対して false を返すこと', () => {
       expect(isValidDate(new Date('invalid'))).toBe(false);
       expect(isValidDate('2024-01-01')).toBe(false);
       expect(isValidDate(null)).toBe(false);
@@ -82,54 +150,9 @@ describe('JST日時ユーティリティ', () => {
     });
   });
 
-  describe('dbNowJST', () => {
-    it('データベース用のJST日時を返すこと', () => {
-      const dbNow = dbNowJST();
-      expect(dbNow).toBeInstanceOf(Date);
-      expect(isValidDate(dbNow)).toBe(true);
-    });
-
-    it('nowJSTと同じ動作をすること', () => {
-      const dbNow = dbNowJST();
-      const now = nowJST();
-      // ほぼ同時刻（1秒以内の差）
-      expect(Math.abs(dbNow.getTime() - now.getTime())).toBeLessThan(1000);
-    });
-  });
-
-  describe('dbValueToJST', () => {
-    it('Date型をJSTに変換すること', () => {
-      const date = new Date('2024-01-01T00:00:00Z');
-      const jstDate = dbValueToJST(date);
-      expect(jstDate).toBeInstanceOf(Date);
-      if (jstDate) {
-        expect(isValidDate(jstDate)).toBe(true);
-      }
-    });
-
-    it('ISO文字列をJSTに変換すること', () => {
-      const isoString = '2024-01-01T00:00:00.000Z';
-      const jstDate = dbValueToJST(isoString);
-      expect(jstDate).toBeInstanceOf(Date);
-      if (jstDate) {
-        expect(isValidDate(jstDate)).toBe(true);
-      }
-    });
-
-    it('null/undefinedに対してnullを返すこと', () => {
-      expect(dbValueToJST(null)).toBeNull();
-      expect(dbValueToJST(undefined)).toBeNull();
-    });
-
-    it('無効な文字列に対してnullを返すこと', () => {
-      expect(dbValueToJST('invalid-date')).toBeNull();
-      expect(dbValueToJST('not a date')).toBeNull();
-    });
-
-    it('無効な型に対してnullを返すこと', () => {
-      expect(dbValueToJST(123456)).toBeNull();
-      expect(dbValueToJST({})).toBeNull();
-      expect(dbValueToJST([])).toBeNull();
+  describe('DISPLAY_TIMEZONE', () => {
+    it('日本標準時であること', () => {
+      expect(DISPLAY_TIMEZONE).toBe('Asia/Tokyo');
     });
   });
 });

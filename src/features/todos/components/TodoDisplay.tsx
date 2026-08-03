@@ -1,6 +1,7 @@
 'use client';
 
 import { Button, Card, Chip } from '@heroui/react';
+import { formatJST } from '@/lib/date-utils';
 import type { Todo } from './types';
 
 /**
@@ -21,10 +22,8 @@ interface TodoDisplayProps {
  * Todoのタイトル、説明、作成日時、更新日時を表示します。
  */
 export function TodoDisplay({ todo, onEdit, onDelete }: TodoDisplayProps) {
-  // 日付を日本語形式でフォーマットするユーティリティ関数
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('ja-JP');
-  };
+  // 日付を日本時間で表示する（閲覧者の端末のタイムゾーンに左右されない）
+  const formatDate = (dateString: string) => formatJST(dateString);
 
   return (
     <Card className="mb-8">

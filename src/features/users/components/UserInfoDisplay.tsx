@@ -1,6 +1,7 @@
 'use client';
 
 import { Button, Card } from '@heroui/react';
+import { formatJST } from '@/lib/date-utils';
 import type { User } from './types';
 import { getFullName, getRoleStyle, roleLabels } from './types';
 /**
@@ -108,7 +109,7 @@ export function UserInfoDisplay({
               作成日時
             </label>
             <p id="create-at-display" className="text-gray-700">
-              {new Date(user.createdAt).toLocaleString('ja-JP')}
+              {formatJST(user.createdAt)}
             </p>
           </div>
           {/* 更新日時 */}
@@ -120,7 +121,7 @@ export function UserInfoDisplay({
               更新日時
             </label>
             <p id="update-at-display" className="text-gray-700">
-              {new Date(user.updatedAt).toLocaleString('ja-JP')}
+              {formatJST(user.updatedAt)}
             </p>
           </div>
         </div>

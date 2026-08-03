@@ -1,113 +1,49 @@
 /**
- * @fileoverview JST日時ユーティリティ
+ * @fileoverview 日時ユーティリティ
  *
- * このファイルは、システム全体で一貫したJST（日本標準時）の日時処理を提供します。
- * date-fnsとdate-fns-tzを使用して、全ての日時オブジェクトがJSTで管理されることを保証します。
- *
- * 主な機能:
- * - 現在のJST日時取得
- * - 任意の日時をJSTに変換
- * - ISO文字列からJST日時への変換
- * - データベース用のJST日時生成
+ * このアプリは日時を JST（日本標準時）で表示します。
+ * ただし **保存する値そのものは変換しません**。
  *
  * 設計方針:
- * - システム内では常にDate型でJST時刻を表現
- * - データベース保存時もJSTで保存
- * - タイムゾーンの混在を防ぐため、このモジュールを経由して日時を生成
+ * - **保存・受け渡しは「絶対時刻」のまま**扱う（`Date` は本来 UTC 基準の絶対時刻）
+ * - **JST になるのは画面に出す瞬間だけ**（`timeZone: 'Asia/Tokyo'` を指定して整形）
+ *
+ * なぜこうするか:
+ * 「保存する時点で JST にずらす」という作り方をすると、**実行環境のタイムゾーンで
+ * 結果が変わってしまいます**。開発機（日本）では正しく見えるのに、UTC で動く
+ * サーバー（Vercel など）では時刻がずれる、という状態になります。
+ * 絶対時刻のまま持ち回れば、どこで動かしても同じ瞬間を指します。
+ *
+ * DB のカラムは `TIMESTAMPTZ`（絶対時刻）なので、この方針と一致しています。
  *
  * @author jugeeem
  * @since 1.0.0
  */
 
-import { fromZonedTime, toZonedTime } from 'date-fns-tz';
-
 /**
- * 日本標準時のタイムゾーン識別子
+ * 表示に使うタイムゾーン
+ *
+ * 画面に出すときだけ使います。保存する値には影響しません。
  */
-const JST_TIMEZONE = 'Asia/Tokyo';
+export const DISPLAY_TIMEZONE = 'Asia/Tokyo';
 
 /**
- * 現在のJST日時を取得
+ * 現在時刻を取得
  *
- * システムのタイムゾーンに関わらず、常に日本標準時（JST）の
- * 現在日時を返します。
+ * 実行環境のタイムゾーンに関係なく、常に「今この瞬間」を返します。
  *
- * @returns {Date} 現在のJST日時
+ * @returns {Date} 現在時刻
  *
  * @example
  * ```typescript
- * const now = nowJST();
- * console.log(now); // 現在のJST時刻
- *
- * // データベース保存用
  * const user = {
- *   createdAt: nowJST(),
- *   updatedAt: nowJST()
+ *   createdAt: dbNow(),
+ *   updatedAt: dbNow()
  * };
  * ```
  */
-export function nowJST(): Date {
-  return toZonedTime(new Date(), JST_TIMEZONE);
-}
-
-/**
- * 任意の日時をJSTに変換
- *
- * 指定された日時オブジェクトをJSTに変換します。
- * 入力がすでにJSTの場合でも、正しく処理されます。
- *
- * @param {Date} date - 変換元の日時
- * @returns {Date} JSTに変換された日時
- *
- * @example
- * ```typescript
- * const utcDate = new Date('2024-01-01T00:00:00Z');
- * const jstDate = toJST(utcDate);
- * // JST: 2024-01-01 09:00:00
- * ```
- */
-export function toJST(date: Date): Date {
-  return toZonedTime(date, JST_TIMEZONE);
-}
-
-/**
- * ISO文字列からJST日時を生成
- *
- * ISO 8601形式の文字列をパースし、JSTの日時オブジェクトを返します。
- * データベースから取得した日時文字列の変換に使用します。
- *
- * @param {string} isoString - ISO 8601形式の日時文字列
- * @returns {Date} JSTの日時オブジェクト
- *
- * @example
- * ```typescript
- * // データベースから取得した文字列
- * const dbTimestamp = '2024-01-01T00:00:00.000Z';
- * const jstDate = fromISOStringToJST(dbTimestamp);
- * ```
- */
-export function fromISOStringToJST(isoString: string): Date {
-  return toZonedTime(new Date(isoString), JST_TIMEZONE);
-}
-
-/**
- * JSTの日時からUTC基準のDateオブジェクトを生成
- *
- * JST時刻として解釈した値を、UTCベースのDateオブジェクトに変換します。
- * データベース保存時など、JSTの時刻をそのままの値で保存したい場合に使用します。
- *
- * @param {Date} jstDate - JST時刻として解釈するDateオブジェクト
- * @returns {Date} UTC基準のDateオブジェクト（JST時刻の値を持つ）
- *
- * @example
- * ```typescript
- * const jstTime = new Date('2024-01-01T09:00:00'); // JST 9:00
- * const utcBased = fromJSTToUTC(jstTime);
- * // データベースには '2024-01-01T09:00:00Z' として保存される
- * ```
- */
-export function fromJSTToUTC(jstDate: Date): Date {
-  return fromZonedTime(jstDate, JST_TIMEZONE);
+export function dbNow(): Date {
+  return new Date();
 }
 
 /**
@@ -131,57 +67,66 @@ export function isValidDate(date: unknown): date is Date {
 }
 
 /**
- * データベース用のJST日時を生成
+ * データベース取得値を Date に変換
  *
- * データベース保存用のJST日時を生成します。
- * created_at、updated_at等のタイムスタンプフィールドに使用します。
+ * データベースから取得した日時値を `Date` に変換します。
+ * 文字列、Date、null など様々な形式に対応します。
  *
- * @returns {Date} データベース保存用のJST日時
- *
- * @example
- * ```typescript
- * const query = `
- *   INSERT INTO users (id, username, created_at, updated_at)
- *   VALUES ($1, $2, $3, $4)
- * `;
- * const values = [id, username, dbNowJST(), dbNowJST()];
- * ```
- */
-export function dbNowJST(): Date {
-  return nowJST();
-}
-
-/**
- * データベース取得値をJST日時に変換
- *
- * データベースから取得した日時値をJSTのDateオブジェクトに変換します。
- * 文字列、Date、nullなど様々な形式に対応します。
+ * **時刻はずらしません。** 取得した瞬間をそのまま保ちます。
  *
  * @param {unknown} value - データベースから取得した日時値
- * @returns {Date | null} JSTの日時オブジェクト、無効な値の場合はnull
+ * @returns {Date | null} 日時オブジェクト、無効な値の場合はnull
  *
  * @example
  * ```typescript
  * const row = await db.query('SELECT created_at FROM users WHERE id = $1', [userId]);
- * const createdAt = dbValueToJST(row.created_at);
- * if (createdAt) {
- *   console.log('作成日時:', createdAt);
- * }
+ * const createdAt = dbValueToDate(row.created_at);
  * ```
  */
-export function dbValueToJST(value: unknown): Date | null {
+export function dbValueToDate(value: unknown): Date | null {
   if (!value) {
     return null;
   }
 
   if (value instanceof Date) {
-    return toJST(value);
+    return isValidDate(value) ? value : null;
   }
 
   if (typeof value === 'string') {
     const date = new Date(value);
-    return isValidDate(date) ? toJST(date) : null;
+    return isValidDate(date) ? date : null;
   }
 
   return null;
+}
+
+/**
+ * 日時を JST の文字列に整形する
+ *
+ * **表示専用**です。実行環境のタイムゾーンや、閲覧者の端末の設定に関係なく、
+ * 常に日本時間で表示されます。
+ *
+ * @param {Date | string | null | undefined} value - 整形する日時
+ * @param {Intl.DateTimeFormatOptions} [options] - 表示形式の指定
+ * @returns {string} JST の日時文字列。無効な値の場合は空文字
+ *
+ * @example
+ * ```typescript
+ * formatJST(todo.createdAt);                          // '2024/1/1 9:00:00'
+ * formatJST(todo.createdAt, { dateStyle: 'medium' }); // '2024/01/01'
+ * ```
+ */
+export function formatJST(
+  value: Date | string | null | undefined,
+  options: Intl.DateTimeFormatOptions = {},
+): string {
+  const date = dbValueToDate(value);
+  if (!date) {
+    return '';
+  }
+
+  return date.toLocaleString('ja-JP', {
+    timeZone: DISPLAY_TIMEZONE,
+    ...options,
+  });
 }
