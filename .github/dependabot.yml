@@ -18,11 +18,33 @@ updates:
       - dependencies
 
     ignore:
-      # TypeScript 7（ネイティブコンパイラ）は Next.js 16 の型チェックが認識できず、
-      # typescript-eslint の peer も `<6.1.0` のため、現時点では採用できない。
+      # TypeScript 7 を除外している理由（2026-08-03 時点で実機検証済み）
       #
-      # 解禁のタイミングは .github/workflows/ts7-readiness.yml が月 1 回自動で検査し、
-      # 使えるようになったら Issue で通知する。通知が来たらこの ignore を外すこと。
+      # TS 7 はコンパイラが Go で書き直され、従来の JavaScript 版コンパイラ API を
+      # 提供しなくなった。Next.js の内蔵型チェッカーはその API を使うため動かせない。
+      # 実際に試すと次のエラーで build が止まる:
+      #
+      #   TypeScript 7.0.2 does not provide the compiler API required by Next.js.
+      #   Enable experimental.useTypeScriptCli in your Next.js config to use the
+      #   TypeScript CLI, or install TypeScript 6 instead.
+      #
+      # ■ 回避策はあるが、採用していない
+      # メッセージにあるとおり next.config.ts に experimental.useTypeScriptCli: true を
+      # 付ければ TS 7 でも型チェックは走る（検証済み）。採用しない理由は 2 つ:
+      #   1. experimental 扱い（型定義上も ExperimentalConfig 配下）なので、
+      #      Next.js のマイナー更新で予告なく変わり得る。ここは自動マージ対象であり、
+      #      受講者が「昨日まで動いたビルドが壊れた」を自力で追うのは難しい
+      #   2. 有効にすると型チェックの対象が広がり、テストファイルの型エラーが 9 件出る
+      #      （Zod 4 の $ZodIssueTooSmall、crypto.randomUUID() の戻り値型）。
+      #      これは TS 7 のせいではなく TS 6 でも同じく出る。つまり Next.js の
+      #      内蔵チェッカーはテストファイルを見ていない。先に直す必要がある
+      #
+      # ■ typescript-eslint の peer は `<6.1.0` だが、これは npm が警告を出すだけで
+      #   インストール自体は通る。止めているのは Next.js の方。
+      #
+      # ■ 解禁の判断
+      # .github/workflows/ts7-readiness.yml が月 1 回「回避策なしで build が通るか」を
+      # 実際に試し、通るようになったら Issue で通知する。通知が来たらこの ignore を外す。
       # （TS 6.x のパッチ / マイナー更新は通常どおり PR が作られる）
       - dependency-name: typescript
         versions:

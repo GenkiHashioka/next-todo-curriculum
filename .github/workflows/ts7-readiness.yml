@@ -1,9 +1,20 @@
 name: TypeScript 7 readiness check
 
-# TypeScript 7（ネイティブコンパイラ）は現在 Next.js 16 の型チェックと
-# typescript-eslint が未対応のため .github/dependabot.yml で除外している。
+# TypeScript 7（ネイティブコンパイラ）は Next.js の内蔵型チェッカーが必要とする
+# コンパイラ API を提供しないため .github/dependabot.yml で除外している（理由の詳細は同ファイル）。
 # エコシステムが追随したことに気づけるよう、月 1 回だけ「TS 7 を入れたら通るか」を
 # 実際に試し、通るようになったら Issue で知らせる。
+#
+# ここで試すのは「回避策なしで通るか」。next.config.ts に experimental.useTypeScriptCli を
+# 付ければ現時点でも通ってしまうが、experimental に依存した状態は解禁の条件にしないため
+# あえて素の状態で判定する。
+#
+# ⚠️ GitHub は「60 日間コミットが無いリポジトリ」のスケジュール実行を自動停止する
+#    （Issue や PR ではリセットされず、コミットのみが対象）。
+#    このリポジトリは Dependabot が毎週更新 PR を作り、CI が緑なら自動マージされて
+#    コミットが積まれるため通常は止まらない。ただし依存の更新が長期間途絶えた場合は
+#    停止し得るので、Actions タブに「This scheduled workflow is disabled」と出ていたら
+#    手動で再有効化すること。
 on:
   schedule:
     - cron: "0 0 1 * *" # 毎月 1 日 09:00 JST（UTC 00:00）
@@ -86,7 +97,8 @@ jobs:
 
             > このチェックは \`.github/workflows/ts7-readiness.yml\` が自動実行しています。
             > まだ早いと判断した場合は、この Issue を閉じれば翌月また通知されます。" \
-              --label dependencies
+              --label dependencies \
+              --assignee "${{ github.repository_owner }}"
           fi
 
       - name: Summary
