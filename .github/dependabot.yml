@@ -17,6 +17,14 @@ updates:
     labels:
       - dependencies
 
+    ignore:
+      # TypeScript 7（ネイティブコンパイラ）は Next.js 16 の型チェックが認識できず、
+      # typescript-eslint の peer も `<6.1.0` のため、現時点では採用できない。
+      # エコシステムが追随したらこの ignore を外してメジャー更新する。
+      - dependency-name: typescript
+        versions:
+          - ">=7"
+
     # 更新をまとめて PR 数を減らす。
     # patch / minor は「安全な更新」としてまとめ、CI が緑なら自動マージされる（auto-merge.yml）。
     # major は別 PR に分離し、必ず人間が確認する。
