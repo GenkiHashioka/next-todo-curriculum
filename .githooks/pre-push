@@ -1,0 +1,29 @@
+#!/bin/sh
+#
+# main ブランチへの push を防ぐ。
+#
+# このリポジトリの main は「受講者の出発点（スターター）」であり、変更しません。
+# 無料プランでは GitHub のブランチ保護が使えないため、この hook で代替しています。
+#
+# 有効化: git config core.hooksPath .githooks
+# 一時的に無視したい場合（講師が教材を更新するときなど): git push --no-verify
+
+while read -r _local_ref _local_sha remote_ref _remote_sha; do
+	case "$remote_ref" in
+	refs/heads/main)
+		echo ""
+		echo "🚫 main への push はできません。"
+		echo ""
+		echo "   main はカリキュラムのスターター（受講者全員の出発点）なので変更しません。"
+		echo "   自分のブランチに push してください。"
+		echo ""
+		echo "   例:"
+		echo "     git checkout -b \${USER}-step-1"
+		echo "     git push -u origin \${USER}-step-1"
+		echo ""
+		exit 1
+		;;
+	esac
+done
+
+exit 0
