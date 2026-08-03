@@ -37,21 +37,37 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # TS 7 を入れてみる。peer 不一致で失敗する場合もあるので --force で試行する。
-      - name: Try TypeScript 7
-        id: install
-        continue-on-error: true
-        run: npm install -D typescript@7 --force
+      # TS 7 を入れて build（型チェック含む）が通るか試す。
+      #
+      # 注意: continue-on-error は失敗を握りつぶして outcome/conclusion まで success に
+      # 変えてしまい、後段の判定に使えない。そのため終了コードを自分で受け取り、
+      # 結果を明示的に output へ書き出す。
+      - name: Try TypeScript 7 and build
+        id: check
+        run: |
+          set +e
+          npm install -D typescript@7 --force
+          install_code=$?
+          if [ "$install_code" -ne 0 ]; then
+            echo "usable=false" >> "$GITHUB_OUTPUT"
+            echo "reason=TypeScript 7 のインストールに失敗しました（peer 依存の不一致など）" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
 
-      # 型チェックを含む build が通るかどうかが本当の判定基準。
-      - name: Build with TypeScript 7
-        id: build
-        continue-on-error: true
-        run: npm run build
+          npm run build
+          build_code=$?
+          if [ "$build_code" -eq 0 ]; then
+            echo "usable=true" >> "$GITHUB_OUTPUT"
+            echo "reason=build に成功しました" >> "$GITHUB_OUTPUT"
+          else
+            echo "usable=false" >> "$GITHUB_OUTPUT"
+            echo "reason=build が失敗しました（終了コード ${build_code}）" >> "$GITHUB_OUTPUT"
+          fi
+          exit 0
 
       # 通った場合だけ Issue を作成して知らせる（普段は何も起きない）
       - name: Open issue when TS 7 becomes usable
-        if: steps.install.outcome == 'success' && steps.build.outcome == 'success'
+        if: steps.check.outputs.usable == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -75,9 +91,10 @@ jobs:
 
       - name: Summary
         run: |
-          echo "install: ${{ steps.install.outcome }} / build: ${{ steps.build.outcome }}" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ steps.build.outcome }}" = "success" ]; then
-            echo "✅ TS 7 で build が通りました（Issue を作成）" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.check.outputs.usable }}" = "true" ]; then
+            echo "✅ TS 7 が使えるようになりました（Issue を作成しました）" >> $GITHUB_STEP_SUMMARY
           else
-            echo "⏳ TS 7 はまだ使えません（想定内・次回チェックします）" >> $GITHUB_STEP_SUMMARY
+            echo "⏳ TS 7 はまだ使えません（想定内・翌月また確認します）" >> $GITHUB_STEP_SUMMARY
           fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "判定理由: ${{ steps.check.outputs.reason }}" >> $GITHUB_STEP_SUMMARY
