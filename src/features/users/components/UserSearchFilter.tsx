@@ -1,11 +1,8 @@
 'use client';
 
-import { Input, ListBox, Select } from '@heroui/react';
+import { Input, Label, ListBox, Select, TextField } from '@heroui/react';
 import type { RoleFilter, SortBy, SortOrder } from './types';
 
-/** 入力・Select トリガーの共通クラス（HeroUI v2 bordered 相当） */
-const fieldClass =
-  'flex w-full items-center justify-between rounded-medium border border-default-200 bg-default-50 px-3 py-2 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30';
 
 /**
  * UserSearchFilterのPropsタイプ定義
@@ -52,40 +49,22 @@ export function UserSearchFilter({
   return (
     <div className="space-y-4">
       {/* 検索ボックス */}
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="search" className="text-sm font-medium text-foreground">
-          ユーザー名
-        </label>
-        <Input
-          id="search"
-          type="text"
-          value={searchQuery}
-          onChange={(e) => {
-            onSearchChange(e.target.value);
-          }}
-          placeholder="ユーザー名で検索"
-          aria-label="ユーザー名"
-          className={fieldClass}
-        />
-      </div>
+      <TextField fullWidth value={searchQuery} onChange={onSearchChange}>
+        <Label>ユーザー名</Label>
+        <Input type="text" placeholder="ユーザー名で検索" />
+      </TextField>
 
       {/* ロールフィルター */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="flex flex-col gap-1.5">
-          <label
-            htmlFor="roleFilter"
-            className="text-sm font-medium text-foreground"
-          >
-            ロールフィルター
-          </label>
-          <Select
-            aria-label="ロールフィルター"
-            selectedKey={String(roleFilter)}
-            onSelectionChange={(key) =>
-              onRoleFilterChange(key === 'all' ? 'all' : Number(key))
-            }
-          >
-            <Select.Trigger className={fieldClass}>
+        <Select
+          fullWidth
+          selectedKey={String(roleFilter)}
+          onSelectionChange={(key) =>
+            onRoleFilterChange(key === 'all' ? 'all' : Number(key))
+          }
+        >
+          <Label>ロールフィルター</Label>
+            <Select.Trigger>
               <Select.Value />
               <Select.Indicator />
             </Select.Trigger>
@@ -108,22 +87,16 @@ export function UserSearchFilter({
                 </ListBox.Item>
               </ListBox>
             </Select.Popover>
-          </Select>
-        </div>
+        </Select>
+
         {/* ソート項目 */}
-        <div className="flex flex-col gap-1.5">
-          <label
-            htmlFor="sortBy"
-            className="text-sm font-medium text-foreground"
-          >
-            並び順
-          </label>
-          <Select
-            aria-label="並び順"
-            selectedKey={sortBy}
-            onSelectionChange={(key) => onSortByChange(key as SortBy)}
-          >
-            <Select.Trigger className={fieldClass}>
+        <Select
+          fullWidth
+          selectedKey={sortBy}
+          onSelectionChange={(key) => onSortByChange(key as SortBy)}
+        >
+          <Label>並び順</Label>
+            <Select.Trigger>
               <Select.Value />
               <Select.Indicator />
             </Select.Trigger>
@@ -146,37 +119,30 @@ export function UserSearchFilter({
                 </ListBox.Item>
               </ListBox>
             </Select.Popover>
-          </Select>
-        </div>
+        </Select>
 
-        <div className="flex flex-col gap-1.5">
-          <label
-            htmlFor="sortOrder"
-            className="text-sm font-medium text-foreground"
-          >
-            順序
-          </label>
-          <Select
-            aria-label="順序"
-            selectedKey={sortOrder}
-            onSelectionChange={(key) => onSortOrderChange(key as SortOrder)}
-          >
-            <Select.Trigger className={fieldClass}>
-              <Select.Value />
-              <Select.Indicator />
-            </Select.Trigger>
-            <Select.Popover>
-              <ListBox>
-                <ListBox.Item id="desc" textValue="降順">
-                  降順
-                </ListBox.Item>
-                <ListBox.Item id="asc" textValue="昇順">
-                  昇順
-                </ListBox.Item>
-              </ListBox>
-            </Select.Popover>
-          </Select>
-        </div>
+        {/* ソート順序 */}
+        <Select
+          fullWidth
+          selectedKey={sortOrder}
+          onSelectionChange={(key) => onSortOrderChange(key as SortOrder)}
+        >
+          <Label>順序</Label>
+          <Select.Trigger>
+            <Select.Value />
+            <Select.Indicator />
+          </Select.Trigger>
+          <Select.Popover>
+            <ListBox>
+              <ListBox.Item id="desc" textValue="降順">
+                降順
+              </ListBox.Item>
+              <ListBox.Item id="asc" textValue="昇順">
+                昇順
+              </ListBox.Item>
+            </ListBox>
+          </Select.Popover>
+        </Select>
       </div>
     </div>
   );

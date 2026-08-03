@@ -27,7 +27,7 @@ export function TodoItem({ todo, onToggleComplete, onDelete }: TodoItemProps) {
   return (
     <Card
       key={todo.id}
-      className="bg-gray-50 hover:bg-gray-100 hover:border-primary transition-all"
+      className="bg-gray-50 hover:bg-gray-100 hover:border-accent transition-all"
     >
       <Card.Content className="flex flex-row items-center justify-between">
         <div className="flex items-start gap-4 flex-1">

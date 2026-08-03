@@ -1,13 +1,10 @@
 'use client';
 
-import { Button, Card, Input, ListBox, Select } from '@heroui/react';
+import { Button, Card, Input, Label, ListBox, Select, TextField } from '@heroui/react';
 import { useState } from 'react';
 import type { User } from './types';
 import { roleLabels } from './types';
 
-/** 入力欄の共通クラス（HeroUI v2 bordered 相当） */
-const inputClass =
-  'w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30';
 
 /**
  * UserInfoEditFormのPropsタイプ定義
@@ -99,76 +96,33 @@ export function UserInfoEditForm({
       <Card.Content className="space-y-6">
         {/* 名前編集 */}
 
-        {/* ユーザー名 */}
-        <div className="flex flex-col gap-1.5">
-          <label
-            htmlFor="username"
-            className="text-sm font-medium text-foreground"
-          >
-            ユーザー名
-          </label>
-          <Input
-            id="username"
-            type="text"
-            disabled
-            readOnly
-            aria-label="ユーザー名"
-            defaultValue={user.username}
-            className="w-full rounded-medium border border-default-200 bg-default-100 px-3 py-2 text-foreground outline-none"
-          />
-        </div>
+        {/* ユーザー名（変更不可） */}
+        <TextField fullWidth isDisabled value={user.username}>
+          <Label>ユーザー名</Label>
+          <Input type="text" readOnly />
+        </TextField>
 
-        {/* 姓 */}
+        {/* 姓・名 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex flex-col gap-1.5">
-            <label
-              htmlFor="lastName"
-              className="text-sm font-medium text-foreground"
-            >
-              姓
-            </label>
-            <Input
-              id="lastName"
-              type="text"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              placeholder="姓"
-              aria-label="姓"
-              className={inputClass}
-            />
-          </div>
+          <TextField fullWidth value={lastName} onChange={setLastName}>
+            <Label>姓</Label>
+            <Input type="text" placeholder="姓" />
+          </TextField>
 
-          {/* 名 */}
-          <div className="flex flex-col gap-1.5">
-            <label
-              htmlFor="firstName"
-              className="text-sm font-medium text-foreground"
-            >
-              名
-            </label>
-            <Input
-              id="firstName"
-              type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              placeholder="名"
-              aria-label="名"
-              className={inputClass}
-            />
-          </div>
+          <TextField fullWidth value={firstName} onChange={setFirstName}>
+            <Label>名</Label>
+            <Input type="text" placeholder="名" />
+          </TextField>
         </div>
 
         {/* 権限編集 */}
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="role" className="text-sm font-medium text-foreground">
-            ロール
-          </label>
-          <Select
-            aria-label="ロール"
-            selectedKey={String(role)}
-            onSelectionChange={(key) => setRole(Number(key))}
-          >
-            <Select.Trigger className={inputClass}>
+        <Select
+          fullWidth
+          selectedKey={String(role)}
+          onSelectionChange={(key) => setRole(Number(key))}
+        >
+          <Label>ロール</Label>
+            <Select.Trigger>
               <Select.Value />
               <Select.Indicator />
             </Select.Trigger>
@@ -185,8 +139,7 @@ export function UserInfoEditForm({
                 ))}
               </ListBox>
             </Select.Popover>
-          </Select>
-        </div>
+        </Select>
       </Card.Content>
     </Card>
   );

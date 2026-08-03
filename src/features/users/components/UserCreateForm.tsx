@@ -3,18 +3,18 @@ import {
   Button,
   buttonVariants,
   Card,
+  FieldError,
   Input,
+  Label,
   ListBox,
   Select,
+  TextField,
 } from '@heroui/react';
 import Link from 'next/link';
 import { type FormEvent, useState } from 'react';
 import { z } from 'zod';
 import { createUser } from '@/lib/api';
 
-/** 入力欄の共通クラス（HeroUI v2 bordered 相当） */
-const inputClass =
-  'w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30';
 
 /**
  * ロール番号とラベルの対応表。
@@ -207,169 +207,102 @@ export function UserCreateForm({ currentUserRole, onSuccess }: UserCreateFormPro
         <form onSubmit={handleSubmit} className="space-y-2">
           {/* ユーザー入力 */}
           <Card.Content>
-            <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor="username"
-                className="text-sm font-medium text-foreground"
-              >
-                ユーザー名
-              </label>
-              <Input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => {
-                  setUsername(e.target.value);
-                  setUsernameError('');
-                }}
-                placeholder="username"
-                aria-label="ユーザー名"
-                aria-invalid={!!usernameError}
-                className={inputClass}
-              />
-              {usernameError && (
-                <span className="text-danger text-sm" role="alert">
-                  {usernameError}
-                </span>
-              )}
-            </div>
+            <TextField
+              isRequired
+              fullWidth
+              isInvalid={!!usernameError}
+              value={username}
+              onChange={(next) => {
+                setUsername(next);
+                setUsernameError('');
+              }}
+            >
+              <Label>ユーザー名</Label>
+              <Input type="text" placeholder="username" />
+              <FieldError>{usernameError}</FieldError>
+            </TextField>
             <p className="text-xs text-gray-500 mt-1">1～50文字で入力してください</p>
           </Card.Content>
 
           {/* パスワード入力 */}
           <Card.Content className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor="password"
-                className="text-sm font-medium text-foreground"
-              >
-                パスワード
-              </label>
-              <Input
-                id="password"
-                type="password"
+            <div>
+              <TextField
+                isRequired
+                fullWidth
+                isInvalid={!!passwordError}
                 value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
+                onChange={(next) => {
+                  setPassword(next);
                   setPasswordError('');
                 }}
-                placeholder="6文字以上"
-                aria-label="パスワード"
-                aria-invalid={!!passwordError}
-                className={inputClass}
-              />
-              {passwordError && (
-                <span className="text-danger text-sm" role="alert">
-                  {passwordError}
-                </span>
-              )}
+              >
+                <Label>パスワード</Label>
+                <Input type="password" placeholder="6文字以上" />
+                <FieldError>{passwordError}</FieldError>
+              </TextField>
               <p className="text-xs text-gray-500 mt-1">最小6文字</p>
             </div>
 
             {/* 確認用パスワード */}
-            <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor="confirmPassword"
-                className="text-sm font-medium text-foreground"
-              >
-                確認用パスワード
-              </label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => {
-                  setConfirmPassword(e.target.value);
-                  setConfirmPasswordError('');
-                }}
-                disabled={isCreating}
-                placeholder="パスワードを再入力"
-                aria-label="確認用パスワード"
-                aria-invalid={!!confirmPasswordError}
-                className={inputClass}
-              />
-              {confirmPasswordError && (
-                <span className="text-danger text-sm" role="alert">
-                  {confirmPasswordError}
-                </span>
-              )}
-            </div>
+            <TextField
+              isRequired
+              fullWidth
+              isDisabled={isCreating}
+              isInvalid={!!confirmPasswordError}
+              value={confirmPassword}
+              onChange={(next) => {
+                setConfirmPassword(next);
+                setConfirmPasswordError('');
+              }}
+            >
+              <Label>確認用パスワード</Label>
+              <Input type="password" placeholder="パスワードを再入力" />
+              <FieldError>{confirmPasswordError}</FieldError>
+            </TextField>
           </Card.Content>
 
           {/* 名前入力 */}
           <Card.Content className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* 姓 */}
-            <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor="lastName"
-                className="text-sm font-medium text-foreground"
-              >
-                姓
-              </label>
-              <Input
-                id="lastName"
-                type="text"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                placeholder="姓"
-                aria-label="姓"
-                className={inputClass}
-              />
-            </div>
+            <TextField fullWidth value={lastName} onChange={setLastName}>
+              <Label>姓</Label>
+              <Input type="text" placeholder="姓" />
+            </TextField>
 
             {/* 名 */}
-            <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor="firstName"
-                className="text-sm font-medium text-foreground"
-              >
-                名
-              </label>
-              <Input
-                id="firstName"
-                type="text"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                placeholder="名"
-                aria-label="名"
-                className={inputClass}
-              />
-            </div>
+            <TextField fullWidth value={firstName} onChange={setFirstName}>
+              <Label>名</Label>
+              <Input type="text" placeholder="名" />
+            </TextField>
           </Card.Content>
 
           {/* 権限選択 */}
           <Card.Content>
-            <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor="role"
-                className="text-sm font-medium text-foreground"
-              >
-                ロール
-              </label>
-              <Select
-                aria-label="ロール"
-                selectedKey={String(role)}
-                onSelectionChange={(key) => setRole(Number(key))}
-              >
-                <Select.Trigger className={inputClass}>
-                  <Select.Value />
-                  <Select.Indicator />
-                </Select.Trigger>
-                <Select.Popover>
-                  <ListBox>
-                    {canCreateRole.map((r) => (
-                      <ListBox.Item
-                        key={String(r.value)}
-                        id={String(r.value)}
-                        textValue={r.label}
-                      >
-                        {r.label}
-                      </ListBox.Item>
-                    ))}
-                  </ListBox>
-                </Select.Popover>
-              </Select>
-            </div>
+            <Select
+              fullWidth
+              selectedKey={String(role)}
+              onSelectionChange={(key) => setRole(Number(key))}
+            >
+              <Label>ロール</Label>
+              <Select.Trigger>
+                <Select.Value />
+                <Select.Indicator />
+              </Select.Trigger>
+              <Select.Popover>
+                <ListBox>
+                  {canCreateRole.map((r) => (
+                    <ListBox.Item
+                      key={String(r.value)}
+                      id={String(r.value)}
+                      textValue={r.label}
+                    >
+                      {r.label}
+                    </ListBox.Item>
+                  ))}
+                </ListBox>
+              </Select.Popover>
+            </Select>
           </Card.Content>
 
           {/* 送信ボタン */}

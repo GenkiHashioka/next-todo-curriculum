@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, Input } from '@heroui/react';
+import { Button, Card, FieldError, Input, Label, TextField } from '@heroui/react';
 import { type FormEvent, useCallback, useState } from 'react';
 import { z } from 'zod';
 
@@ -195,87 +195,53 @@ export function PasswordChangeForm() {
         // 変更フォーム
         <form onSubmit={handleChange}>
           <Card.Content className="space-y-6">
-            <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor="currentPassword"
-                className="text-sm font-medium text-foreground"
-              >
-                現在のパスワード
-              </label>
-              <Input
-                id="currentPassword"
-                type="password"
-                value={currentPassword}
-                onChange={(e) => {
-                  setCurrentPassword(e.target.value);
-                  setCurrentPasswordError('');
-                  setError('');
-                }}
-                placeholder="現在のパスワード"
-                aria-label="現在のパスワード"
-                aria-invalid={!!currentPasswordError}
-                className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
-              />
-              {currentPasswordError && (
-                <span className="text-danger text-sm" role="alert">
-                  {currentPasswordError}
-                </span>
-              )}
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor="newPassword"
-                className="text-sm font-medium text-foreground"
-              >
-                新しいパスワード
-              </label>
-              <Input
-                id="newPassword"
-                type="password"
-                value={newPassword}
-                onChange={(e) => {
-                  setNewPassword(e.target.value);
-                  setNewPasswordError('');
-                  setError('');
-                }}
-                placeholder="新しいパスワード(6文字以上)"
-                aria-label="新しいパスワード"
-                aria-invalid={!!newPasswordError}
-                className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
-              />
-              {newPasswordError && (
-                <span className="text-danger text-sm" role="alert">
-                  {newPasswordError}
-                </span>
-              )}
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor="confirmPassword"
-                className="text-sm font-medium text-foreground"
-              >
-                新しいパスワード(確認)
-              </label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => {
-                  setConfirmPassword(e.target.value);
-                  setConfirmPasswordError('');
-                  setError('');
-                }}
-                placeholder="新しいパスワードを再入力"
-                aria-label="新しいパスワード(確認)"
-                aria-invalid={!!confirmPasswordError}
-                className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
-              />
-              {confirmPasswordError && (
-                <span className="text-danger text-sm" role="alert">
-                  {confirmPasswordError}
-                </span>
-              )}
-            </div>
+            <TextField
+              isRequired
+              fullWidth
+              isInvalid={!!currentPasswordError}
+              value={currentPassword}
+              onChange={(next) => {
+                setCurrentPassword(next);
+                setCurrentPasswordError('');
+                setError('');
+              }}
+            >
+              <Label>現在のパスワード</Label>
+              <Input type="password" placeholder="現在のパスワード" />
+              <FieldError>{currentPasswordError}</FieldError>
+            </TextField>
+
+            <TextField
+              isRequired
+              fullWidth
+              isInvalid={!!newPasswordError}
+              value={newPassword}
+              onChange={(next) => {
+                setNewPassword(next);
+                setNewPasswordError('');
+                setError('');
+              }}
+            >
+              <Label>新しいパスワード</Label>
+              <Input type="password" placeholder="新しいパスワード(6文字以上)" />
+              <FieldError>{newPasswordError}</FieldError>
+            </TextField>
+
+            <TextField
+              isRequired
+              fullWidth
+              isInvalid={!!confirmPasswordError}
+              value={confirmPassword}
+              onChange={(next) => {
+                setConfirmPassword(next);
+                setConfirmPasswordError('');
+                setError('');
+              }}
+            >
+              <Label>新しいパスワード(確認)</Label>
+              <Input type="password" placeholder="新しいパスワードを再入力" />
+              <FieldError>{confirmPasswordError}</FieldError>
+            </TextField>
           </Card.Content>
 
           <Card.Footer className="justify-end gap-3">

@@ -24,7 +24,7 @@ export default function ErrorPage({
             プロフィールの読み込みエラー
           </h2>
           {error.digest && (
-            <p className="text-small text-default-500">エラーID: {error.digest}</p>
+            <p className="text-xs text-muted">エラーID: {error.digest}</p>
           )}
         </Card.Header>
         <Card.Content>
@@ -32,9 +32,9 @@ export default function ErrorPage({
             プロフィール情報を取得できませんでした。
           </p>
           <div className="bg-danger-50 border-l-4 border-danger p-3 rounded">
-            <p className="text-small text-danger-800">{error.message}</p>
+            <p className="text-sm text-danger-800">{error.message}</p>
           </div>
-          <p className="text-small text-default-500 mt-3">
+          <p className="text-xs text-muted mt-3">
             認証エラーの可能性があります。再ログインをお試しください。
           </p>
         </Card.Content>

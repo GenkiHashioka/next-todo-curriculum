@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, Input } from '@heroui/react';
+import { Button, Card, FieldError, Input, Label, TextField } from '@heroui/react';
 import { type FormEvent, useCallback, useState } from 'react';
 import { z } from 'zod';
 import { updateCurrentUserProfile } from '@/lib/api';
@@ -153,75 +153,39 @@ export function EditProfileInfo({ user, onSuccess, onCancel }: EditProfileInfoPr
 
       <form onSubmit={handleUpdate}>
         <Card.Content className="space-y-6">
-          <div className="flex flex-col gap-1.5">
-            <label
-              htmlFor="username"
-              className="text-sm font-medium text-foreground"
-            >
-              ユーザー名
-            </label>
-            <Input
-              id="username"
-              type="text"
-              value={user.username}
-              readOnly
-              disabled
-              aria-label="ユーザー名"
-              className="w-full rounded-medium border border-default-200 bg-default-100 px-3 py-2 text-foreground outline-none"
-            />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <label
-              htmlFor="lastName"
-              className="text-sm font-medium text-foreground"
-            >
-              姓
-            </label>
-            <Input
-              id="lastName"
-              type="text"
-              value={lastName}
-              onChange={(e) => {
-                setLastName(e.target.value);
-                setLastNameError('');
-              }}
-              placeholder="姓を入力"
-              aria-label="姓"
-              aria-invalid={!!lastNameError}
-              className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
-            />
-            {lastNameError && (
-              <span className="text-danger text-sm" role="alert">
-                {lastNameError}
-              </span>
-            )}
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <label
-              htmlFor="firstName"
-              className="text-sm font-medium text-foreground"
-            >
-              名
-            </label>
-            <Input
-              id="firstName"
-              type="text"
-              value={firstName}
-              onChange={(e) => {
-                setFirstName(e.target.value);
-                setFirstNameError('');
-              }}
-              placeholder="名を入力"
-              aria-label="名"
-              aria-invalid={!!firstNameError}
-              className="w-full rounded-medium border border-default-200 bg-default-50 px-3 py-2 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
-            />
-            {firstNameError && (
-              <span className="text-danger text-sm" role="alert">
-                {firstNameError}
-              </span>
-            )}
-          </div>
+          {/* ユーザー名は変更不可のため読み取り専用 */}
+          <TextField fullWidth isDisabled value={user.username}>
+            <Label>ユーザー名</Label>
+            <Input type="text" readOnly />
+          </TextField>
+
+          <TextField
+            fullWidth
+            isInvalid={!!lastNameError}
+            value={lastName}
+            onChange={(next) => {
+              setLastName(next);
+              setLastNameError('');
+            }}
+          >
+            <Label>姓</Label>
+            <Input type="text" placeholder="姓を入力" />
+            <FieldError>{lastNameError}</FieldError>
+          </TextField>
+
+          <TextField
+            fullWidth
+            isInvalid={!!firstNameError}
+            value={firstName}
+            onChange={(next) => {
+              setFirstName(next);
+              setFirstNameError('');
+            }}
+          >
+            <Label>名</Label>
+            <Input type="text" placeholder="名を入力" />
+            <FieldError>{firstNameError}</FieldError>
+          </TextField>
         </Card.Content>
 
         <Card.Footer className="justify-end gap-3">

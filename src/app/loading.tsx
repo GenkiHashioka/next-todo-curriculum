@@ -17,7 +17,7 @@ export default function Loading() {
             <p className="text-default-700 font-medium">
               アプリケーションを読み込み中...
             </p>
-            <p className="text-small text-default-500 mt-1">しばらくお待ちください</p>
+            <p className="text-xs text-muted mt-1">しばらくお待ちください</p>
           </div>
         </Card.Content>
       </Card>

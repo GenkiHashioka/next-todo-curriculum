@@ -30,7 +30,7 @@ export function UserListItem({
   onDelete,
 }: UserListItemProps) {
   return (
-    <Card className="bg-gray-50 hover:bg-gray-100 hover:border-primary transition-all">
+    <Card className="bg-gray-50 hover:bg-gray-100 hover:border-accent transition-all">
       <Card.Content className="flex flex-row items-center justify-between">
         <div className="flex items-center gap-4 flex-1">
           {/* ユーザー情報 */}
