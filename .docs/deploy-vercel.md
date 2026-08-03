@@ -20,11 +20,12 @@ Neon 単体でプロジェクトを作ろうとすると「Vercel の Neon Postg
 案内されるため、**Vercel を先に作り、そこから Neon を追加する**流れになる。
 
 ```
-1. Vercel でプロジェクト作成（先に作る）
-2. Vercel の Marketplace から Neon を追加（DB が自動で作られる）
-3. Neon にテーブルを作成
-4. 残りの環境変数を設定して再デプロイ
-5. 動作確認
+1. Vercel でプロジェクト作成（先に作る／初回は main が公開される）
+2. デプロイ対象を reference/v3-complete に切り替える（作成後の設定）
+3. Vercel の Storage から Neon を追加（DB が自動で作られる）
+4. Neon にテーブルを作成
+5. 残りの環境変数を設定して再デプロイ
+6. 動作確認
 ```
 
 ---
@@ -34,25 +35,39 @@ Neon 単体でプロジェクトを作ろうとすると「Vercel の Neon Postg
 1. https://vercel.com に GitHub アカウントでサインアップ
 2. **Add New → Project** から `next-todo-curriculum` をインポート
    - Private リポジトリなので、GitHub 連携時にこのリポジトリへのアクセスを許可する
-3. **設定を変更する（重要）**
+3. インポート画面では以下だけ設定する
 
    | 項目 | 値 |
    |---|---|
    | Framework Preset | Next.js（自動検出される） |
-   | **Production Branch** | **`reference/v3-complete`** ← 既定は `main` なので必ず変更 |
    | Build Command / Root Directory | 既定のまま |
+   | Environment Variables | ここで `JWT_SECRET` と `NODE_ENV=production` を入れておくと後が楽 |
 
-   > ⚠️ `main` はスターター（`src/features/` が空）なので、
-   > そのままデプロイすると**画面が何も無いアプリ**が公開されてしまう。
+   > ℹ️ **インポート画面に「Production Branch」の項目はない。**
+   > デプロイ対象ブランチはプロジェクト作成後に変更する（次の手順 2）。
 
-   > 💡 Production Branch は Project Settings → Git からいつでも変更できる。
-   > 初回デプロイが `main` で走ってしまっても、変更後に再デプロイすればよい。
-
-4. この時点では DB が無いため、ビルドが通ってもアプリはまだ正常に動かない。次へ進む。
+4. **Deploy** を押す
+   - この初回デプロイは既定ブランチ（`main`＝スターター）で走るため、
+     **画面が何も無いアプリ**が公開される。想定どおりなので気にしなくてよい。
+   - DB もまだ無いので、この時点ではアプリは正常に動かない。
 
 ---
 
-## 2. Neon（PostgreSQL）を追加する
+## 2. デプロイ対象を見本ブランチに切り替える
+
+`main` はスターター（`src/features/` が空）なので、そのままでは中身の無いアプリが
+公開され続ける。**完成見本のブランチに切り替える。**
+
+1. プロジェクト → **Settings** → 左メニュー **Git**
+2. **Production Branch** を `main` から **`reference/v3-complete`** に変更して保存
+
+3. 設定を変えただけでは本番 URL は切り替わらないので、どちらかで反映させる
+   - **Deployments** タブ →`reference/v3-complete` のデプロイの **⋯ → Promote to Production**
+   - または `reference/v3-complete` に何か push して再デプロイを走らせる
+
+---
+
+## 3. Neon（PostgreSQL）を追加する
 
 1. Vercel のプロジェクト画面 → **Storage** タブ（または Integrations / Marketplace）
 2. **Neon（Postgres）** を選んで作成
@@ -72,7 +87,7 @@ Neon 単体でプロジェクトを作ろうとすると「Vercel の Neon Postg
 
 ---
 
-## 3. テーブルを作成する
+## 4. テーブルを作成する
 
 Vercel の Storage 画面から Neon のコンソールを開く（または https://console.neon.tech）。
 
@@ -90,7 +105,7 @@ Vercel の Storage 画面から Neon のコンソールを開く（または htt
 
 ---
 
-## 4. 残りの環境変数を設定して再デプロイ
+## 5. 残りの環境変数を設定して再デプロイ
 
 Vercel の **Settings → Environment Variables** で、以下を追加する。
 
@@ -107,7 +122,7 @@ Vercel の **Settings → Environment Variables** で、以下を追加する。
 
 ---
 
-## 5. 動作確認
+## 6. 動作確認
 
 発行された URL（`https://xxx.vercel.app`）を開く。
 
@@ -126,7 +141,7 @@ Vercel の **Settings → Environment Variables** で、以下を追加する。
 
 ---
 
-## 6. 以降の運用
+## 7. 以降の運用
 
 - `reference/v3-complete` に push すると**自動で再デプロイ**される
 - 受講者向けの README からこの URL を案内すると、
@@ -139,6 +154,6 @@ Vercel の **Settings → Environment Variables** で、以下を追加する。
 | 画面が真っ白・404 だらけ | Production Branch が `main`（スターター）になっている可能性大 |
 | 500 エラー・DB に繋がらない | Neon の統合が入っているか、環境変数に `DATABASE_URL` があるか確認 |
 | `self signed certificate` などの SSL エラー | 接続文字列に `sslmode=require` が付いているか確認 |
-| ビルドは通るが API が 500 | Neon にテーブルが作られていない（手順 3 の SQL を実行したか確認） |
+| ビルドは通るが API が 500 | Neon にテーブルが作られていない（手順 4 の SQL を実行したか確認） |
 | ログインできるがすぐ切れる | `JWT_SECRET` が未設定。設定後に再デプロイしたか確認 |
 | 環境変数を足したのに反映されない | 追加後に **Redeploy** が必要 |
