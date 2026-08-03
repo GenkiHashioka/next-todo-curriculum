@@ -19,7 +19,7 @@ import { randomUUID } from 'node:crypto';
 import type { CreateTodoInput, Todo, UpdateTodoInput } from '@/domain/entities/Todo';
 import type { TodoRepository } from '@/domain/repositories/TodoRepository';
 import { database } from '@/infrastructure/database/connection';
-import { dbNowJST, dbValueToJST } from '@/lib/date-utils';
+import { dbNow, dbValueToDate } from '@/lib/date-utils';
 
 /**
  * PostgreSQL ToDoリポジトリ実装クラス
@@ -295,7 +295,7 @@ export class PostgresTodoRepository implements TodoRepository {
    */
   async create(input: CreateTodoInput): Promise<Todo> {
     const id = randomUUID();
-    const now = dbNowJST();
+    const now = dbNow();
 
     const query = `
       INSERT INTO todos (id, title, descriptions, completed, user_id, created_at, updated_at)
@@ -382,7 +382,7 @@ export class PostgresTodoRepository implements TodoRepository {
     }
 
     updateFields.push(`updated_at = $${paramIndex++}`);
-    values.push(dbNowJST());
+    values.push(dbNow());
 
     values.push(id);
 
@@ -440,7 +440,7 @@ export class PostgresTodoRepository implements TodoRepository {
       WHERE id = $2 AND deleted = FALSE
     `;
 
-    const result = await database.query(query, [dbNowJST(), id]);
+    const result = await database.query(query, [dbNow(), id]);
     return (result.rowCount ?? 0) > 0;
   }
 
@@ -549,9 +549,9 @@ export class PostgresTodoRepository implements TodoRepository {
       title: row.title as string,
       descriptions: row.descriptions as string | undefined,
       completed: row.completed as boolean,
-      createdAt: dbValueToJST(row.created_at) ?? dbNowJST(),
+      createdAt: dbValueToDate(row.created_at) ?? dbNow(),
       createdBy: row.created_by as string,
-      updatedAt: dbValueToJST(row.updated_at) ?? dbNowJST(),
+      updatedAt: dbValueToDate(row.updated_at) ?? dbNow(),
       updatedBy: row.updated_by as string,
       deleted: row.deleted as boolean,
       userId: row.user_id as string,

@@ -34,7 +34,7 @@ import type {
   UserSearchFilters,
   UserSortOptions,
 } from '@/domain/repositories/UserRepository';
-import { dbNowJST } from '@/lib/date-utils';
+import { dbNow } from '@/lib/date-utils';
 
 /**
  * 安全なユーザー情報型（パスワードハッシュを除外）
@@ -336,7 +336,7 @@ export class UserUseCase {
       `;
 
       const db = await import('@/infrastructure/database/connection');
-      await db.database.query(query, [passwordHash, dbNowJST(), id]);
+      await db.database.query(query, [passwordHash, dbNow(), id]);
 
       // 更新後のユーザー情報を取得
       updatedUser = await this.userRepository.findById(id);
@@ -363,7 +363,7 @@ export class UserUseCase {
       `;
 
       const db = await import('@/infrastructure/database/connection');
-      await db.database.query(query, [input.username, dbNowJST(), id]);
+      await db.database.query(query, [input.username, dbNow(), id]);
 
       // 更新後のユーザー情報を取得
       updatedUser = await this.userRepository.findById(id);
