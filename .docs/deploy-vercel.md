@@ -108,8 +108,32 @@ Neon 単体でプロジェクトを作ろうとすると「Vercel の Neon Postg
 
 Vercel の Storage 画面から Neon のコンソールを開く（または https://console.neon.tech）。
 
-**SQL Editor** に、リポジトリの [`.docker/db/init.sql`](../.docker/db/init.sql) の内容を
-そのまま貼り付けて実行する。
+### まず「どの DB に作るか」を確認する
+
+Neon の SQL Editor には **Branch**（Neon 独自の DB ブランチ）と **Database** の
+選択欄がある。複数ある場合は、**アプリが接続する DB を選ぶ必要がある。**
+
+接続先は Vercel の環境変数 `DATABASE_URL` に書かれている。
+
+```
+postgresql://user:pass@ep-xxx-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require
+                                                                  ~~~~~~
+                                                                  ← これが DB 名
+```
+
+SQL Editor で次を実行し、表示される DB 名が上記と一致していることを確認する。
+
+```sql
+SELECT current_database();
+```
+
+> ⚠️ 別の DB にテーブルを作ってしまうと、テーブルは存在するのにアプリからは
+> 「テーブルが無い」と言われる状態になる（API が 500 を返す）。
+
+### テーブルを作成する
+
+リポジトリの [`.docker/db/init.sql`](../.docker/db/init.sql) の内容をそのまま
+SQL Editor に貼り付けて実行する。
 
 作成されるもの:
 
@@ -117,8 +141,14 @@ Vercel の Storage 画面から Neon のコンソールを開く（または htt
 - `todos` テーブル（＋ user_id / deleted のインデックス）
 - `uuid-ossp` 拡張
 
-> ✅ 実行後、`SELECT * FROM users;` が「0 行」で返れば成功
-> （テーブルはあるがデータは空）。
+### 作成できたか確認する
+
+```sql
+SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';
+```
+
+→ `users` と `todos` が出れば成功。
+`SELECT * FROM users;` が「0 行」で返るのも正常（テーブルはあるがデータは空）。
 
 ---
 
@@ -177,6 +207,6 @@ Vercel の **Settings → Environment Variables** で追加する。
 | 画面が真っ白・404 だらけ | Settings → Environments → Production の Branch Tracking が `main`（スターター）のままの可能性大 |
 | 500 エラー・DB に繋がらない | Neon の統合が入っているか、環境変数に `DATABASE_URL` があるか確認 |
 | `self signed certificate` などの SSL エラー | 接続文字列に `sslmode=require` が付いているか確認 |
-| ビルドは通るが API が 500 | Neon にテーブルが作られていない（手順 4 の SQL を実行したか確認） |
+| ビルドは通るが API が 500 | Neon にテーブルが無い、または DATABASE_URL とは別の DB に作ってしまっている（手順 4 の current_database() で確認） |
 | ログインできるがすぐ切れる | `JWT_SECRET` が未設定。設定後に再デプロイしたか確認 |
 | 環境変数を足したのに反映されない | 追加後に **Redeploy** が必要 |
