@@ -149,13 +149,22 @@ if (branch === 'main') {
 // 2. コミット・push の漏れ
 // ────────────────────────────────────────────────────────────
 {
-  const dirty = tryGit(['status', '--porcelain']);
+  // `git status` は Windows だと改行コード（CRLF）の違いだけで「変更あり」と報告するため、
+  // 実際の差分を見る `git diff` を使う。新規ファイルは diff に出ないので別途拾う。
+  const modified = tryGit(['diff', '--name-only', 'HEAD']);
+  const untracked = tryGit(['ls-files', '--others', '--exclude-standard']);
   const unpushed = tryGit(['log', '--oneline', '@{u}..HEAD']);
   const lines = [];
 
-  if (dirty) {
+  const pending = [modified, untracked]
+    .filter(Boolean)
+    .flatMap((l) => l.split('\n'))
+    .filter(Boolean);
+
+  if (pending.length) {
     lines.push('コミットしていない変更があります:');
-    lines.push(...dirty.split('\n').slice(0, 10).map((l) => `    ${l}`));
+    lines.push(...pending.slice(0, 10).map((f) => `    ${f}`));
+    if (pending.length > 10) lines.push(`    ... 他 ${pending.length - 10} 件`);
   }
   if (unpushed === null) {
     lines.push('このブランチはまだ push されていません（リモートが未設定）。');
@@ -172,25 +181,33 @@ if (branch === 'main') {
 // 3. 触ってはいけない層
 // ────────────────────────────────────────────────────────────
 {
-  // コミット済みの差分と、まだコミットしていない変更の両方を見る
-  const committed = tryGit(['diff', '--name-only', 'origin/main...HEAD', '--', ...PROTECTED_PATHS]);
-  const working = tryGit(['status', '--porcelain', '--', ...PROTECTED_PATHS]);
+  // 「今の main と中身が違うか」を見る。
+  //
+  // `origin/main...HEAD`（3点）だと「分岐点以降に触ったか」になり、main 側の修正を
+  // 取り込んだだけのファイルまで引っかかる。ここで知りたいのは履歴ではなく現在の中身なので、
+  // 2 点比較を使う。
+  //
+  // `git status` ではなく `git diff` を使うのは、Windows では改行コード（CRLF）の違いだけで
+  // status が「変更あり」と報告してしまい、ほぼ全ファイルが誤検知になるため。
+  const committed = tryGit(['diff', '--name-only', 'origin/main', 'HEAD', '--', ...PROTECTED_PATHS]);
+  const uncommitted = tryGit(['diff', '--name-only', 'HEAD', '--', ...PROTECTED_PATHS]);
 
-  const files = new Set();
-  if (committed) for (const f of committed.split('\n')) files.add(f.trim());
-  // porcelain の各行は「XY<空白>パス」。XY は必ず 2 文字なので、そこから先を取る
-  if (working) for (const l of working.split('\n')) files.add(l.slice(2).trim());
-  files.delete('');
+  const found = new Set();
+  for (const list of [committed, uncommitted]) {
+    if (list) for (const f of list.split('\n')) found.add(f.trim());
+  }
+  found.delete('');
+  const files = [...found];
 
   if (committed === null) {
     record('触ってはいけない層', 'warn', [
       'origin/main を参照できませんでした（git fetch origin を実行してください）。',
     ]);
-  } else if (files.size) {
+  } else if (files.length) {
     record('触ってはいけない層', 'error', [
       'バックエンド側を変更しています。これはフロントエンドの課題なので、',
       'API を書き換えて解決するのは筋が違います。元に戻してください。',
-      ...[...files].map((f) => `    ${f}`),
+      ...files.map((f) => `    ${f}`),
     ]);
   } else {
     record('触ってはいけない層', 'ok');
