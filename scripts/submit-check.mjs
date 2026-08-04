@@ -3,7 +3,7 @@
  * 提出前チェック（受講者用）
  *
  * レビューに出せる状態かどうかを、機械的に判定できる範囲だけ検査します。
- *   npm run submit-check
+ *   bun run submit-check
  *
  * 【このスクリプトの方針】
  * - 見つけた問題を直しません。場所と理由を出すだけです。
@@ -220,7 +220,7 @@ if (branch === 'main') {
 {
   process.stdout.write(`${C.dim}  ビルド中...${C.reset}`);
   try {
-    execFileSync('npm', ['run', 'build'], { stdio: 'pipe', shell: process.platform === 'win32' });
+    execFileSync('bun', ['run', 'build'], { stdio: 'pipe' });
     process.stdout.write('\r\x1b[K');
     record('ビルド', 'ok');
   } catch (e) {
@@ -245,14 +245,14 @@ if (branch === 'main') {
 // ────────────────────────────────────────────────────────────
 {
   try {
-    execFileSync('npm', ['run', 'lint'], { stdio: 'pipe', shell: process.platform === 'win32' });
+    execFileSync('bun', ['run', 'lint'], { stdio: 'pipe' });
     record('Lint', 'ok');
   } catch (e) {
     const out = `${e.stdout ?? ''}${e.stderr ?? ''}`;
     const picked = out.split(/\r?\n/).filter((l) => l.trim()).slice(-12);
     record('Lint', 'warn', [
       'Biome の指摘があります。多くは自動修正できます:',
-      '    npm run check',
+      '    bun run check',
       ...picked.map((l) => `    ${l.trim()}`),
     ]);
   }

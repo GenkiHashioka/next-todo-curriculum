@@ -65,8 +65,8 @@ v3 に**ある**もの: `accent` `background` `border` `danger` `field-*` `focus
 教材が正しくても、実装が壊れていたら意味がありません。
 
 ```bash
-npm run build   # 型エラーの検出
-npm test        # API 側のテスト
+bun run build   # 型エラーの検出
+bun run test        # API 側のテスト
 ```
 
 ### 5. 教材の版数記述が古くなっていないか

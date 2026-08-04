@@ -53,7 +53,7 @@ main（不変）
    - **Docker Desktop**
    - **VS Code**（または Cursor）+ Dev Containers 拡張
 3. README の「セットアップ」に沿って環境構築してもらう
-   - clone →「Reopen in Container」→ `npm run dev` の 3 手
+   - clone →「Reopen in Container」→ `bun run dev` の 3 手
    - `.env` の作成・`JWT_SECRET` の生成・`core.hooksPath` の設定は
      **コンテナの初回セットアップで自動的に行われる**（手作業なし）
 4. 自分のベースブランチを作ってもらう
@@ -86,7 +86,7 @@ main（不変）
 ### レビューの流れ（PR ベース）
 
 ```
-受講者: npm run submit-check   ← 機械的な問題はここで潰れる
+受講者: bun run submit-check   ← 機械的な問題はここで潰れる
       ↓
 受講者: PR 作成（{名前}-step-N → {名前}）
       ↓
@@ -98,7 +98,7 @@ main（不変）
 ```
 
 > 💡 **機械的なチェックは受講者側で済んでいる前提**です。
-> 各 Step 教材の末尾で、提出前に `npm run submit-check` を実行するよう案内しています
+> 各 Step 教材の末尾で、提出前に `bun run submit-check` を実行するよう案内しています
 > （Claude Code なら `/submit-check` でも可）。ブランチ・ビルド・ステップ制約・
 > HeroUI v2 の混入はここで潰れます。**講師は理解度の確認に集中してください。**
 >
@@ -162,7 +162,7 @@ main（不変）
 
 - [ ] ブランチ名が規約どおりか（`{名前}-step-N`）
 - [ ] `main` に直接コミットしていないか
-- [ ] `npm run build` が通るか（型エラーがないか）
+- [ ] `bun run build` が通るか（型エラーがないか）
 - [ ] 触ってはいけない場所（`src/app/api/`, `domain/`, `infrastructure/`, `usecases/`）を
       変更していないか
 - [ ] コンソールにエラーが出ていないか

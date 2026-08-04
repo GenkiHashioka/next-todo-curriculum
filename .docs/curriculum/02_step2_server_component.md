@@ -1646,7 +1646,7 @@ Step 2 完了後、以下を確認してください。
 実装を終えたら、**レビューに出す前に**次を実行してください。
 
 ```bash
-npm run submit-check
+bun run submit-check
 ```
 
 > Claude Code を使っている場合は `/submit-check` でも実行できます

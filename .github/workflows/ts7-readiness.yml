@@ -43,10 +43,14 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: 22
-          cache: npm
+
+      - name: Setup bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
       # TS 7 を入れて build（型チェック含む）が通るか試す。
       #
@@ -57,7 +61,7 @@ jobs:
         id: check
         run: |
           set +e
-          npm install -D typescript@7 --force
+          bun add -d typescript@7 --force
           install_code=$?
           if [ "$install_code" -ne 0 ]; then
             echo "usable=false" >> "$GITHUB_OUTPUT"
@@ -65,7 +69,7 @@ jobs:
             exit 0
           fi
 
-          npm run build
+          bun run build
           build_code=$?
           if [ "$build_code" -eq 0 ]; then
             echo "usable=true" >> "$GITHUB_OUTPUT"
@@ -87,13 +91,13 @@ jobs:
           if [ "$existing" = "0" ]; then
             gh issue create \
               --title "TypeScript 7 が使えるようになった可能性があります" \
-              --body "月次チェックで **TypeScript 7 を入れた状態の \`npm run build\`（型チェック含む）が成功** しました。
+              --body "月次チェックで **TypeScript 7 を入れた状態の \`bun run build\`（型チェック含む）が成功** しました。
 
             エコシステムが追随した可能性があります。次の対応を検討してください。
 
             1. \`.github/dependabot.yml\` の \`ignore\`（typescript \`>=7\`）を外す
             2. TS 7 へメジャー更新する PR を確認してマージする
-            3. \`npm run lint\`（typescript-eslint）も問題ないか確認する
+            3. \`bun run lint\`（typescript-eslint）も問題ないか確認する
 
             > このチェックは \`.github/workflows/ts7-readiness.yml\` が自動実行しています。
             > まだ早いと判断した場合は、この Issue を閉じれば翌月また通知されます。" \

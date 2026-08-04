@@ -1,6 +1,6 @@
 ---
 name: submit-check
-description: レビューに出す前の自己チェック。npm run submit-check を実行し、その結果を受講者に説明する。ブランチ・ビルド・ステップ制約・HeroUI v2 の混入などを検査する。受講者が各ステップの実装を終えたときに使う。Use when a student finished implementing a step and wants to check whether it is ready to submit for review.
+description: レビューに出す前の自己チェック。bun run submit-check を実行し、その結果を受講者に説明する。ブランチ・ビルド・ステップ制約・HeroUI v2 の混入などを検査する。受講者が各ステップの実装を終えたときに使う。Use when a student finished implementing a step and wants to check whether it is ready to submit for review.
 ---
 
 # 提出前の自己チェック
@@ -11,7 +11,7 @@ description: レビューに出す前の自己チェック。npm run submit-chec
 
 ## ⚠️ このスキルの役割（重要）
 
-検査そのものは `npm run submit-check`（[scripts/submit-check.mjs](../../../scripts/submit-check.mjs)）
+検査そのものは `bun run submit-check`（[scripts/submit-check.mjs](../../../scripts/submit-check.mjs)）
 が行います。**あなたの仕事は、その結果を読み解いて受講者に説明すること**です。
 
 - ここで見るのは、**機械的に判定できることだけ**です。
@@ -37,7 +37,7 @@ description: レビューに出す前の自己チェック。npm run submit-chec
 ### 1. チェックを実行する
 
 ```bash
-npm run submit-check
+bun run submit-check
 ```
 
 ビルドを含むため 1 分ほどかかります。終了コードは、直すべき問題があれば 1、なければ 0 です。
@@ -70,7 +70,7 @@ Props としても普通に使われます**。その場合はまったく問題
 HeroUI のコンポーネントに付いている場合だけが指摘対象です
 （v3 では `color=` → `variant=`、`isLoading=` → `isPending=`）。
 
-`Lint` の `確認` は、多くが `npm run check` で自動修正できます。
+`Lint` の `確認` は、多くが `bun run check` で自動修正できます。
 **受講者自身が実行できるよう案内**してください（こちらで実行しない）。
 
 ### 4. 機械では判定できないことを念押しする

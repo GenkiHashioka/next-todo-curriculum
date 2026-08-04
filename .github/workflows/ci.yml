@@ -45,21 +45,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      # Jest は Node で動くため、bun と両方を用意する。
+      # （テストを bun test へ移行しない理由は
+      #   .docs/curriculum/INSTRUCTOR_GUIDE.md の「テストについて」を参照）
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
           node-version: 22
-          cache: npm
+
+      - name: Setup bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
       - name: Lint & format check (Biome)
-        run: npx biome ci src/
+        run: bunx biome ci src/
         continue-on-error: true # 既存の指摘があるため、当面は警告扱い
 
       - name: Test
-        run: npm test
+        run: bun run test
 
       - name: Build (型チェックを含む)
-        run: npm run build
+        run: bun run build

@@ -61,11 +61,11 @@ git diff --stat origin/main...origin/{受講者名}-step-1           # Step1
 | **CI が緑か** | `gh pr checks {PR番号}` — PR で自動実行される。**赤なら中身を読む前に差し戻してよい** |
 | PR の向き先 | `{受講者名}-step-{N}` → `{受講者名}`。**`main` に向いていたら差し戻す** |
 | 触ってはいけない層を変更していないか | 差分に `src/app/api/` `src/domain/` `src/infrastructure/` `src/usecases/` `src/lib/` が含まれないか |
-| ビルドが通るか | CI が緑ならこれで担保済み。CI が無ければ `npm run build` |
+| ビルドが通るか | CI が緑ならこれで担保済み。CI が無ければ `bun run build` |
 | `main` に直接コミットしていないか | `git log origin/main --oneline -5` に受講者のコミットが無いか |
 | ブランチ名が規約どおりか | `{受講者名}-step-{N}` の形式か |
 
-> 💡 受講者は提出前に `npm run submit-check` を実行するよう案内されています
+> 💡 受講者は提出前に `bun run submit-check` を実行するよう案内されています
 > （各 Step 教材の末尾）。**上記の多くはそこで潰れている前提**です。
 > ここが軒並み落ちている場合は、実行してから出し直してもらう方が早いです。
 > **講師のレビューは、機械では見られない「理解しているか」に時間を使ってください。**

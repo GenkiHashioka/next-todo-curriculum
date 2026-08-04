@@ -102,7 +102,7 @@ git clone https://github.com/GenkiHashioka/next-todo-curriculum.git
 コンテナの中のターミナル（VS Code のターミナル）で実行します。
 
 ```bash
-npm run dev
+bun run dev
 ```
 
 → http://localhost:3000 を開きます。
@@ -150,7 +150,7 @@ main（不変・スターター）
 ステップの実装が終わったら、**まず提出前チェックを実行**してください。
 
 ```bash
-npm run submit-check
+bun run submit-check
 ```
 
 ブランチ・ビルド・ステップの制約など、機械的に確認できることを検査します。
@@ -183,15 +183,15 @@ git checkout -b hashioka-step-2   # 次のステップへ
 ## 📚 よく使うコマンド
 
 ```bash
-npm run dev            # 開発サーバー起動（Turbopack）
-npm run build          # 本番ビルド（型チェックも実行されます）
-npm run check          # Biome でフォーマット＋リント（コミット前に実行推奨）
-npm test               # テスト実行（API 側のテスト）
+bun run dev            # 開発サーバー起動（Turbopack）
+bun run build          # 本番ビルド（型チェックも実行されます）
+bun run check          # Biome でフォーマット＋リント（コミット前に実行推奨）
+bun run test           # テスト実行（API 側のテスト）
 
-npm run submit-check   # ★ 提出前チェック（レビューに出す前に必ず実行）
+bun run submit-check   # ★ 提出前チェック（レビューに出す前に必ず実行）
 ```
 
-> ✅ **コミット前に `npm run build` が通ることを確認**してください。型エラーはここで見つかります。
+> ✅ **コミット前に `bun run build` が通ることを確認**してください。型エラーはここで見つかります。
 
 ---
 
@@ -207,6 +207,7 @@ npm run submit-check   # ★ 提出前チェック（レビューに出す前に
 | 認証 | JWT（Cookie 保存） |
 | テスト | Jest |
 | コード品質 | Biome |
+| パッケージ管理 | bun |
 | 開発環境 | Dev Container（Docker） |
 
 > ⚠️ **HeroUI は v3 です。** ネット上の記事の多くは v2 向けで **書き方が異なります**。
@@ -280,7 +281,7 @@ git switch main                     # 戻る
 | DB を空に戻したい | コンテナの外で `docker compose down -v`（データが消えます） |
 | 画面が 404 | まだそのページを実装していない可能性大（教材を確認） |
 | HeroUI の書き方が記事と違う | v3 を使用中。[移行対応表](./.docs/heroui-v2-to-v3-migration.md)を参照 |
-| 型エラーが出る | `npm run build` で詳細を確認 |
+| 型エラーが出る | `bun run build` で詳細を確認 |
 | 削除したはずのページで型エラーが出る | ビルドキャッシュが古い。`rm -rf .next` してから再ビルド<br>（ブランチを切り替えた直後に起きやすい） |
 
 解決しない場合は、遠慮なく質問してください。
