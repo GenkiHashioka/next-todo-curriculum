@@ -403,10 +403,10 @@ import Link from 'next/link'
       Todo App
     </Link>
     <nav className="hidden sm:flex items-center gap-6">
-      <Link href="/todos" className="text-gray-700 hover:text-primary font-medium">
+      <Link href="/todos" className="text-gray-700 hover:text-accent font-medium">
         Todos
       </Link>
-      <Link href="/profile" className="text-gray-700 hover:text-primary font-medium">
+      <Link href="/profile" className="text-gray-700 hover:text-accent font-medium">
         Profile
       </Link>
     </nav>
@@ -621,7 +621,7 @@ export default function Error({
           )}
         </Card.Header>
         <Card.Content>
-          <p className="text-default-700">{error.message}</p>
+          <p className="text-foreground">{error.message}</p>
         </Card.Content>
         <Card.Footer>
           <Button
@@ -673,7 +673,7 @@ export default function Loading() {
       <Card className="max-w-md w-full">
         <Card.Content className="flex flex-col items-center justify-center py-12 gap-4">
           <Spinner size="lg" color="accent" />
-          <p className="text-default-600">読み込み中...</p>
+          <p className="text-muted">読み込み中...</p>
         </Card.Content>
       </Card>
     </div>
@@ -719,7 +719,7 @@ export default function Loading() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-4">
       <Spinner size="lg" color="accent" />
-      <p className="text-default-600">データを取得中...</p>
+      <p className="text-muted">データを取得中...</p>
     </div>
   )
 }
@@ -893,7 +893,7 @@ export default function Error({
           )}
         </Card.Header>
         <Card.Content>
-          <p className="text-default-700 mb-2">
+          <p className="text-foreground mb-2">
             Todoページの読み込み中にエラーが発生しました。
           </p>
           <p className="text-xs text-muted">{error.message}</p>
@@ -946,11 +946,11 @@ export default function Error({
           )}
         </Card.Header>
         <Card.Content>
-          <p className="text-default-700 mb-4">
+          <p className="text-foreground mb-4">
             指定されたTodoの詳細を取得できませんでした。
           </p>
-          <div className="bg-danger-50 border-l-4 border-danger p-3 rounded">
-            <p className="text-sm text-danger-800">{error.message}</p>
+          <div className="bg-danger-soft border-l-4 border-danger p-3 rounded">
+            <p className="text-sm text-danger-soft-foreground">{error.message}</p>
           </div>
         </Card.Content>
         <Card.Footer className="flex flex-col gap-2">
@@ -979,7 +979,7 @@ export default function Error({
 - `error.digest` でエラーIDを表示（デバッグに有用）
 - `useEffect` でエラーログを記録
 - 複数のアクションボタンを提供（再試行、戻る）
-- `bg-danger-50` などでエラー詳細を視覚的に強調
+- `bg-danger-soft` などでエラー詳細を視覚的に強調
 
 ---
 
@@ -1000,7 +1000,7 @@ export default function Loading() {
         <Card.Content className="flex flex-col items-center justify-center py-12 gap-4">
           <Spinner size="lg" color="accent" />
           <div className="text-center">
-            <p className="text-default-700 font-medium">Todoを読み込み中...</p>
+            <p className="text-foreground font-medium">Todoを読み込み中...</p>
             <p className="text-xs text-muted mt-1">しばらくお待ちください</p>
           </div>
         </Card.Content>
@@ -1303,6 +1303,11 @@ PR を作るとビルドとテストが自動で走ります。**緑になった
 **Author**: jugeeem（原著）  
 **Reviser**: Genki Hashioka（HeroUI v3・近代化スタックへの改訂）  
 **Changes**:
+- v2.3.0 (2026-08-04): /check-curriculum-sync による再検査で見つかった、v3 に無いクラスの
+  取りこぼしを修正（`text-default-700`→`text-foreground`、`text-default-600`→`text-muted`、
+  `bg-danger-50`→`bg-danger-soft`、`text-danger-800`→`text-danger-soft-foreground`、
+  `hover:text-primary`→`hover:text-accent`）。v2.1.0 の「一掃した」は不正確だった
+  （実装の該当箇所も同時に修正、詳細はコミット参照）
 - v2.2.0 (2026-08-03): 提出前チェック（/submit-check）の実行を §9 に追加
   （HeroUI v2 の書き方の混入検査を含む）
 - v2.1.0 (2026-08-03): 実装との突き合わせによる修正

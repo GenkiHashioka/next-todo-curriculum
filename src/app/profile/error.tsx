@@ -28,11 +28,11 @@ export default function ErrorPage({
           )}
         </Card.Header>
         <Card.Content>
-          <p className="text-default-700 mb-2">
+          <p className="text-foreground mb-2">
             プロフィール情報を取得できませんでした。
           </p>
-          <div className="bg-danger-50 border-l-4 border-danger p-3 rounded">
-            <p className="text-sm text-danger-800">{error.message}</p>
+          <div className="bg-danger-soft border-l-4 border-danger p-3 rounded">
+            <p className="text-sm text-danger-soft-foreground">{error.message}</p>
           </div>
           <p className="text-xs text-muted mt-3">
             認証エラーの可能性があります。再ログインをお試しください。

@@ -33,9 +33,9 @@ export default function ErrorPage({
           )}
         </Card.Header>
         <Card.Content>
-          <p className="text-default-700 mb-2">Todoの一覧を取得できませんでした。</p>
-          <div className="bg-danger-50 border-l-4 border-danger p-3 rounded">
-            <p className="text-sm text-danger-800">{error.message}</p>
+          <p className="text-foreground mb-2">Todoの一覧を取得できませんでした。</p>
+          <div className="bg-danger-soft border-l-4 border-danger p-3 rounded">
+            <p className="text-sm text-danger-soft-foreground">{error.message}</p>
           </div>
         </Card.Content>
         <Card.Footer className="gap-2">

@@ -14,7 +14,7 @@ export default function Loading() {
         <Card.Content className="flex flex-col items-center justify-center py-12 gap-4">
           <Spinner size="lg" color="accent" />
           <div className="text-center">
-            <p className="text-default-700 font-medium">
+            <p className="text-foreground font-medium">
               アプリケーションを読み込み中...
             </p>
             <p className="text-xs text-muted mt-1">しばらくお待ちください</p>

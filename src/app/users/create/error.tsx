@@ -27,11 +27,11 @@ export default function ErrorPage({
           )}
         </Card.Header>
         <Card.Content>
-          <p className="text-default-700 mb-2">
+          <p className="text-foreground mb-2">
             ユーザー作成ページの読み込みに失敗しました。
           </p>
-          <div className="bg-danger-50 border-l-4 border-danger p-3 rounded">
-            <p className="text-sm text-danger-800">{error.message}</p>
+          <div className="bg-danger-soft border-l-4 border-danger p-3 rounded">
+            <p className="text-sm text-danger-soft-foreground">{error.message}</p>
           </div>
         </Card.Content>
         <Card.Footer className="flex flex-col gap-2">

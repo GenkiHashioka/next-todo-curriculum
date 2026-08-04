@@ -201,7 +201,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
       <div className="mt-6 text-center">
         <p className="text-sm text-gray-600 flex items-center justify-center gap-1">
           すでにアカウントをお持ちの場合は
-          <Link href="/login" className="text-primary font-medium hover:underline">
+          <Link href="/login" className="text-accent font-medium hover:underline">
             ログイン
           </Link>
         </p>

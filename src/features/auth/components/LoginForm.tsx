@@ -149,8 +149,8 @@ export function LoginForm() {
 
         {/*ログイン時エラーメッセージの表示 */}
         {error && (
-          <div className="p-3 bg-danger-50 border border-danger-200 rounded-md">
-            <p className="text-danger text-sm">{error}</p>
+          <div className="p-3 bg-danger-soft border border-danger rounded-md">
+            <p className="text-danger-soft-foreground text-sm">{error}</p>
           </div>
         )}
         {/* ログインボタン */}
@@ -167,7 +167,7 @@ export function LoginForm() {
       <div className="mt-6 text-center">
         <p className="text-sm text-gray-600 flex items-center justify-center gap-1">
           アカウントをお持ちでない場合は
-          <Link href="/register" className="text-primary font-medium hover:underline">
+          <Link href="/register" className="text-accent font-medium hover:underline">
             新規登録
           </Link>
         </p>
