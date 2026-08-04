@@ -6,10 +6,25 @@ name: CI
 # 壊れたまま公開されないよう、push のたびにビルドとテストを確認する。
 # （push イベントのワークフローは push 先ブランチの定義が使われるため、
 #   このファイルはこのブランチにも必要）
+#
+# ドキュメントだけの変更では実行しない。
+# 教材のコード例は実行されないため、ビルドやテストの結果は変わらないため。
+# （教材と実装の食い違いは .claude/skills/check-curriculum-sync で別途検査する）
+#
+# 除外が効くのは「変更されたファイルがすべて除外対象のとき」だけ。
+# コードが 1 ファイルでも含まれていれば実行される。
 on:
   push:
     branches: [reference/v3-complete]
+    paths-ignore:
+      - '**.md'
+      - '.docs/**'
+      - '.claude/**'
   pull_request:
+    paths-ignore:
+      - '**.md'
+      - '.docs/**'
+      - '.claude/**'
 
 # 同じブランチで新しい push があったら、古い実行はキャンセルして無駄な時間を使わない
 concurrency:
