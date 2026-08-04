@@ -65,14 +65,15 @@
 セットアップ手順は `main` ブランチと同じです。
 [main の README](../../blob/main/README.md#-セットアップ) を参照してください。
 
-かいつまむと:
+かいつまむと、**VS Code で開いて「Reopen in Container」を押し**、コンテナの中で:
 
 ```bash
-npm install
-cp .env.example .env    # 値は main の README を参照
-docker compose up -d    # PostgreSQL を起動
 npm run dev             # http://localhost:3000
 ```
+
+`.env` の作成も依存のインストールも、コンテナの初回セットアップで自動的に行われます。
+
+> Windows の場合は、**WSL2 の中に clone** してください（Windows 側だと極端に遅くなります）。
 
 `main` と違い、このブランチは**最初から全画面が動きます**。
 ユーザーがまだ無い場合は `/register` からアカウントを作成してください。

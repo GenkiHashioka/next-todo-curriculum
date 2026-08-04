@@ -1,22 +1,48 @@
 services:
+  # 開発用コンテナ。VS Code の Dev Container がこのサービスの中に入る。
+  # アプリ自体はこの中で手動起動する（npm run dev）ので、常駐だけさせておく。
+  app:
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      # リポジトリ全体をコンテナ内へマウントする
+      - .:/workspace:cached
+    working_dir: /workspace
+    # 環境変数はここで注入しない。
+    # env_file で .env を読み込ませると NODE_ENV=development がプロセスの環境変数として
+    # 設定され、`next build`（本来 production で動く）が壊れる。
+    # .env は Next.js 自身が読み込むので、コンテナ側で渡す必要はない。
+    command: sleep infinity
+    # DB が接続を受け付けられる状態になってから起動する
+    depends_on:
+      db:
+        condition: service_healthy
+
   db:
     build:
       context: .
       dockerfile: .docker/db/Dockerfile
+    # 値はすべて既定値を持たせてある。
+    # .env は Dev Container の初回セットアップ（コンテナ起動後）で作られるため、
+    # 既定値が無いと「.env が無いので compose が起動できない → だから .env も作れない」
+    # という堂々巡りになる。既定値があれば .env 無しでも起動でき、
+    # .env を置けばそちらが優先される。
     environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME:-todos}
+      POSTGRES_USER: ${DB_USER:-admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
     ports:
-      - "${DB_LOCAL_PORT}:${DB_CONTAINER_PORT}"
+      # ホスト側にも公開しておく（GUI クライアントから DB を覗きたいとき用）
+      - "${DB_LOCAL_PORT:-5431}:${DB_CONTAINER_PORT:-5432}"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./.docker/db/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -d ${DB_NAME} -U ${DB_USER}"]
-      interval: ${HEALTHCHECK_INTERVAL}
-      timeout: ${HEALTHCHECK_TIMEOUT}
-      retries: ${HEALTHCHECK_RETRIES}
+      test: ["CMD-SHELL", "pg_isready -d ${DB_NAME:-todos} -U ${DB_USER:-admin}"]
+      interval: ${HEALTHCHECK_INTERVAL:-30s}
+      timeout: ${HEALTHCHECK_TIMEOUT:-10s}
+      retries: ${HEALTHCHECK_RETRIES:-5}
 
 volumes:
   postgres_data:

@@ -1,0 +1,58 @@
+{
+  "name": "next-todo-curriculum",
+
+  // リポジトリ直下の compose.yml をそのまま使い、その app サービスの中で作業する。
+  // DB（db サービス）も一緒に立ち上がるので、別途 docker compose を叩く必要はない。
+  "dockerComposeFile": "../compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+
+  // VS Code を閉じたらコンテナも止める（DB だけ動き続けるのを防ぐ）
+  "shutdownAction": "stopCompose",
+
+  // root ではなく node ユーザーで作業する。
+  // updateRemoteUserUID により、ホスト側で作ったファイルの所有者がずれない。
+  "remoteUser": "node",
+  "updateRemoteUserUID": true,
+
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "configureZshAsDefaultShell": false,
+      "username": "node"
+    },
+    // レビューは PR ベースで行うため、gh コマンドを使えるようにしておく
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  "forwardPorts": [3000, 5432],
+  "portsAttributes": {
+    "3000": { "label": "Todo アプリ (Next.js)", "onAutoForward": "notify" },
+    "5432": { "label": "PostgreSQL", "onAutoForward": "silent" }
+  },
+
+  // 初回作成時のセットアップ（.env 生成・git hooks 設定・依存インストール）
+  "postCreateCommand": "bash .devcontainer/scripts/post-create.sh",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "anthropic.claude-code",
+        "biomejs.biome",
+        "ms-ossdata.vscode-postgresql",
+        "github.vscode-pull-request-github"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+
+        // 改行コードは LF に統一する（.gitattributes と同じ意図）
+        "files.eol": "\n",
+
+        // 保存時の自動整形は無効。整形は `npm run check` でまとめて行う。
+        // 有効にすると、書いている途中のコードが勝手に変わって混乱のもとになる。
+        "editor.formatOnSave": false,
+        "editor.defaultFormatter": "biomejs.biome"
+      }
+    }
+  }
+}
