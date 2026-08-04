@@ -73,8 +73,7 @@ npm run dev             # http://localhost:3000
 
 `.env` の作成も依存のインストールも、コンテナの初回セットアップで自動的に行われます。
 
-> - Windows の場合は、**WSL2 の中に clone** してください（Windows 側だと極端に遅くなります）
-> - macOS の場合は、**Docker Desktop ではなく** OrbStack / Colima / Podman Desktop などを使ってください
+> Windows の場合は、**WSL2 の中に clone** してください（Windows 側だと極端に遅くなります）。
 
 `main` と違い、このブランチは**最初から全画面が動きます**。
 ユーザーがまだ無い場合は `/register` からアカウントを作成してください。
