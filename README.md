@@ -36,27 +36,12 @@ Node.js や PostgreSQL を自分の PC に入れる必要はありません。
 
 ### 必要なもの
 
-- **コンテナを動かす環境**（下記参照）
+- **Docker Desktop**
 - **VS Code** + [Dev Containers 拡張](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
   - Cursor でも同じ手順で使えます
 
 > ⚠️ **エディタは VS Code（または Cursor）を使ってください。**
 > このカリキュラムは Dev Container を前提にしており、他のエディタでは環境が揃いません。
-
-**コンテナ環境の選び方**
-
-| OS | 推奨 |
-|---|---|
-| **Windows** | **Docker Desktop**（WSL2 バックエンド） |
-| **macOS** | **Docker Desktop は避けてください。** [OrbStack](https://orbstack.dev/) / [Colima](https://github.com/abiosoft/colima) / [Podman Desktop](https://podman-desktop.io/) などを使ってください |
-
-> ℹ️ **Mac で代替を使う場合の注意**
-> Dev Containers 拡張が公式にサポートしているのは Docker です。
-> 他のランタイムは「Docker 互換 CLI として動く場合が多いが、公式サポートではない」
-> という位置づけです（[VS Code 公式ドキュメント](https://code.visualstudio.com/docs/devcontainers/containers)）。
-> 動かない場合は環境を切り分ける必要があるので、**セットアップで詰まったら早めに相談してください。**
->
-> なお OrbStack は**業務利用が有償**です。無償で使うなら Colima か Podman Desktop になります。
 
 ### 1. リポジトリを取得
 
@@ -287,9 +272,8 @@ git switch main                     # 戻る
 
 | 症状 | 対処 |
 |---|---|
-| コンテナが起動しない | コンテナ環境（Docker Desktop / OrbStack / Colima など）が起動しているか確認 |
+| コンテナが起動しない | Docker Desktop が起動しているか確認 |
 | **動作がとにかく重い（Windows）** | リポジトリを **WSL2 の中**に置いているか確認。Windows 側（`C:\...`）だと極端に遅くなります |
-| **「Reopen in Container」が反応しない（Mac）** | Docker 以外のランタイムは公式サポート外です。`docker ps` が通るか確認し、通らなければランタイム側の設定を見直してください |
 | DB に繋がらない | `.env` の `DB_HOST` が `localhost` ではなく **`db`** になっているか確認 |
 | ポート 5431 が使えない | 他のプロジェクトの PostgreSQL と衝突。`.env` の `DB_LOCAL_PORT` を変更 |
 | セットアップをやり直したい | `F1` →「Dev Containers: Rebuild Container」 |

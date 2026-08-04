@@ -50,9 +50,7 @@ main（不変）
 
 1. GitHub でリポジトリへコラボレーター招待（**Write** 権限）
 2. 事前に用意してもらうもの
-   - **コンテナ環境**
-     - Windows: Docker Desktop（WSL2 バックエンド）
-     - **macOS: Docker Desktop は避ける。** OrbStack / Colima / Podman Desktop など
+   - **Docker Desktop**
    - **VS Code**（または Cursor）+ Dev Containers 拡張
 3. README の「セットアップ」に沿って環境構築してもらう
    - clone →「Reopen in Container」→ `npm run dev` の 3 手
@@ -73,9 +71,6 @@ main（不変）
 >   Windows 側（`C:\Users\...`）に置くと動作が極端に遅くなり、「重い」で離脱します
 > - **初回は 5〜15 分かかる。**
 >   何も起きていないように見えて不安になるので、先に伝えておく
-> - **Mac の受講者は Docker 以外のランタイムを使うことになる。**
->   Dev Containers 拡張が公式サポートするのは Docker のみなので、
->   立ち上がらない場合は環境側の切り分けが必要。ここは講師が手を貸す前提で見ておく
 >
 > 初回だけ画面共有で一緒に立ち上げると確実です。
 
