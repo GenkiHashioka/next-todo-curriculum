@@ -893,6 +893,13 @@ export function TodoListPage({ initialData }: Props) {
 
 #### 子コンポーネント例
 
+> 📌 以下は分割の一例です。Step 4 では分割方法や Props 設計は自由なので、
+> このとおりに実装する必要はありません。
+> 参考として、`reference/v3-complete` ブランチの実装ではフィルタとソートを
+> 分けず、1 つの `TodoFilter` コンポーネント（Props も `completedFilter` /
+> `onFilterChange` など異なる名前）にまとめています。どちらのアプローチも
+> 妥当なので、自分が納得できる分け方を選んでください。
+
 **TodoItem.tsx**:
 ```typescript
 // src/features/todos/components/TodoItem.tsx
