@@ -336,3 +336,5 @@ UI に関わる更新は、デプロイされた画面も確認することを�
 **Document Version**: 1.5.0
 **Last Updated**: 2026-08-04
 **Author**: Genki Hashioka
+
+<!-- 最終更新: DevContainer / bun 対応 -->
