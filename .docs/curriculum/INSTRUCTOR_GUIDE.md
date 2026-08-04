@@ -34,13 +34,11 @@ main（不変）
 そのため、次の 3 段構えで担保します。
 
 1. **git hook**（`.githooks/pre-push`）— `main` への push を拒否する
-   セットアップ時に受講者が有効化します（README のセットアップ手順に記載）。
-   ```bash
-   git config core.hooksPath .githooks
-   ```
+   **Dev Container の初回セットアップで自動的に有効化される**ため、
+   受講者が実行し忘れる余地はありません（`.devcontainer/scripts/post-create.sh`）。
    講師が教材更新で `main` に push するときは `--no-verify` で回避できます。
-   > ⚠️ 有効化しなければ効きません（hook は clone しても自動では有効になりません）。
-   > あくまで**うっかり防止**であり、強制力はありません。
+   > ℹ️ コンテナを使わずに clone した場合は有効になりません。
+   > 手動で有効化する場合は `git config core.hooksPath .githooks`。
 2. **規約** — README と `AGENTS.md` で「`main` へ直接 push しない」と明示
 3. **復旧手段** — 万一 `main` が変更されても `reference/v3-complete` から復旧できる
 
@@ -51,21 +49,30 @@ main（不変）
 ## 2. 受講者の受け入れ手順
 
 1. GitHub でリポジトリへコラボレーター招待（**Write** 権限）
-2. README の「セットアップ」に沿って環境構築してもらう
-   - Node.js 20+ / Docker Desktop
-   - `.env` 作成（`JWT_SECRET` は各自で生成）
-   - **`git config core.hooksPath .githooks`**（`main` への push 防止。忘れやすい）
-   - `docker compose up -d` → `npm run dev`
-3. 自分のベースブランチを作ってもらう
+2. 事前に用意してもらうもの
+   - **Docker Desktop**
+   - **VS Code**（または Cursor）+ Dev Containers 拡張
+3. README の「セットアップ」に沿って環境構築してもらう
+   - clone →「Reopen in Container」→ `npm run dev` の 3 手
+   - `.env` の作成・`JWT_SECRET` の生成・`core.hooksPath` の設定は
+     **コンテナの初回セットアップで自動的に行われる**（手作業なし）
+4. 自分のベースブランチを作ってもらう
    ```bash
    git checkout main
    git checkout -b {受講者名}
    git push -u origin {受講者名}
    ```
-4. [基本設計書](./00_basic_design.md) を読んでもらってから Step 1 へ
+5. [基本設計書](./00_basic_design.md) を読んでもらってから Step 1 へ
 
-> 💡 **最初のつまずきポイント**は環境構築です。ここで止まると離脱しやすいので、
-> 初回は画面共有などで一緒に立ち上げるとスムーズです。
+> 💡 **最初のつまずきポイントは環境構築**です。Dev Container 化でかなり減りましたが、
+> 残っている落とし穴は次の 2 つ。受け入れ時に必ず口頭で伝えてください。
+>
+> - **Windows の受講者は WSL2 の中に clone する。**
+>   Windows 側（`C:\Users\...`）に置くと動作が極端に遅くなり、「重い」で離脱します
+> - **初回は 5〜15 分かかる。**
+>   何も起きていないように見えて不安になるので、先に伝えておく
+>
+> 初回だけ画面共有で一緒に立ち上げると確実です。
 
 ---
 
@@ -282,6 +289,6 @@ UI に関わる更新は、デプロイされた画面も確認することを�
 
 ---
 
-**Document Version**: 1.3.0
-**Last Updated**: 2026-08-03
+**Document Version**: 1.4.0
+**Last Updated**: 2026-08-04
 **Author**: Genki Hashioka

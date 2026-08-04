@@ -31,69 +31,75 @@
 
 ## 🚀 セットアップ
 
+開発環境は **Dev Container**（Docker の中で開発する仕組み）で統一しています。
+Node.js や PostgreSQL を自分の PC に入れる必要はありません。
+
 ### 必要なもの
 
-- **Node.js 20 以上**
-- **Docker Desktop**（PostgreSQL を動かすため）
+- **Docker Desktop**
+- **VS Code** + [Dev Containers 拡張](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+  - Cursor でも同じ手順で使えます
+
+> ⚠️ **エディタは VS Code（または Cursor）を使ってください。**
+> このカリキュラムは Dev Container を前提にしており、他のエディタでは環境が揃いません。
 
 ### 1. リポジトリを取得
 
+**取得する場所が OS によって違います。ここだけ注意してください。**
+
+<table>
+<tr><th>OS</th><th>clone する場所</th></tr>
+<tr>
+<td><b>Windows</b></td>
+<td>
+
+**必ず WSL2 の中**に置いてください。
+Windows 側（`C:\Users\...`）に置くと**動作が極端に遅くなります**。
+
+```bash
+# WSL2 のターミナルを開いて実行
+cd ~
+git clone https://github.com/GenkiHashioka/next-todo-curriculum.git
+```
+
+</td>
+</tr>
+<tr>
+<td><b>macOS / Linux</b></td>
+<td>
+
+どこでも構いません。
+
 ```bash
 git clone https://github.com/GenkiHashioka/next-todo-curriculum.git
-cd next-todo-curriculum
-npm install
-
-# main へ誤って push しないようにする（この 1 回だけ）
-git config core.hooksPath .githooks
 ```
 
-> 最後のコマンドは、`main` への `git push` を止めるだけのものです。
-> `main` は受講者全員の出発点なので変更しません（[ブランチの使い方](#-ブランチの使い方)）。
+</td>
+</tr>
+</table>
 
-### 2. 環境変数を設定
+### 2. コンテナで開く
 
-`.env.example` をコピーして `.env` を作成し、以下の値を設定します。
+取得したフォルダを VS Code で開くと、右下に通知が出ます。
 
-```bash
-cp .env.example .env
-```
+> Folder contains a Dev Container configuration file. Reopen folder to develop in a container.
 
-```bash
-HEALTHCHECK_INTERVAL=30s
-HEALTHCHECK_TIMEOUT=10s
-HEALTHCHECK_RETRIES=5
+**「Reopen in Container」** を押してください。
+（通知が出ない場合は `F1` →「Dev Containers: Reopen in Container」）
 
-DB_HOST=localhost
-DB_LOCAL_PORT=5431
-DB_CONTAINER_PORT=5432
-DB_NAME=todos
-DB_USER=admin
-DB_PASSWORD=password
+これだけで、次がすべて自動で行われます。
 
-NODE_ENV=development
-JWT_SECRET=<任意の長いランダム文字列>
-DB_URL=postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_LOCAL_PORT}/${DB_NAME}
+- Node.js と PostgreSQL の準備
+- `.env` の作成（`JWT_SECRET` も自動生成されます）
+- `main` へ誤って push しないための設定
+- 依存パッケージのインストール
 
-NGINX_LOCAL_PORT=80
-NGINX_CONTAINER_PORT=80
-```
+> ⏳ **初回は 5〜15 分ほどかかります。**（Docker イメージの取得と依存のインストール）
+> 2 回目以降は数秒で開きます。
 
-> 💡 `JWT_SECRET` は自分で決めた長いランダム文字列で構いません。
-> 例: `openssl rand -base64 64`（Git Bash や WSL で実行）
+### 3. 開発サーバーを起動
 
-### 3. データベースを起動
-
-```bash
-docker compose up -d
-```
-
-起動確認（`STATUS` が `Up` になっていれば OK）:
-
-```bash
-docker compose ps
-```
-
-### 4. 開発サーバーを起動
+コンテナの中のターミナル（VS Code のターミナル）で実行します。
 
 ```bash
 npm run dev
@@ -105,7 +111,7 @@ npm run dev
 > `src/features/` が空なので、`/login` などにアクセスしても 404 です。
 > ここから Step 1 の教材に沿って、あなたが画面を作っていきます。
 
-### 5. 最初のユーザーを作る
+### 4. 最初のユーザーを作る
 
 データベースは空の状態から始まります。Step 1 でユーザー登録画面（`/register`）を実装したら、
 そこから自分のアカウントを作成してください。
@@ -201,6 +207,7 @@ npm run submit-check   # ★ 提出前チェック（レビューに出す前に
 | 認証 | JWT（Cookie 保存） |
 | テスト | Jest |
 | コード品質 | Biome |
+| 開発環境 | Dev Container（Docker） |
 
 > ⚠️ **HeroUI は v3 です。** ネット上の記事の多くは v2 向けで **書き方が異なります**。
 > v2 → v3 の対応表を [.docs/heroui-v2-to-v3-migration.md](./.docs/heroui-v2-to-v3-migration.md) に
@@ -265,8 +272,12 @@ git switch main                     # 戻る
 
 | 症状 | 対処 |
 |---|---|
-| `docker compose up` でエラー | Docker Desktop が起動しているか確認 |
-| DB に繋がらない | `.env` の `DB_LOCAL_PORT=5431` が他と競合していないか確認 |
+| コンテナが起動しない | Docker Desktop が起動しているか確認 |
+| **動作がとにかく重い（Windows）** | リポジトリを **WSL2 の中**に置いているか確認。Windows 側（`C:\...`）だと極端に遅くなります |
+| DB に繋がらない | `.env` の `DB_HOST` が `localhost` ではなく **`db`** になっているか確認 |
+| ポート 5431 が使えない | 他のプロジェクトの PostgreSQL と衝突。`.env` の `DB_LOCAL_PORT` を変更 |
+| セットアップをやり直したい | `F1` →「Dev Containers: Rebuild Container」 |
+| DB を空に戻したい | コンテナの外で `docker compose down -v`（データが消えます） |
 | 画面が 404 | まだそのページを実装していない可能性大（教材を確認） |
 | HeroUI の書き方が記事と違う | v3 を使用中。[移行対応表](./.docs/heroui-v2-to-v3-migration.md)を参照 |
 | 型エラーが出る | `npm run build` で詳細を確認 |
