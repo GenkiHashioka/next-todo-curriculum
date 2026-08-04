@@ -22,7 +22,14 @@
       "username": "node"
     },
     // レビューは PR ベースで行うため、gh コマンドを使えるようにしておく
-    "ghcr.io/devcontainers/features/github-cli:1": {}
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+
+    // パッケージ管理とタスク実行に使う。実アプリ（shiftapp-orchestra）と同じ feature。
+    // テストだけは Jest のままなので、bun run test は内部で node + Jest を呼ぶ。
+    // 理由は .docs/curriculum/INSTRUCTOR_GUIDE.md の「テストについて」を参照。
+    "ghcr.io/shyim/devcontainers-features/bun:0": {
+      "version": "latest"
+    }
   },
 
   "forwardPorts": [3000, 5432],

@@ -68,7 +68,7 @@
 かいつまむと、**VS Code で開いて「Reopen in Container」を押し**、コンテナの中で:
 
 ```bash
-npm run dev             # http://localhost:3000
+bun run dev             # http://localhost:3000
 ```
 
 `.env` の作成も依存のインストールも、コンテナの初回セットアップで自動的に行われます。
@@ -142,7 +142,7 @@ DB を PostgreSQL から別のものに変えても、`domain` と `usecases` �
 - **層の分離** — 各層が自分の責務だけを持ち、越境しない
 - **依存性の注入（DI）** — `lib/container.ts` が実装を組み立て、上位層は interface だけを知る
 - **テスタビリティ** — 依存を差し替えられるので、DB なしで **425 件**のテストが動く
-- **型安全性** — TypeScript 6 による厳密な型チェック（`npm run build` で検証）
+- **型安全性** — TypeScript 6 による厳密な型チェック（`bun run build` で検証）
 
 > 💡 **フロントから見ると**: 画面（`features/`）は `lib/api.ts` の Server Actions を呼ぶだけで、
 > その先の層構造を意識する必要はありません。この「境界」があるおかげで、

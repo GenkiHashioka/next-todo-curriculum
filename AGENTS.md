@@ -167,16 +167,16 @@ docs: READMEにセットアップ手順を追記
 
 | コマンド | 用途 |
 |---|---|
-| `npm run dev` | 開発サーバー起動 |
-| `npm run build` | 本番ビルド（**型エラーはここで分かる**） |
-| `npm run check` | Biome による整形・リント |
-| `npm test` | API 側のテスト |
+| `bun run dev` | 開発サーバー起動 |
+| `bun run build` | 本番ビルド（**型エラーはここで分かる**） |
+| `bun run check` | Biome による整形・リント |
+| `bun run test` | API 側のテスト |
 
 受講者が「動いた」と言ったら、**なぜ動いたのかを説明できるか**を確認してあげてください。
 
 ### 提出前チェック
 
-各ステップの実装が終わったら、受講者に **`npm run submit-check`** を実行するよう
+各ステップの実装が終わったら、受講者に **`bun run submit-check`** を実行するよう
 案内してください。ブランチ・ビルド・ステップ制約・HeroUI v2 の混入を機械的に検査します。
 （Claude Code なら `/submit-check` で、結果の読み解きまで一緒にできます）
 
