@@ -291,6 +291,53 @@ git checkout -b {受講者名}-step-2
 メジャー更新の PR が来たら、CI の結果を見てからマージしてください。
 UI に関わる更新は、デプロイされた画面も確認することを推奨します。
 
+### `reference/v3-complete` へのバックマージ（週次・手動）
+
+**Dependabot が対象にしているのは `main` だけ**です（`.github/dependabot.yml` に
+`target-branch` の指定が無く、既定の `main` のみが対象）。自動マージされた変更も
+`reference/v3-complete` には反映されないため、**週に 1 回ほど手動で取り込んでください**。
+
+自動化はしていません。GitHub Actions は無料枠に収めたい方針で、かつ `main` は
+フロントエンド実装（`src/features/`）が空のスターターなので、講師が定期的に
+中身を見ておく必要性自体があるためです。
+
+```bash
+# 1. main 側で直近マージされた Dependabot PR を確認
+gh pr list --base main --state merged --search "author:app/dependabot" \
+  --json number,title,mergedAt --limit 20
+
+# 2. reference/v3-complete から作業ブランチを切って main を取り込む
+git fetch origin
+git checkout -b backmerge/$(date +%Y%m%d) origin/reference/v3-complete
+git merge origin/main
+```
+
+`reference/v3-complete` はバックエンド層（`src/infrastructure/` 等）や
+`.devcontainer/` `.docs/` が `main` とほぼ同一で、`src/features/` 配下（フロント実装）
+だけが分岐している設計なので、コンフリクトは基本的に起きません。`bun.lock` で
+揉めたら `main` 側を採用して `bun install` で整合を取り直すのが早いです。
+
+```bash
+git checkout --theirs bun.lock
+bun install
+git add bun.lock
+```
+
+取り込んだら、依存の版が上がったことで教材のコード例が古くなっていないかを
+[check-curriculum-sync スキル](../../.claude/skills/check-curriculum-sync/SKILL.md)で確認してから PR を出してください
+（バージョン記述だけでなく、破壊的変更で API の書き方が変わっていないかもここで拾えます）。
+
+```bash
+bun install && bun run build && bun run test && bun run lint
+git push -u origin backmerge/$(date +%Y%m%d)
+gh pr create --base reference/v3-complete --head backmerge/$(date +%Y%m%d) \
+  --title "chore: main の依存更新を反映（$(date +%Y-%m-%d)）"
+```
+
+> 💡 この一連の流れは [`/backmerge-reference` スキル](../../.claude/skills/backmerge-reference/SKILL.md)
+> にまとめてあります。`main` の未反映コミット確認からブランチ作成、動作確認、
+> check-curriculum-sync の実行、PR 作成まで一気に進められます。
+
 ---
 
 ## 8. テストについて（よく聞かれる点）
