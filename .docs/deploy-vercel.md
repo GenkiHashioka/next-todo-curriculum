@@ -101,6 +101,10 @@ Neon 単体でプロジェクトを作ろうとすると「Vercel の Neon Postg
 > Vercel はリクエストごとに関数が起動するため、接続は**プーリング済み**
 > （ホスト名に `-pooler` が入っているもの）である必要がある。
 > 統合が入れる `DATABASE_URL` は通常プーリング済みなのでそのまま使える。
+>
+> SSL の有無は**接続文字列に `sslmode=require` が入っているか**で決まる。
+> Neon が払い出す URL には最初から付いているので、こちらも設定不要。
+> `sslmode` の付かない DB に繋ぐ場合だけ、環境変数 `DB_SSL=true` を追加する。
 
 ---
 
@@ -207,6 +211,7 @@ Vercel の **Settings → Environment Variables** で追加する。
 | 画面が真っ白・404 だらけ | Settings → Environments → Production の Branch Tracking が `main`（スターター）のままの可能性大 |
 | 500 エラー・DB に繋がらない | Neon の統合が入っているか、環境変数に `DATABASE_URL` があるか確認 |
 | `self signed certificate` などの SSL エラー | 接続文字列に `sslmode=require` が付いているか確認 |
+| `The server does not support SSL connections` | SSL 非対応の DB に SSL で繋ぎにいっている。接続文字列の `sslmode=require` と環境変数 `DB_SSL` を両方外す。**ローカルでこれが出た場合**は、`DB_URL` に `sslmode=require` が紛れ込んでいないか確認する（ローカルの PostgreSQL は SSL 非対応） |
 | ビルドは通るが API が 500 | Neon にテーブルが無い、または DATABASE_URL とは別の DB に作ってしまっている（手順 4 の current_database() で確認） |
 | **ログインは通るが一覧ページでエラー**<br>`Unexpected token '<', "<!DOCTYPE "...` | サーバー側の自己 API 呼び出しが **Deployment Protection** に阻まれ、JSON ではなく SSO ログイン画面の HTML を受け取っている。下記「補足」参照 |
 | ログインできるがすぐ切れる | `JWT_SECRET` が未設定。設定後に再デプロイしたか確認 |
