@@ -16,6 +16,30 @@
 ### 1.3 完成イメージ
 すべての機能が動作する基本的な Todo アプリケーション。UIは簡素だが、CRUD 操作がすべて実装されている状態。
 
+### 1.4 動作確認用のアカウント
+
+データベースは空の状態から始まりますが、**動作確認用の管理者アカウントが用意されています**。
+
+| ユーザー名 | パスワード | ロール |
+|---|---|---|
+| `admin` | `password` | ADMIN（1） |
+
+Dev Container の初回セットアップで自動的に作られます。
+消えてしまった場合は、コンテナの中で次を実行すれば作り直せます。
+
+```bash
+bun run seed:admin
+```
+
+このアカウントが必要になるのは [2.4 管理者機能ページ](#24-管理者機能ページadminmanager専用) です。
+そこで作る `/users` は ADMIN・MANAGER しか入れないので、
+自分で登録したアカウント（後述のとおり `role: 4`）では確認できません。
+
+> 💡 API を素の状態で叩いてみたいときは、
+> [.docs/postman/next-todo.postman_collection.json](../postman/next-todo.postman_collection.json) を
+> Postman に import すると、全エンドポイントのリクエストが揃った状態から始められます。
+> 画面を作る前に「API が何を返すのか」を見ておくと、実装が進めやすくなります。
+
 ---
 
 ## 2. 実装するページ一覧
@@ -84,6 +108,10 @@ const [isLoading, setIsLoading] = useState<boolean>(false)
   throw new Error(errorData.error || 'ユーザー登録に失敗しました');
   ```
 - **ユーザーロール**: 登録時に `role: 4` を自動設定
+
+> ⚠️ ここで作るアカウントは `role: 4`（USER）なので、
+> [2.4 管理者機能ページ](#24-管理者機能ページadminmanager専用) の `/users` には入れません。
+> そちらの動作確認には、用意されている `admin` / `password`（[1.4](#14-動作確認用のアカウント)）を使ってください。
 
 ---
 
@@ -337,10 +365,15 @@ const [successMessage, setSuccessMessage] = useState<string>('') // 成功メッ
 
 ### 2.4 管理者機能ページ（ADMIN・MANAGER専用）
 
+> 🔑 **動作確認には `admin` / `password` でログインしてください。**
+> ここのページは ADMIN・MANAGER 専用なので、
+> 2.1 の登録画面で作ったアカウント（`role: 4`）では入れません。
+> アカウントの詳細は [1.4 動作確認用のアカウント](#14-動作確認用のアカウント) を参照。
+
 #### `/users` - ユーザー一覧ページ
 **ファイル**: `src/features/users/UserListPage.tsx`
 
-**アクセス権限**: `role >= 2` (ADMIN: 1, MANAGER: 2 のみアクセス可能)
+**アクセス権限**: `role <= 2` (ADMIN: 1, MANAGER: 2 のみアクセス可能)
 
 **主な機能**:
 - 全ユーザーの一覧表示
@@ -406,7 +439,7 @@ const [currentUserId, setCurrentUserId] = useState<string>('') // 現在のユ�
 #### `/users/[id]` - ユーザー詳細ページ
 **ファイル**: `src/features/users/UserDetailPage.tsx`
 
-**アクセス権限**: `role >= 2` (ADMIN・MANAGER のみアクセス可能)
+**アクセス権限**: `role <= 2` (ADMIN・MANAGER のみアクセス可能)
 
 **主な機能**:
 - ユーザーの詳細情報表示(ユーザー名、名前、ロール)
@@ -476,7 +509,7 @@ const [currentUserId, setCurrentUserId] = useState<string>('') // 現在のユ�
 #### `/users/create` - ユーザー作成ページ（オプション）
 **ファイル**: `src/features/users/CreateUserPage.tsx`
 
-**アクセス権限**: `role >= 2` (ADMIN・MANAGER のみアクセス可能)
+**アクセス権限**: `role <= 2` (ADMIN・MANAGER のみアクセス可能)
 
 **主な機能**:
 - 新規ユーザーの作成フォーム

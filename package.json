@@ -13,6 +13,7 @@
     "format": "biome format --write src/",
     "lint": "biome lint src/",
     "check": "biome check src/ --write --unsafe",
+    "seed:admin": "bun scripts/seed-admin.mjs",
     "submit-check": "bun scripts/submit-check.mjs"
   },
   "dependencies": {

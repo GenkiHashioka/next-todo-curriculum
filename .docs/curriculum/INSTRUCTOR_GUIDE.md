@@ -54,7 +54,8 @@ main（不変）
    - **VS Code**（または Cursor）+ Dev Containers 拡張
 3. README の「セットアップ」に沿って環境構築してもらう
    - clone →「Reopen in Container」→ `bun run dev` の 3 手
-   - `.env` の作成・`JWT_SECRET` の生成・`core.hooksPath` の設定は
+   - `.env` の作成・`JWT_SECRET` の生成・`core.hooksPath` の設定・
+     **動作確認用の管理者アカウント（`admin` / `password`）の作成**は
      **コンテナの初回セットアップで自動的に行われる**（手作業なし）
 4. 自分のベースブランチを作ってもらう
    ```bash
@@ -73,6 +74,16 @@ main（不変）
 >   何も起きていないように見えて不安になるので、先に伝えておく
 >
 > 初回だけ画面共有で一緒に立ち上げると確実です。
+
+> 🔑 **管理者アカウントについて**
+>
+> DB は空から始まるため、Step 1 の「管理者機能ページ（`/users`）」を
+> 自分で登録したアカウント（`role: 4`）では確認できません。
+> そこで動作確認用に `admin` / `password`（ADMIN）を自動作成しています。
+> 消えた場合は `bun run seed:admin` で作り直せます。
+>
+> ローカル限定の学習用アカウントです。デプロイ環境（Vercel / Neon）では作られないので、
+> そちらは [deploy-vercel.md](../deploy-vercel.md) のとおり SQL で昇格させてください。
 
 ---
 
