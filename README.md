@@ -93,6 +93,7 @@ git clone https://github.com/GenkiHashioka/next-todo-curriculum.git
 - `.env` の作成（`JWT_SECRET` も自動生成されます）
 - `main` へ誤って push しないための設定
 - 依存パッケージのインストール
+- 動作確認用の管理者アカウントの作成
 
 > ⏳ **初回は 5〜15 分ほどかかります。**（Docker イメージの取得と依存のインストール）
 > 2 回目以降は数秒で開きます。
@@ -111,10 +112,28 @@ bun run dev
 > `src/features/` が空なので、`/login` などにアクセスしても 404 です。
 > ここから Step 1 の教材に沿って、あなたが画面を作っていきます。
 
-### 4. 最初のユーザーを作る
+### 4. アカウントについて
 
-データベースは空の状態から始まります。Step 1 でユーザー登録画面（`/register`）を実装したら、
-そこから自分のアカウントを作成してください。
+データベースは空の状態から始まりますが、**動作確認用の管理者アカウントが用意されています。**
+
+| ユーザー名 | パスワード | ロール |
+|---|---|---|
+| `admin` | `password` | ADMIN |
+
+Step 1 では、ADMIN・MANAGER だけが入れる**管理者機能ページ（`/users`）**も作ります。
+自分で登録したアカウントは一般ユーザー（`role: 4`）なのでそこには入れません。
+**管理者向けの画面はこのアカウントで確認してください。**
+
+自分のアカウントは、Step 1 でユーザー登録画面（`/register`）を実装したら
+そこから作成できます。
+
+> 管理者アカウントが消えてしまったら、コンテナの中で `bun run seed:admin` を実行すれば
+> 作り直せます（既にある場合は何もしないので、何度実行しても安全です）。
+
+> 💡 **画面を作る前に API を触ってみたいときは**、
+> [.docs/postman/next-todo.postman_collection.json](./.docs/postman/next-todo.postman_collection.json) を
+> [Postman](https://www.postman.com/) に import すると、全エンドポイントのリクエストが
+> 揃った状態から始められます（任意）。
 
 ---
 
@@ -187,6 +206,7 @@ bun run dev            # 開発サーバー起動（Turbopack）
 bun run build          # 本番ビルド（型チェックも実行されます）
 bun run check          # Biome でフォーマット＋リント（コミット前に実行推奨）
 bun run test           # テスト実行（API 側のテスト）
+bun run seed:admin     # 動作確認用の管理者アカウントを作り直す
 
 bun run submit-check   # ★ 提出前チェック（レビューに出す前に必ず実行）
 ```
@@ -278,7 +298,9 @@ git switch main                     # 戻る
 | DB に繋がらない | `.env` の `DB_HOST` が `localhost` ではなく **`db`** になっているか確認 |
 | ポート 5431 が使えない | 他のプロジェクトの PostgreSQL と衝突。`.env` の `DB_LOCAL_PORT` を変更 |
 | セットアップをやり直したい | `F1` →「Dev Containers: Rebuild Container」 |
-| DB を空に戻したい | コンテナの外で `docker compose down -v`（データが消えます） |
+| DB を空に戻したい | コンテナの外で `docker compose down -v`（データが消えます）。<br>戻したあとは `bun run seed:admin` で管理者アカウントを作り直してください |
+| `admin` でログインできない | `bun run seed:admin` を実行（既にある場合は何もしません） |
+| `The server does not support SSL connections` | `.env` の `DB_URL` に `sslmode=require` が紛れ込んでいないか確認。<br>ローカルの PostgreSQL は SSL に対応していません |
 | 画面が 404 | まだそのページを実装していない可能性大（教材を確認） |
 | HeroUI の書き方が記事と違う | v3 を使用中。[移行対応表](./.docs/heroui-v2-to-v3-migration.md)を参照 |
 | 型エラーが出る | `bun run build` で詳細を確認 |
