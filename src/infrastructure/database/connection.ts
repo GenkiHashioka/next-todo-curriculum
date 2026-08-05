@@ -82,12 +82,20 @@ class Database {
     const connectionString =
       process.env.DB_URL || process.env.DATABASE_URL || process.env.POSTGRES_URL;
 
-    // SSL の要否。
+    // SSL の要否は「接続文字列に書いてあるか」だけで決める。
     // ローカルの Docker PostgreSQL は SSL 非対応、Neon などのマネージド DB は必須。
-    // 接続文字列に sslmode=require が含まれるか、本番環境なら SSL を有効にする。
+    // Neon / Vercel Postgres が払い出す URL には sslmode=require が含まれるので、
+    // これだけでデプロイ環境も判定できる。
+    //
+    // NODE_ENV では判定しないこと。next build は process.env.NODE_ENV を
+    // ビルド時に "production" へ展開するため、条件式が定数 true に畳まれて
+    // 消えてしまう。結果、本番ビルド（next start）ではローカルの PostgreSQL に対しても
+    // SSL で接続しにいき、"The server does not support SSL connections" で必ず落ちる。
+    //
+    // sslmode の付いていないマネージド DB に繋ぐ場合は DB_SSL=true を指定する。
     const needsSsl =
-      /sslmode=require/.test(connectionString ?? '') ||
-      process.env.NODE_ENV === 'production';
+      /[?&]sslmode=(require|verify-ca|verify-full)/.test(connectionString ?? '') ||
+      process.env.DB_SSL === 'true';
 
     this.pool = new Pool({
       connectionString,
