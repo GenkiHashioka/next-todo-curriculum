@@ -53,9 +53,9 @@ React + Next.js の初心者が、API との連携を学習するための Todo 
 ## 3. 技術スタック
 
 ### 3.1 フロントエンド
-- **フレームワーク**: Next.js 16.2.10 (App Router)
-- **UI ライブラリ**: React 19.2.7
-- **スタイリング**: Tailwind CSS 4.3, HeroUI 3.2.2
+- **フレームワーク**: Next.js 16.3.0 (App Router)
+- **UI ライブラリ**: React 19.2.8
+- **スタイリング**: Tailwind CSS 4.3, HeroUI 3.2.3
 - **型定義**: TypeScript 6.0.3
 - **状態管理**: React Hooks（useState, useEffect, etc.）
 
