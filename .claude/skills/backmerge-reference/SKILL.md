@@ -53,26 +53,64 @@ gh pr list --repo GenkiHashioka/next-todo-curriculum \
 git log --oneline origin/reference/v3-complete..origin/main
 ```
 
-### 3. 作業ブランチを切って `main` を取り込む
+### 3. 作業ブランチを切る
 
 ```bash
 git checkout -b backmerge/$(date +%Y%m%d) origin/reference/v3-complete
-git merge origin/main
 ```
 
-`reference/v3-complete` はバックエンド層（`src/infrastructure/` 等）や `.devcontainer/` `.docs/` が
-`main` とほぼ同一で、`src/features/` 配下（フロント実装）だけが分岐している設計なので、
-コンフリクトは基本的に起きません。起きた場合の典型は `bun.lock` で、`main` 側を採用して
-`bun install` で整合を取り直すのが早いです。
+> [!CAUTION]
+> **`git merge origin/main` は絶対に実行しないでください。**
+> このブランチの実装ファイルが **30 件削除されます**（`src/app/` 16 件・`src/features/` 14 件）。
+>
+> merge base の時点では `src/features/` に 37 ファイル存在していましたが、その後 `main` が
+> `1d23d77 chore: 受講者向けスターター状態を派生（近代化済み・フロント空）` で 36 ファイルを
+> 削除しています。Git はこれを「`main` が意図的に削除した」と解釈するため、merge すると
+> **削除が伝播**します。しかも `reference/v3-complete` 側が触っていないファイルは
+> **コンフリクトにすらならず黙って消えます**。
+>
+> 影響は事前に確認できます（作業ツリーを一切変更しません）。
+>
+> ```bash
+> TREE=$(git merge-tree --write-tree origin/reference/v3-complete origin/main | head -1)
+> diff <(git ls-tree -r origin/reference/v3-complete --name-only) \
+>      <(git ls-tree -r $TREE --name-only) | grep "^<"
+> ```
+
+### 3-1. 取り込める変更を cherry-pick する
+
+`src/` の実装やテスト、設定ファイルの修正は cherry-pick で取り込みます。
+手順 2 で確認したコミットから、`reference/v3-complete` に必要なものを選んでください。
 
 ```bash
-git checkout --theirs bun.lock
-bun install
-git add bun.lock
+git cherry-pick <SHA>
 ```
 
-`src/features/` や `.docs/curriculum/` にコンフリクトが出た場合は機械的に解決せず、
-中身を見てから判断してください（`reference/v3-complete` 側の実装・記述を壊さないこと）。
+コンフリクトが出た場合は機械的に解決せず、中身を見てから判断してください
+（`reference/v3-complete` 側の実装・記述を壊さないこと）。
+
+### 3-2. 依存バージョンを同期する
+
+**個別の Dependabot コミットを cherry-pick してはいけません。** `reference/v3-complete` が
+中間バージョンを飛ばしている場合に取りこぼします（例: `jose` を 6.2.7 → 6.2.8 する PR は、
+`^6.2.5` のままの `reference/v3-complete` には当たらない）。
+`package.json` と `bun.lock` を `main` と同一にします。
+
+```bash
+git checkout origin/main -- package.json bun.lock
+bun install --frozen-lockfile   # 整合性を検証（解決は変えない）
+git add package.json bun.lock
+```
+
+`bun install` で lock を再生成すると、キャレット範囲内で推移的依存が `main` と食い違う
+可能性があります。**lock も `main` から取得**してください。これで両ブランチの依存ツリーが
+完全に一致します。
+
+### 3-3. ブランチ固有のファイルは手で適用する
+
+`.github/workflows/ci.yml` は **`main` 版で上書きしないでください。**
+このブランチはトリガーが `branches: [reference/v3-complete]` になっており、
+説明コメントも異なります。`main` 側の変更内容だけを読み取り、手で適用します。
 
 ### 4. 動作確認
 
@@ -136,7 +174,8 @@ PR の本文には、取り込んだ主な依存更新（手順 2 で確認し�
 | 項目 | 結果 |
 |---|---|
 | 取り込んだ Dependabot PR | #.., #.. |
-| コンフリクト | なし / bun.lock のみ / {ファイル名}（要確認） |
+| 取り込み方法 | cherry-pick {SHA} / 依存同期 / 手動適用 |
+| `src/features/` の健全性 | ✅ 37 ファイル健在 |
 | build / test / lint | ✅ 緑 |
 | check-curriculum-sync | ✅ 問題なし / ⚠️ {内容}を修正 |
 | PR | {URL} |
