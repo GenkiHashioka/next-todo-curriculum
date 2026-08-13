@@ -306,22 +306,36 @@ UI に関わる更新は、デプロイされた画面も確認することを�
 gh pr list --base main --state merged --search "author:app/dependabot" \
   --json number,title,mergedAt --limit 20
 
-# 2. reference/v3-complete から作業ブランチを切って main を取り込む
+# 2. reference/v3-complete から作業ブランチを切る
 git fetch origin
 git checkout -b backmerge/$(date +%Y%m%d) origin/reference/v3-complete
-git merge origin/main
 ```
 
-`reference/v3-complete` はバックエンド層（`src/infrastructure/` 等）や
-`.devcontainer/` `.docs/` が `main` とほぼ同一で、`src/features/` 配下（フロント実装）
-だけが分岐している設計なので、コンフリクトは基本的に起きません。`bun.lock` で
-揉めたら `main` 側を採用して `bun install` で整合を取り直すのが早いです。
+> ⚠️ **`git merge origin/main` は実行しないでください。**
+> `reference/v3-complete` の実装ファイルが **30 件削除されます**
+> （`src/app/` 16 件・`src/features/` 14 件）。
+>
+> merge base の時点では `src/features/` に 37 ファイルありましたが、その後 `main` が
+> `1d23d77`（受講者向けスターター状態の派生）で 36 ファイルを削除しています。
+> Git はこれを「`main` が意図的に削除した」と解釈するため、merge すると削除が伝播し、
+> `reference/v3-complete` 側が触っていないファイルは**コンフリクトにすらならず消えます**。
+
+取り込みは cherry-pick と、依存ファイルの同期で行います。
 
 ```bash
-git checkout --theirs bun.lock
-bun install
-git add bun.lock
+# 3. 実装・テスト・設定の修正は cherry-pick
+git cherry-pick <SHA>
+
+# 4. 依存は package.json と bun.lock を main と同一にする
+#    （個別の Dependabot コミットを cherry-pick すると中間バージョンを取りこぼす）
+git checkout origin/main -- package.json bun.lock
+bun install --frozen-lockfile
+git add package.json bun.lock
 ```
+
+`.github/workflows/ci.yml` は `main` 版で上書きしないでください。このブランチは
+トリガーが `branches: [reference/v3-complete]` で、説明コメントも異なります。
+`main` 側の変更内容だけを読み取り、手で適用します。
 
 取り込んだら、依存の版が上がったことで教材のコード例が古くなっていないかを
 [check-curriculum-sync スキル](../../.claude/skills/check-curriculum-sync/SKILL.md)で確認してから PR を出してください
