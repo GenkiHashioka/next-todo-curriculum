@@ -3,25 +3,19 @@ name: CI
 # main への push と、すべての PR で実行する。
 # 依存更新 PR（Dependabot）が壊れていないかを、ここで自動判定する。
 #
-# ドキュメントだけの変更では実行しない。
-# 教材のコード例は実行されないため、ビルドやテストの結果は変わらないため。
-# （教材と実装の食い違いは .claude/skills/check-curriculum-sync で別途検査する）
+# 以前はドキュメントだけの変更を paths-ignore で除外していた。
+# Actions の無料枠を節約するためだったが、次の 2 点から除外をやめた。
 #
-# 除外が効くのは「変更されたファイルがすべて除外対象のとき」だけ。
-# コードが 1 ファイルでも含まれていれば実行されるので、
-# 受講者の PR（src/features/ を含む）は従来どおり CI が走る。
+# 1. public リポジトリの標準ランナーは Actions が無料。節約する理由がなくなった。
+# 2. main のブランチ保護で `build & test` を必須チェックにしたため、
+#    除外が有効だと「CI がスキップ ＝ チェックが報告されない」状態になり、
+#    ドキュメントだけの PR が永久にマージできなくなる。
+#
+# （教材と実装の食い違いは .claude/skills/check-curriculum-sync で別途検査する）
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - '**.md'
-      - '.docs/**'
-      - '.claude/**'
   pull_request:
-    paths-ignore:
-      - '**.md'
-      - '.docs/**'
-      - '.claude/**'
 
 # 同じブランチで新しい push があったら、古い実行はキャンセルして無駄な時間を使わない
 concurrency:
