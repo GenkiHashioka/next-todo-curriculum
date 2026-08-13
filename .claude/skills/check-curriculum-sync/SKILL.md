@@ -60,6 +60,31 @@ v3 に**ある**もの: `accent` `background` `border` `danger` `field-*` `focus
 - `Checkbox` が **複合構造**（`Content > Control > Indicator`）になっているか
 - `Card.Header` で横並びが必要な箇所に **`flex-row`** が指定されているか
 
+> ℹ️ **この対応表の実装ファイルは `reference/v3-complete` にしか存在しません**
+> （`main` は `src/features/` が空のスターター）。突き合わせはこのブランチで行ってください。
+
+#### どこを重点的に見るかの絞り込み
+
+毎回すべての教材を読み直す必要はありません。**実装が変わったなら、その実装を引用している
+教材も変わるべき**という関係を使って、見る範囲を機械的に絞れます。
+
+```bash
+# 前回の同期時点から、対応表の実装ファイルが変わったか
+git diff <前回の同期コミット>..HEAD --name-only -- \
+  src/features/auth/components/LoginForm.tsx \
+  src/features/todos/components/TodoFilter.tsx \
+  src/features/users/UserListPage.tsx \
+  src/features/todos/components/TodoItem.tsx \
+  src/components/Header.tsx \
+  'src/features/*/components/'
+```
+
+変更があった実装ファイルに対応する節だけを重点確認します。
+**依存の破壊的変更で実装を直したのに教材を直し忘れる**、という取りこぼしをここで防ぎます。
+
+`<前回の同期コミット>` は、直近の `chore: main の依存更新を反映` コミットを起点にすると
+おおよそ合います（`git log --oneline --grep "依存更新を反映" -1`）。
+
 ### 4. 実装が実際に動くか
 
 教材が正しくても、実装が壊れていたら意味がありません。
@@ -71,11 +96,21 @@ bun run test        # API 側のテスト
 
 ### 5. 教材の版数記述が古くなっていないか
 
+**`package.json` の実値と突き合わせてください。** 「古そうなバージョン」を grep で
+探す方式では、`16.2.10` → `16.3.0` のような**同一メジャー内の乖離を検出できません**。
+
 ```bash
-grep -rnE "Next\.js 1[0-5]|React 19\.1|HeroUI 2|Zod 3|TypeScript 5" .docs/curriculum/
+# 正（package.json の実際の値）
+grep -E '"(next|react|@heroui/react|typescript|zod|tailwindcss)"' package.json
+
+# 教材側の記述（パッチレベルまで書いてあるのは 00_basic_design.md の技術スタック節だけ）
+grep -nE "(Next\.js|React|HeroUI|Zod|TypeScript|Tailwind( CSS)?) v?[0-9]+\.[0-9]+" \
+  .docs/curriculum/00_basic_design.md
 ```
 
-`package.json` の実際のバージョンと突き合わせます。
+乖離が見つかった場合、**このスキルでは直さず報告に留めてください。**
+版数記述の更新は `main` を起点に行う工程（`/sync-doc-versions`）の担当です。
+ここで `reference/v3-complete` 側を先に直すと、`main` が後追いする逆流が起きます。
 
 ### 6. 両ブランチに反映されているか
 
