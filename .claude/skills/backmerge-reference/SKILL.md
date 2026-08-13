@@ -22,8 +22,21 @@ description: main にマージされた Dependabot の依存更新を reference/
 - 「教材（`main` 前提）とデプロイされた見本（`reference/v3-complete`）で挙動が違う」事故が起きる
 
 これを避けるため、`main` の更新を定期的に手動で取り込みます。
-**自動化はしていません**（GitHub Actions は無料枠に収めたい方針、かつ `main` はフロントエンド実装が
-空のスターターなので講師が定期的に中身を見る必要性自体がある — 詳細は INSTRUCTOR_GUIDE.md 参照）。
+**自動化はしていません**（`main` はフロントエンド実装が空のスターターなので、
+講師が定期的に中身を見る必要性自体があるため — 詳細は INSTRUCTOR_GUIDE.md 参照）。
+
+## 実行前に：これは工程の 3 番目です
+
+```
+① Dependabot PR が main にマージされる
+        ↓
+② /sync-doc-versions        （main）教材の版数記述を追従 → PR → マージ
+        ↓
+③ /backmerge-reference      ← いまここ
+```
+
+**②を先に済ませてください。** `main` の教材が古いままバックマージすると、
+古い記述を `reference/v3-complete` へ運んでしまいます。
 
 ---
 
@@ -37,6 +50,15 @@ git fetch origin
 ```
 
 未認証なら、続行せず講師に `gh auth login` を依頼してください（このスキルは代わりに認証できません）。
+
+`main` 側の教材が最新か（②が済んでいるか）も確認します。
+
+```bash
+grep -E '"(next|react|@heroui/react)"' package.json
+git show origin/main:.docs/curriculum/00_basic_design.md | sed -n '/技術スタック/,/バックエンド/p'
+```
+
+食い違っていたら、先に `/sync-doc-versions` を実行してください。
 
 ### 2. 未反映の Dependabot 更新を確認
 
@@ -133,12 +155,36 @@ bun run lint
 `check-curriculum-sync` スキルを呼び出し、その手順どおりに検査してください。
 特に今回の文脈で見るべきは:
 
-- 版数記述（`grep -rnE "Next\.js 1[0-5]|React 19\.1|HeroUI 2|Zod 3|TypeScript 5" .docs/curriculum/`）
-  — 更新後のバージョンと食い違っていないか
 - 更新した依存（HeroUI / Next.js / Zod など）に破壊的変更があった場合、
   教材のコード例がその変更を反映できているか
+- 手順 4 で実装を直した場合、その実装を引用している教材の節も直す必要がないか
+  （`check-curriculum-sync` の「どこを重点的に見るかの絞り込み」を使う）
 
 問題が見つかった場合は、教材側を実装に合わせて修正してから次に進みます。
+
+> ℹ️ **版数記述の乖離が見つかった場合**は、ここで直さず報告に留めてください。
+> それは `/sync-doc-versions`（`main` 起点）の担当です。ここで直すと `main` が後追いになります。
+> ②を飛ばしてしまった可能性が高いので、講師に確認してください。
+
+#### ⚠️ 教材を修正したら、`main` 向けにも同じ PR を出す
+
+教材（`.docs/curriculum/`）は **`main` と `reference/v3-complete` の両方に必要**で、
+内容が一致している必要があります。しかし教材のコード例の誤りは、実装がある
+`reference/v3-complete` でしか発見できません。
+
+そのため、このブランチで教材を直した場合は、**同一のコミットを `main` 向け PR にも
+cherry-pick してペアで出してください。** 片方だけマージすると両ブランチが乖離します。
+
+```bash
+# このブランチで教材を直したコミットの SHA を控えておく
+git log --oneline -1
+
+# main 向けのペア PR
+git checkout -b docs/{内容}-main origin/main
+git cherry-pick <SHA>
+git push -u origin docs/{内容}-main
+gh pr create --base main --title "docs: {内容}"
+```
 
 ### 6. PR を作成する
 
