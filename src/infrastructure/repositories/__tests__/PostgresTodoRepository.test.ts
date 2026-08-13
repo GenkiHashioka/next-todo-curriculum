@@ -207,7 +207,7 @@ describe('PostgresTodoRepository', () => {
         completed: false,
         userId: 'user-123',
       };
-      const mockId = 'new-todo-id';
+      const mockId = '11111111-1111-4111-8111-111111111111';
       const mockDate = new Date('2024-01-01T12:00:00Z');
 
       mockRandomUUID.mockReturnValue(mockId);
@@ -267,7 +267,7 @@ describe('PostgresTodoRepository', () => {
         title: '説明なしタスク',
         userId: 'user-123',
       };
-      const mockId = 'new-todo-id';
+      const mockId = '11111111-1111-4111-8111-111111111111';
       const mockDate = new Date('2024-01-01T12:00:00Z');
 
       mockRandomUUID.mockReturnValue(mockId);
