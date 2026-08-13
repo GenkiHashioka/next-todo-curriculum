@@ -128,7 +128,7 @@ describe('/api/users/me/password API エンドポイント', () => {
         {
           code: 'too_small',
           minimum: 1,
-          type: 'string',
+          origin: 'string',
           inclusive: true,
           exact: false,
           message: 'Current password is required',
@@ -164,7 +164,7 @@ describe('/api/users/me/password API エンドポイント', () => {
         {
           code: 'too_small',
           minimum: 6,
-          type: 'string',
+          origin: 'string',
           inclusive: true,
           exact: false,
           message: 'Password must be at least 6 characters',
@@ -200,7 +200,7 @@ describe('/api/users/me/password API エンドポイント', () => {
         {
           code: 'too_small',
           minimum: 1,
-          type: 'string',
+          origin: 'string',
           inclusive: true,
           exact: false,
           message: 'Password confirmation is required',
@@ -268,7 +268,7 @@ describe('/api/users/me/password API エンドポイント', () => {
         {
           code: 'too_small',
           minimum: 1,
-          type: 'string',
+          origin: 'string',
           inclusive: true,
           exact: false,
           message: 'Current password is required',
@@ -277,7 +277,7 @@ describe('/api/users/me/password API エンドポイント', () => {
         {
           code: 'too_small',
           minimum: 6,
-          type: 'string',
+          origin: 'string',
           inclusive: true,
           exact: false,
           message: 'Password must be at least 6 characters',

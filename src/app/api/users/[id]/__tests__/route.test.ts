@@ -325,7 +325,7 @@ describe('/api/users/[id] API エンドポイント', () => {
           {
             code: 'too_small',
             minimum: 1,
-            type: 'string',
+            origin: 'string',
             inclusive: true,
             exact: false,
             message: 'First name is required',
