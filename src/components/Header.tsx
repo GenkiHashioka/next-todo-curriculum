@@ -3,7 +3,7 @@
 import { Button } from '@heroui/react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 /**
  * ヘッダーコンポーネント。
@@ -23,55 +23,13 @@ export function Header() {
   // 認証確認中フラグ
   const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
 
-  // ページ遷移が行われるときに認証状態と権限状態を確認する副作用
-  useEffect(() => {
-    /**
-     * 認証状態と権限状態を確認する非同期関数。
-     * APIエンドポイントから認証情報を取得し、状態を更新します。
-     *
-     * @returns {Promise<void>} 非同期処理完了を表すPromise
-     */
-    const checkAuth = async () => {
-      try {
-        // APIエンドポイントから認証情報を取得
-        const response = await fetch('/api/users/me');
-
-        // レスポンスが正常であれば認証状態と権限状態を更新
-        if (response.ok) {
-          const data = await response.json();
-          setIsAuthenticated(true);
-          setUserRole(data.data.role);
-        } else {
-          setIsAuthenticated(false);
-        }
-      } catch (err) {
-        // エラー発生時は未認証とする
-        setIsAuthenticated(false);
-        console.error('認証確認エラー:', err);
-      } finally {
-        // 認証確認完了
-        setIsCheckingAuth(false);
-      }
-    };
-
-    // ログインページとユーザー新規作成ページは認証不要なのでスキップ
-    if (pathname === '/login' || pathname === '/register') {
-      setIsAuthenticated(false);
-      setIsCheckingAuth(false);
-      return;
-    }
-
-    // 認証チェックを実行
-    checkAuth();
-  }, [pathname]);
-
   /**
    * ログアウト処理を行う非同期関数。
    * サーバーにログアウトリクエストを送信し、成功した場合はログインページにリダイレクトします。
    *
    * @returns {Promise<void>} 非同期処理完了を表すPromise
    */
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     try {
       // サーバーにログアウトリクエストを送信
       await fetch('/api/auth/logout', {
@@ -84,7 +42,69 @@ export function Header() {
       // ログアウトエラーをコンソールに表示
       console.error('ログアウトエラー:', err);
     }
-  };
+  }, [router]);
+
+  // ページ遷移が行われるときに認証状態と権限状態を確認する副作用
+  useEffect(() => {
+    // 画面遷移時に状態書き換えを防ぐための破棄フラグ
+    let cancelled = false;
+    /**
+     * 認証状態と権限状態を確認する非同期関数。
+     * APIエンドポイントから認証情報を取得し、状態を更新します。
+     *
+     * @returns {Promise<void>} 非同期処理完了を表すPromise
+     */
+    const checkAuth = async () => {
+      try {
+        // APIエンドポイントから認証情報を取得
+        const response = await fetch('/api/users/me');
+        if (cancelled) return;
+
+        // 401(認証切れ・無効なトークン)の場合、強制的にログアウト
+        if (response.status === 401) {
+          await handleLogout();
+          return;
+        }
+
+        // レスポンスが正常であれば認証状態と権限状態を更新
+        if (response.ok) {
+          const data = await response.json();
+          if (cancelled) return;
+
+          setIsAuthenticated(true);
+          setUserRole(data.data.role);
+        } else {
+          setIsAuthenticated(false);
+        }
+      } catch (err) {
+        if (cancelled) return;
+        // エラー発生時は未認証とする
+        setIsAuthenticated(false);
+        console.error('認証確認エラー:', err);
+      } finally {
+        if (!cancelled) {
+          // 認証確認完了
+          setIsCheckingAuth(false);
+        }
+      }
+    };
+
+    // ログインページとユーザー新規作成ページは認証不要なのでスキップ
+    if (pathname === '/login' || pathname === '/register') {
+      setIsAuthenticated(false);
+      setIsCheckingAuth(false);
+      return;
+    }
+
+    // 認証チェックを実行
+    checkAuth();
+
+    // コンポーネント破棄（画面遷移など）が行われた場合、フラグをtrueにする
+    return () => {
+      cancelled = true;
+    };
+  }, [pathname, handleLogout]);
+
   // 認証確認中は何も表示しない
   if (isCheckingAuth) {
     return null;

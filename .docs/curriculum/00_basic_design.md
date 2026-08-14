@@ -269,6 +269,9 @@ src/
 - Cookie ベースの認証（JWT）
 - ミドルウェアで認証チェック
 - 未認証時はログインページへリダイレクト
+- 認証済みでログイン・新規登録ページにアクセスした場合は Todo 一覧へリダイレクト
+  （トークンは HttpOnly Cookie に入っており、クライアント側からは保持の有無を
+  判定できないため、この判定はミドルウェアで行う）
 
 ### 7.2 エラーハンドリング
 - API エラーは try-catch で捕捉
@@ -353,7 +356,7 @@ src/
 
 ---
 
-**Document Version**: 2.1.0  
-**Last Updated**: 2026-08-03  
+**Document Version**: 2.2.0  
+**Last Updated**: 2026-08-15  
 **Author**: jugeeem（原著）  
 **Reviser**: Genki Hashioka（HeroUI v3・近代化スタックへの改訂）
