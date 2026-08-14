@@ -48,6 +48,21 @@ function isPublicPath(path: string): boolean {
 }
 
 /**
+ * ログイン画面や新規登録画面など、未認証ユーザー専用のパスかどうかを判定します。
+ *
+ * 認証済みユーザーがアクセスした場合は Todo一覧（/todos）へリダイレクトされます。
+ * 未認証の場合は、後続の isPublicPath 側で公開パスとして処理（許可）されます。
+ *
+ * @param path - チェックするURLパス文字列
+ * @returns 認証向けのページパスである場合は true、そうでない場合は false
+ */
+function isGuestOnlyPath(path: string): boolean {
+  // 未認証ユーザー専用対象パス
+  const guestOnlyPaths = ['/login', '/register'];
+  return guestOnlyPaths.includes(path);
+}
+
+/**
  * Next.jsのミドルウェア関数。リクエストごとに実行され、認証とルートの保護を処理します。
  *
  * - 公開パスへのアクセスは常に許可されます
@@ -60,6 +75,21 @@ function isPublicPath(path: string): boolean {
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   console.log(`[Middleware] Processing path: ${path}`);
+
+  // 未認証ユーザー対象パスへのアクセスをチェック
+  if (isGuestOnlyPath(path)) {
+    console.log(`[Middleware] Checking if user is already authenticated for ${path}`);
+
+    // 認証情報取得
+    const authMiddleware = new AuthMiddleware();
+    const authResult = await authMiddleware.authenticate(request);
+
+    // 認証に成功している場合は、既にログイン済みと判定して、/todosに遷移する。
+    if (authResult.success) {
+      console.log(`[Middleware] User already authenticated, redirecting to /todos`);
+      return NextResponse.redirect(new URL('/todos', request.url));
+    }
+  }
 
   // 公開パスは認証なしで通す
   if (isPublicPath(path)) {
@@ -121,5 +151,7 @@ export const config = {
     '/users',
     '/profile/:path*',
     '/profile',
+    '/login',
+    '/register',
   ],
 };
