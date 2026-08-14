@@ -2413,11 +2413,15 @@ export default function RootLayout({
 
 ---
 
-**Document Version**: 2.2.0  
-**Last Updated**: 2026-08-03  
+**Document Version**: 2.3.0  
+**Last Updated**: 2026-08-15  
 **Author**: jugeeem（原著）  
 **Reviser**: Genki Hashioka（HeroUI v3・近代化スタックへの改訂）  
 **Changes**: 
+- v2.3.0 (2026-08-15): Header 実装例を修正後の実装に追従
+  - useEffect の cleanup（破棄フラグ）・401 での強制ログアウト・useCallback を反映
+  - 実装のポイントに「await の後で画面を書き換えるときは、まだ有効か確かめる」を追加
+    （理由を書かずにコードだけ載せると、意味が分からないまま写経することになるため）
 - v2.2.0 (2026-08-03): 提出前チェック（/submit-check）の実行を §8 に追加
   修了時の案内を「見本」から「参考実装（実装例のひとつ）」へ改め、違いを許容する旨を明記
 - v2.1.0 (2026-08-03): 実装との突き合わせによる修正

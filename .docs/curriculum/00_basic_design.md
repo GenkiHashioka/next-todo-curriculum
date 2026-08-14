@@ -356,7 +356,7 @@ src/
 
 ---
 
-**Document Version**: 2.1.0  
-**Last Updated**: 2026-08-03  
+**Document Version**: 2.2.0  
+**Last Updated**: 2026-08-15  
 **Author**: jugeeem（原著）  
 **Reviser**: Genki Hashioka（HeroUI v3・近代化スタックへの改訂）
