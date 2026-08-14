@@ -473,7 +473,7 @@ export default function RootLayout({
 import { Button } from '@heroui/react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export function Header() {
   const router = useRouter();
@@ -482,23 +482,52 @@ export function Header() {
   const [userRole, setUserRole] = useState<number>(4); // GENERAL (デフォルト)
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
+  // ログアウト処理
+  // useEffect の中からも呼ぶため、useCallback で同一性を保つ（後述）
+  const handleLogout = useCallback(async () => {
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+      });
+      setIsAuthenticated(false);
+      router.push('/login');
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+  }, [router]);
+
   // 認証状態をチェック
   useEffect(() => {
+    // 遷移前に投げた結果で、遷移後の画面を書き換えないための破棄フラグ（後述）
+    let cancelled = false;
+
     const checkAuth = async () => {
       try {
         const response = await fetch('/api/users/me');
-        
+        if (cancelled) return;
+
+        // 401（トークンが無効、またはユーザーが存在しない）ならセッションを捨てる
+        if (response.status === 401) {
+          await handleLogout();
+          return;
+        }
+
         if (response.ok) {
           const data = await response.json();
+          if (cancelled) return;
+
           setIsAuthenticated(true);
           setUserRole(data.data.role);
         } else {
           setIsAuthenticated(false);
         }
       } catch (err) {
+        if (cancelled) return;
         setIsAuthenticated(false);
       } finally {
-        setIsCheckingAuth(false);
+        if (!cancelled) {
+          setIsCheckingAuth(false);
+        }
       }
     };
 
@@ -510,20 +539,12 @@ export function Header() {
     }
 
     checkAuth();
-  }, [pathname]);
 
-  // ログアウト処理
-  const handleLogout = async () => {
-    try {
-      await fetch('/api/auth/logout', {
-        method: 'POST',
-      });
-      setIsAuthenticated(false);
-      router.push('/login');
-    } catch (err) {
-      console.error('Logout error:', err);
-    }
-  };
+    // 画面遷移などでこの effect が破棄されるときに呼ばれる
+    return () => {
+      cancelled = true;
+    };
+  }, [pathname, handleLogout]);
 
   // 認証チェック中は何も表示しない
   if (isCheckingAuth) {
@@ -612,6 +633,46 @@ export function Header() {
 5. **ログアウト処理**
    - `/api/auth/logout` を呼び出し
    - ログイン画面にリダイレクト
+   - Cookie を削除できるのはサーバーだけ（`auth_token` は HttpOnly）なので、
+     必ずこの API を経由する。`document.cookie` からは消せない
+   - `/api/users/me` が **401** を返したときも同じ処理を呼ぶ。401 は
+     「トークンが無効」か「ユーザーが存在しない」を意味し、どちらもセッションが
+     死んでいる。500 やネットワークエラーでログアウトさせないよう、
+     `!response.ok` ではなく `response.status === 401` で判定する
+
+6. **`await` の後で画面を書き換えるときは、まだ有効か確かめる**
+
+   `useEffect` の中で `cancelled` フラグを使っているのは、次の事故を防ぐためです。
+
+   ```
+   0ms    ルート「/」を開く
+          ヘッダー「認証されてる？」→ サーバーに質問を投げる（返事待ち）
+   10ms   ページが /login へ移動する
+          ヘッダー「ログイン画面か。じゃあ何も表示しない」と判断
+   100ms  ← 0ms に投げた質問の返事が返ってくる「されてるよ！」
+          ヘッダー「じゃあ表示するね」
+          → ログイン画面にヘッダーが出てしまう
+   ```
+
+   **過去の質問の答えが、今の画面の判断を上書きしてしまう**わけです。判定の
+   ロジック自体は正しく、10ms 時点の判断が 100ms 時点の返事に負けただけです。
+
+   同期的なコードならこれは起きません。**`await` を書いた瞬間に、そこが
+   「時間の裂け目」になります。** `await` の前と後は別の時刻の世界で、前では
+   正しかった前提（この画面はまだ表示されている）が、後では崩れているかもしれない。
+
+   そこで、画面遷移などで effect が破棄されるときに呼ばれる **cleanup 関数**で
+   `cancelled = true` を立てておき、返事が届いたときに「もう用済みだった」と
+   判断して捨てます。判定を置く場所は分岐ごとではなく、**`await` の直後**です。
+   `await` を跨がない限り時間は進まないので、一度確かめたらその後の同期処理は
+   まとめて信用できます。
+
+   `handleLogout` を `useCallback` で包んでいるのも同じ流れの話です。包まないと
+   再レンダリングのたびに別物として作り直され、それを依存配列で見張っている
+   `useEffect` が「変わった」と判断して再実行してしまいます。
+
+   > この後始末は Header だけの話ではありません。**マウント時や URL 変化時に
+   > `fetch` して結果で画面を変えるコンポーネントは、すべて同じ問題を持ちます。**
 
 #### 4.0.5 各ページコンポーネントからの変更点
 
@@ -2097,7 +2158,7 @@ export function ProfileInfo({ user, onUpdate }: ProfileInfoProps) {
 import { Button } from '@heroui/react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export function Header() {
   const router = useRouter();
@@ -2106,23 +2167,52 @@ export function Header() {
   const [userRole, setUserRole] = useState<number>(4);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
+  // ログアウト処理
+  // useEffect の中からも呼ぶため、useCallback で同一性を保つ（理由は 4.0.4 を参照）
+  const handleLogout = useCallback(async () => {
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+      });
+      setIsAuthenticated(false);
+      router.push('/login');
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+  }, [router]);
+
   // 認証状態をチェック
   useEffect(() => {
+    // 遷移前に投げた結果で、遷移後の画面を書き換えないための破棄フラグ（理由は 4.0.4 を参照）
+    let cancelled = false;
+
     const checkAuth = async () => {
       try {
         const response = await fetch('/api/users/me');
-        
+        if (cancelled) return;
+
+        // 401（トークンが無効、またはユーザーが存在しない）ならセッションを捨てる
+        if (response.status === 401) {
+          await handleLogout();
+          return;
+        }
+
         if (response.ok) {
           const data = await response.json();
+          if (cancelled) return;
+
           setIsAuthenticated(true);
           setUserRole(data.data.role);
         } else {
           setIsAuthenticated(false);
         }
       } catch (err) {
+        if (cancelled) return;
         setIsAuthenticated(false);
       } finally {
-        setIsCheckingAuth(false);
+        if (!cancelled) {
+          setIsCheckingAuth(false);
+        }
       }
     };
 
@@ -2134,20 +2224,12 @@ export function Header() {
     }
 
     checkAuth();
-  }, [pathname]);
 
-  // ログアウト処理
-  const handleLogout = async () => {
-    try {
-      await fetch('/api/auth/logout', {
-        method: 'POST',
-      });
-      setIsAuthenticated(false);
-      router.push('/login');
-    } catch (err) {
-      console.error('Logout error:', err);
-    }
-  };
+    // 画面遷移などでこの effect が破棄されるときに呼ばれる
+    return () => {
+      cancelled = true;
+    };
+  }, [pathname, handleLogout]);
 
   // 認証チェック中は何も表示しない
   if (isCheckingAuth) {
@@ -2331,11 +2413,15 @@ export default function RootLayout({
 
 ---
 
-**Document Version**: 2.2.0  
-**Last Updated**: 2026-08-03  
+**Document Version**: 2.3.0  
+**Last Updated**: 2026-08-15  
 **Author**: jugeeem（原著）  
 **Reviser**: Genki Hashioka（HeroUI v3・近代化スタックへの改訂）  
 **Changes**: 
+- v2.3.0 (2026-08-15): Header 実装例を修正後の実装に追従
+  - useEffect の cleanup（破棄フラグ）・401 での強制ログアウト・useCallback を反映
+  - 実装のポイントに「await の後で画面を書き換えるときは、まだ有効か確かめる」を追加
+    （理由を書かずにコードだけ載せると、意味が分からないまま写経することになるため）
 - v2.2.0 (2026-08-03): 提出前チェック（/submit-check）の実行を §8 に追加
   修了時の案内を「見本」から「参考実装（実装例のひとつ）」へ改め、違いを許容する旨を明記
 - v2.1.0 (2026-08-03): 実装との突き合わせによる修正
